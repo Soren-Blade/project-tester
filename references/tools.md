@@ -68,6 +68,10 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | K8s 故障编排 | Chaos Mesh CRD / LitmusChaos `ChaosEngine` | 静态审查 timeout / 重试 / SIGTERM 配置 | `chaos-resilience.md` §4 |
 | 非 REST 实调 | `grpcurl -plaintext -d '{...}' host:port Service/Method`（reflection 或 `-protoset`） | 用项目自带 client / 静态读 `.proto`、`*.graphql` | `protocol-testing.md` §3 |
 | DB 对账与并发 | `psql -tAc "SELECT count(*)"` + shell 后台并发 | 通过 API 读回比对，标注「间接验证」 | `data-integrity-testing.md` §4/§6 |
+| **SBOM 与依赖扫描**（v1.2） | `syft ./proj -o cyclonedx-json=cdx.json` → `grype sbom:./cdx.json`；`osv-scanner scan source -r .`（V2 beta）；`trivy image <img>` | 静态查 lockfile、`sha256sum` 两次构建比对、`git diff --exit-code -- <lock>`，注明「未扫描」 | `supply-chain-testing.md` §4/§8 |
+| **签名与 provenance 验证**（v1.2） | `cosign verify $IMAGE --certificate-identity=$ID --certificate-oidc-issuer=$ISSUER`；`slsa-verifier verify-artifact <artifact> --provenance-path <p> --source-uri github.com/<org>/<repo>` | 只留 digest 与静态审查，结论标 `BLOCKED`，**不得**写「已验证供应链安全」 | `supply-chain-testing.md` §4/§8 |
+| **伪本地化 / locale 矩阵**（v1.2） | 脚本生成加长带变音伪串；浏览器切 `lang`/`dir`；`new Intl.Collator('tr-TR')` 对比排序 | `git grep` 查硬编码串、拼接、`toLocaleString('en-US')`、裸 `sort()` / `toUpperCase()`；注明「未做渲染验证」 | `i18n-localization-testing.md` §2/§7 |
+| **双租户否定路径**（v1.2） | 构造 T1/T2 + 相同 ID 夹具；`curl` 换 `X-Tenant-ID`/token；`psql -tAc "SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname=current_user"`；同一 pooled connection 连跑两租户 | `git grep` 查 context 传播、cache key、prefix 授权、`SET LOCAL`，注明「未做双租户实测」 | `multi-tenancy-testing.md` §1/§10 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -77,6 +81,9 @@ for c in node npm npx python python3 pytest go cargo curl git; do
 done
 command -v k6 || echo "k6 MISSING -> 用 shell 分位数采样"
 command -v schemathesis || command -v uvx || echo "schemathesis MISSING -> 手写参数矩阵"
+for c in syft grype osv-scanner cosign slsa-verifier trivy; do
+  command -v "$c" >/dev/null || echo "$c MISSING -> 走 sha256sum / git grep 静态降级，结论标 BLOCKED"
+done
 ```
 
 ## 工具使用纪律

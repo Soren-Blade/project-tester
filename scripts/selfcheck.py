@@ -5,6 +5,10 @@
 用法：python scripts/selfcheck.py
 退出码：0 = 全部通过；1 = 存在 FAIL（禁止升版本 / 同步 / 提交）
 只做本地确定性检查，不联网、不改文件。
+
+检查项：frontmatter / 版本一致 / 本地引用完整性 / 占位资源 URL /
+关键字段 / 模板行数 / 索引覆盖 / **路由闭环（孤儿文档）** / **可证伪规则同步** /
+global-lessons 格式。
 """
 from __future__ import annotations
 
@@ -115,6 +119,9 @@ checks = {
     "assets/bug-report-template.md": ["最小可复现实例", "预期 vs 实际", "环境指纹"],
     "assets/test-plan-template.md": ["风险分", "六维"],
     "assets/release-gate-template.md": ["/12", "回滚预案", "No-Go"],
+    "assets/supply-chain-evidence-template.md": ["R-3", "sha256", "provenance"],
+    "assets/i18n-matrix-template.md": ["locale", "RTL", "伪本地化"],
+    "assets/tenant-isolation-matrix-template.md": ["R-4", "否定路径", "BLOCKED"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -142,6 +149,48 @@ if unindexed:
     warn("未被 SKILL.md/README 索引的手册: " + ", ".join(unindexed))
 else:
     ok(f"references/ 全部 {len(refs)} 份手册已索引")
+
+# 7b) 路由闭环（孤儿文档门禁）：专项手册必须同时出现在 dissect.md §8 路由表与 SKILL.md
+#     L1 元手册对所有项目都读，不要求出现在 §8 路由表里。
+CORE_REFS = {
+    "dissect.md", "tools.md", "personas.md", "test-design.md",
+    "memory-tree.md", "evolution.md", "self-evolution.md", "quality-gates.md",
+}
+dissect = read(ROOT / "references/dissect.md")
+route_marker = "## 8. 项目形态 → 能力层路由"
+if route_marker in dissect:
+    route_section = dissect.split(route_marker, 1)[1].split("## 产出格式", 1)[0]
+else:
+    route_section = ""
+    fail("references/dissect.md 缺少 §8 路由表，无法校验孤儿文档")
+orphans: list[str] = []
+special_refs = [p for p in refs if p.name not in CORE_REFS]
+for p in special_refs:
+    if p.name not in route_section:
+        orphans.append(f"{p.name}: 缺 dissect.md §8 路由")
+    elif p.name not in skill:
+        orphans.append(f"{p.name}: 缺 SKILL.md 叠加项/索引")
+if orphans:
+    for item in sorted(orphans):
+        fail(f"孤儿文档: {item}")
+else:
+    ok(f"路由闭环：{len(special_refs)} 份专项手册均有 §8 路由 + SKILL.md 触发条件")
+
+# 7c) 可证伪规则同步（双向）：SKILL.md 定义集与 quality-gates.md 引用集必须相等
+#     单向检查挡不住「悄悄删掉一条规则」，所以两边都查。
+rules = sorted(set(re.findall(r"\*\*(R-\d+)\s", skill)))
+qg = read(ROOT / "references/quality-gates.md")
+qg_rules = sorted(set(re.findall(r"R-\d+", qg)))
+unsynced = [r for r in rules if r not in qg_rules]
+orphan_qg = [r for r in qg_rules if r not in rules]
+if len(rules) < 2:
+    fail(f"SKILL.md 可证伪规则不足（仅识别到 {len(rules)} 条）")
+elif unsynced:
+    fail("可证伪规则未接入 quality-gates.md: " + ", ".join(unsynced))
+elif orphan_qg:
+    fail("quality-gates.md 出现 SKILL.md 未定义的规则（可能被悄悄删除或编号写错）: " + ", ".join(orphan_qg))
+else:
+    ok(f"可证伪规则双向同步：{', '.join(rules)} 共 {len(rules)} 条，SKILL.md 与 quality-gates.md 集合一致")
 
 # 8) global-lessons 格式（软约束）
 gl = read(ROOT / "memory/global-lessons.md")

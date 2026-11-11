@@ -105,6 +105,7 @@ npx lighthouse http://127.0.0.1:3000 --only-categories=accessibility,performance
 - 客户端校验通过但服务端拒绝时，前端能否把服务端字段错误回填到对应控件
 - 双击提交、提交后立刻刷新 → 幂等与重复提交防护（与 `api-testing.md` §5 联动）
 - 日期/时区：跨日边界、不同 locale 格式解析一致性
+- **i18n 联动（v1.2）**：切换 locale 后复验错误文案、日期/货币/数字格式、文本扩展后的截断与换行、RTL 输入起点与 `dirname` 提交方向；tofu（字形缺失方框）、按 Unicode 码点排序、用 `toUpperCase()` 处理土耳其语用户名**都算 bug**。完整矩阵见 `references/i18n-localization-testing.md` §1/§5 与 `assets/i18n-matrix-template.md`；**静态 grep 出 `dir` 属性 ≠ UI 已正确镜像**，伪本地化 `can never catch all issues`，结论不得写成「多语言没问题」
 
 ## 7. Playwright Test Agents（AI 辅助生成，v1.56+ / 2026）
 
@@ -129,6 +130,7 @@ npx lighthouse http://127.0.0.1:3000 --only-categories=accessibility,performance
 5. 占位资源 URL 或引用了不存在的本地媒体
 6. 动效未尊重 `prefers-reduced-motion`、持续动画导致卡顿
 7. 加载后布局跳动（CLS）、图片未声明尺寸
+8. tofu（字形缺失方框）、RTL 未镜像、locale 切换后仍显示硬编码格式串或按码点排序（`i18n-localization-testing.md` §5/§7）
 
 ## 9. 记录格式
 

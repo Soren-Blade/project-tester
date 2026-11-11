@@ -73,16 +73,26 @@
 
 **v1.1 分流**：§5 是「测得到」的最小前提清单；要把每项变成断言，见 `references/observability-testing.md`（链路贯通、span、SLI/SLO 与错误预算）；要验证依赖挂掉时的行为，见 `references/chaos-resilience.md`（稳态假设 + 故障注入 + 恢复验证）；写入后的库/缓存/事件一致性见 `references/data-integrity-testing.md`。Gate 2（非功能）、Gate 4（部署与回滚）、Gate 6（发布后验证）应吸收这三类证据，并在 `assets/release-gate-template.md` 逐门留证。
 
+**v1.2 分流（三类新证据各自归门，不重复计分）**：
+
+| 新证据 | 归入 | 说明 |
+|---|---|---|
+| `references/supply-chain-testing.md` 的 digest / SBOM / 签名 / provenance（R-3） | **Gate 3 + Gate 4** | Gate 3 看依赖侧漏洞与抑制，Gate 4 看「部署的制品是否就是被验证过的那个」；纯源码项目标「不适用」，不倒扣也不冒充通过 |
+| `references/i18n-localization-testing.md` 的 locale × 六维矩阵（含 RTL、格式往返） | **Gate 1** | 属于「需求都实现了吗」在多语言下的等价验收；无浏览器时静态审查标 BLOCKED，不填 2 分 |
+| `references/multi-tenancy-testing.md` 的双租户否定路径（R-4） | **Gate 1 + Gate 3** | 功能验收要证明 T1 看不到 T2，安全审查要证明每条 tenant-owned path 都有授权边界；单租户标「不适用」 |
+
+> 打分纪律：这三类证据是**对应门的「有证据地完整验证」(2 分) 的前置条件**，不是额外加分项。缺证据时该门最高 1 分，并在 `assets/release-gate-template.md` 写明缺口。
+
 ## 6. 六道发布门禁（12 分 Go/No-Go）
 
 每道 0~2 分：`0` 未检查 ｜ `1` 部分检查 ｜ `2` 有证据地完整验证。
 
 | Gate | 问题 | 关键证据 |
 |---|---|---|
-| 1 功能验收 | 需求都实现了吗？ | 验收标准 ↔ 用例 ↔ 结果对照表；happy/边界/异常/数据完整性/向后兼容/幂等 |
+| 1 功能验收 | 需求都实现了吗？ | 验收标准 ↔ 用例 ↔ 结果对照表；happy/边界/异常/数据完整性/向后兼容/幂等；**多语言/RTL 场景按 `i18n-localization-testing.md` 的 locale 矩阵复验** |
 | 2 非功能验收 | 快、稳、可观测吗？ | p95/p99 实测值、错误率、N+1 检查、`EXPLAIN ANALYZE`、缓存命中率、`/health` `/ready`、日志与告警 |
-| 3 安全审查 | 安全吗？ | 见 `security-testing.md`：输入校验、BOLA/BFLA、上传、限流、密钥、`npm audit`/`pip-audit`/`govulncheck` |
-| 4 部署就绪 | 能安全部署与回滚吗？ | CI 全绿、lint/build、迁移在类生产数据上测过且 down 可用、`.env.example`、回滚预案 |
+| 3 安全审查 | 安全吗？ | 见 `security-testing.md`：输入校验、BOLA/BFLA、上传、限流、密钥、`npm audit`/`pip-audit`/`govulncheck`；**多租户项目另加 R-4 否定路径矩阵**（`multi-tenancy-testing.md` §2）；**有发布产物另加 R-3 制品完整性证据**（`supply-chain-testing.md` §7） |
+| 4 部署就绪 | 能安全部署与回滚吗？ | CI 全绿、lint/build、迁移在类生产数据上测过且 down 可用、`.env.example`、回滚预案、**制品 `sha256` + SBOM 原件 + 签名/provenance 验证输出、CI 流水线完整性静态审查** |
 | 5 发布执行 | 怎么放？ | 公告 → 迁移 → 金丝雀 10%→50%→100% → 冒烟 → 监控 30 分钟 |
 | 6 发布后验证 | 真的好了吗？ | 0~30min 健康检查/错误率/延迟/核心旅程/日志/告警；1~24h 客诉、业务指标、内存 CPU、队列积压 |
 

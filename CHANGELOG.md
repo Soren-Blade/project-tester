@@ -5,6 +5,89 @@
 
 ---
 
+## [v1.2.0] — 2026-11-11 · 每日升级 #3
+
+**主题**：从「系统行为」扩展到「交付链与边界正确性」——补齐软件供应链/制品完整性、国际化与本地化、多租户隔离三块深水区，并吸收提案区的 i18n 提案。
+
+**遵循上轮建议**：未重写已覆盖主题（测试设计、OWASP API、性能、前端、全栈发布、AI 原生、可观测性、韧性、数据一致性、非 REST 协议），以 **Enhance 为主、New 为辅**；四层模型与五阶段流程**未改语义**（故按 `self-evolution.md` §7 只升 MINOR）；每轮至少补一条可证伪规则 → 本轮引入 **R-3 / R-4**（共 2 条）。
+
+**本轮修正的两处真实缺口（自我进化证据）**：
+
+1. v1.1 CHANGELOG 声称「孤儿文档门禁由 `selfcheck.py` 索引覆盖检查验证」**并不准确**——旧脚本只检查 references 是否被 `SKILL.md`/`README.md` 提及，从未校验 `dissect.md` §8 路由表。本轮在 `scripts/selfcheck.py` 新增 §7b，逐份核对「§8 路由 + SKILL.md 触发条件」双条件（L1 元手册白名单豁免），缺一即 **FAIL**。
+2. 上轮新增的 4 份手册都有路由，但更早的 `references/performance-testing.md` 至今**没有 §8 路由**。本轮补齐该行。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/supply-chain-testing.md`、`references/i18n-localization-testing.md`、`references/multi-tenancy-testing.md`、`assets/supply-chain-evidence-template.md`、`assets/i18n-matrix-template.md`、`assets/tenant-isolation-matrix-template.md` |
+| **Enhance** | `SKILL.md`（version 1.2.0、description 触发词、v1.2 叠加项表、阶段 1/3/4、判 bug 第 7 条、R-3/R-4、参考索引）、`README.md`（徽章/问题表/结构 31→37/速查/设计要点/版本史）、`references/dissect.md`（§1 栈指纹、§6 设施盘点、§7 攻击面、§8 补 `performance-testing.md` + 3 条新路由、路由闭环说明、产出格式）、`references/quality-gates.md`（§3 加 R-3/R-4 两行、§8 核对项扩为 R-1~R-4）、`references/tools.md`（专项工具表 4 行、可用性探测、降级纪律）、`references/fullstack-integration.md`（§6 Gate 1/3/4 证据 + v1.2 分流表与打分纪律）、`references/frontend-testing.md`（§6 i18n 联动、§8 判 bug 第 8 条）、`references/security-testing.md`（§5 三条分工 + 边界说明）、`references/self-evolution.md`（§3 自检范围、§5 门禁改为代码强制）、`scripts/selfcheck.py`（§7b 路由闭环、§7c 可证伪规则同步、3 份新模板字段检查） |
+| **Merge** | `memory/global-lessons.md`：新增 3 组共 20 条 v1.2 教训，仍保持单文件不膨胀；i18n 提案结案为「已吸收」，ROI / 移动端 / 桌面端提案标注顺延理由；不重复抄写手册正文，只留「教训 — 应用」一行式条目 |
+| **Match** | 3 份新手册 + 早前遗漏的 `performance-testing.md` 均在 `dissect.md` §8 与 `SKILL.md` 叠加项有触发条件；R-3/R-4 在 `SKILL.md`、`quality-gates.md` §3/§8、Go/No-Go 三处口径一致。以上均由 `selfcheck.py` **代码强制**，不再是人工声明 |
+| **Existing** | 五阶段模型、四层能力模型、记忆树 <100 行纪律、双视角、"工具缺失不中止"降级原则、六门禁 12 分、缺陷八字段、权限裁决、`SKILL.md` 的 todo 示例 —— 全部保留，未改语义 |
+
+### 蒸馏来源（本轮实查，均可核查）
+
+| 来源 | URL / 位置 | 关键结论 |
+|---|---|---|
+| OWASP Top 10:2025 A03（官方） | https://owasp.org/Top10/2025/A03_2025-Software_Supply_Chain_Failures/ | 依赖漏洞、恶意依赖、CI/CD 污染、制品篡改、供应链变更管理；postinstall 蠕虫类场景 |
+| OWASP Software Supply Chain Security CS | https://cheatsheetseries.owasp.org/cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.html | 依赖锁定与签名验证、SBOM production + consumption 双端自动化、ephemeral 构建、protected branch、私有 registry 无旁路、最终二进制**供应方与消费方双侧**扫描、SAST 结果须人工复核 |
+| OWASP Dependency Graph & SBOM CS | https://cheatsheetseries.owasp.org/cheatsheets/Dependency_Graph_SBOM_Cheat_Sheet.html | 「A component missing from an SBOM is not evidence that it is absent from the software」；direct + transitive；schema 校验与覆盖缺口声明；**签名 attestation 绑定制品 digest**（分别签名不建立关系）；VEX 复核；签名「do not prove that an SBOM is accurate or complete」 |
+| OWASP Vulnerable Dependency Management CS | https://cheatsheetseries.owasp.org/cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.html | 「Silencing the scanner or bumping a version string is not remediation」；补丁验证须未打补丁失败、打补丁通过，「A test that passes in both cases proves nothing about the patch」 |
+| OWASP Multi_Tenant_Security_Cheat_Sheet | https://cheatsheetseries.owasp.org/cheatsheets/Multi_Tenant_Security_Cheat_Sheet.html | client-supplied tenant identifier 只是 selector；「Query parameterization prevents injection, not cross-tenant access」；共享 queue/topic 与 object prefix 不是隔离边界；RLS / `SET LOCAL` / 连接池复用 / deployed request role / WORM audit / offboarding / 双租户 backup 恢复；intentional sharing 须 exact permitted path 且 no broader access |
+| SLSA v1.0 spec（levels / provenance / verifying-artifacts） | https://slsa.dev/spec/v1.0/levels · https://slsa.dev/spec/v1.0/provenance · https://slsa.dev/spec/v1.0/verifying-artifacts | Build L0~L3；`predicateType=https://slsa.dev/provenance/v1`；`buildDefinition`/`runDetails`/`buildType`/`externalParameters`/`builder.id` 为 L1 REQUIRED；`externalParameters` untrusted 须下游验证；`Consumers MUST accept only specific signer-builder pairs`；验证三步（level → expectations → 可选递归依赖） |
+| NTIA SBOM 最小要素 | https://www.ntia.gov/SBOM | supplier / component name / version / unique identifier / dependency relationship / author / timestamp 七要素 |
+| npm `ci` 官方文档 | https://docs.npmjs.com/cli/v10/commands/npm-ci | 必须有 lockfile；package.json 与 lock 不一致时**退出错误**而非更新 lock；不写回 package.json / lock |
+| Microsoft Learn《Test cases for locale awareness》 | https://learn.microsoft.com/en-us/globalization/testing/test-cases-for-locale-awareness | 日期/时间/数字/货币/日历/时区/DST、CSV 分隔符、collation（土耳其语 dotted/dotless I、`côte < coté`、`Å`、`CH`）、IME、文本扩展、伪本地化、伪镜像、font fallback；`pseudolocalization "can never catch all issues"`；数据跨 app language × OS language 互通 |
+| W3C International《Structural markup and right-to-left text in HTML》 | https://www.w3.org/International/questions/qa-html-dir | base direction 用 HTML `dir` **而非 CSS**；`lang` ≠ 方向；`<html lang="ar" dir="rtl">`；`dir="auto"` 按首个强方向性字符；`<bdi>`；`dirname` 提交方向；logical properties；textarea/pre 多段落方向；滚动条属 browser chrome 不算缺陷 |
+| GitHub 供应链工具链 | https://github.com/anchore/syft · https://github.com/anchore/grype · https://github.com/google/osv-scanner · https://github.com/sigstore/cosign · https://github.com/slsa-framework/slsa-verifier · https://github.com/aquasecurity/trivy | Syft `-o cyclonedx-json` / `-o spdx-json`；Grype `sbom:`；OSV-Scanner V2 beta `scan source -r` / `scan image`；Cosign keyless 须 `--certificate-identity` + `--certificate-oidc-issuer`；slsa-verifier `verify-artifact` 的 artifact 是位置参数、`--source-uri` 只收 GitHub URI；只记录页面明确给出的命令，不臆造参数 |
+| `awesome-qa-skills` / `awesome-qa-prompt`（GitHub） | https://github.com/naodeng/awesome-qa-skills · https://github.com/naodeng/awesome-qa-prompt | 复核治理分类与证据门禁口径，确认本轮仍走 Existing/Enhance/Merge/Match/New，不引入新流程层级 |
+| 用户附加技能 `frontend-dev` / `fullstack-dev`（二次蒸馏） | 本地 `~/.workbuddy-ai/skills/` | frontend-dev：无 placeholder URL、GPU-only 动画、`useEffect` cleanup `ctx.revert()`、`prefers-reduced-motion`、动态视口、font fallback、运行时渲染验证；fullstack-dev：结构化日志 request_id、`/health` vs `/ready`、迁移 up/down、缓存 TTL 与写失效、后台任务幂等与 DLQ、跨边界错误映射、六门禁 12 分 |
+
+**口径诚实标注**：OWASP Dependency Graph & SBOM Cheat Sheet 引用的是 `slsa.dev/spec/v1.2/verifying-artifacts`，但本轮逐条核验的是 **v1.0** 的 levels / provenance / verifying-artifacts 三个页面，v1.2 仅记录链接、未逐条比对，故手册与本报告均不得写成「已核验 v1.2」。W3C `qa-html-dir` 是 structural markup 页面，把 inline bidi 指向另文，页面本身**没有 `bdo` 规则**可审查，故未伪造相关 guidance。OWASP 多租户 CS **没有独立 Search/Index isolation 章节**，搜索用例是从 tenant-owned access path 通用规则推导，手册已显式标注。
+
+### 主要改动
+
+1. **软件供应链与制品完整性**（`supply-chain-testing.md` + 证据模板）：三条认知打底（SBOM 缺项 ≠ 不存在、签名有效 ≠ 安全、生成与验证须成对）、依赖/锁文件 D-1~D-10、SBOM B-1~B-10（NTIA 七要素、覆盖缺口、attestation 绑 digest）、Syft/Grype/OSV-Scanner/Trivy/Cosign/slsa-verifier 真实命令、SLSA Build L0~L3 判级与 provenance 验证三步、CI/CD 完整性静态审查、L0 零依赖降级
+2. **R-3 制品完整性**：要求 `sha256` + SBOM 原件 + 验证命令原文/退出码/输出行 + 扫描输出；明确定义不适用写法，禁止把「签名有效」升级成「制品无漏洞」
+3. **国际化与本地化**（`i18n-localization-testing.md` + 矩阵模板）：代表 locale × 六维矩阵、伪本地化四步与五类缺陷、伪镜像、F-1~F-8 格式与数据互通、collation/大小写/复数、W3C RTL 硬规则表（`dir`/`dir="auto"`/`dirname`/`<bdi>`/logical properties）、字体与 IME、静态审查清单、`BLOCKED` 降级写法
+4. **多租户隔离**（`multi-tenancy-testing.md` + 矩阵模板）：双租户相同 ID 夹具与一票否决四条、TC-1~TC-8、IDOR/SEARCH、DB/RLS/连接池（含 `rolsuper`/`rolbypassrls`、`SET LOCAL`、连接复用）、CACHE/QUEUE/noisy-neighbor、FILE/offboarding/BACKUP（含 `tenants/acme/` 尾斜杠、双租户恢复到独立资源）、LOG/AUDIT/ADMIN、L0 静态降级
+5. **R-4 租户隔离**：要求夹具 + 一票否决逐条结果 + 连接复用/noisy-neighbor/双租户备份恢复三项原始输出 + intentional sharing 的 "no broader access" 证据；明确「一条 404 不构成通过」
+6. **路由闭环落地到代码**：`selfcheck.py` §7b 双条件核对（§8 路由 + SKILL.md）、§7c 可证伪规则 R-1~R-4 在 `quality-gates.md` 同步、3 份新模板字段检查；补齐 `performance-testing.md` 缺失的 §8 路由；`self-evolution.md` §5 改为「代码强制」表述
+7. **交叉引用而非重写**：`security-testing.md` §5 划清「运行时输入与权限 / 交付链来源与完整性 / 共享基础设施边界」三者分工；`fullstack-integration.md` §6 加 v1.2 分流表，明确三类新证据各归 Gate 1/3/4 且「是 2 分的前置条件，不是额外加分」；`frontend-testing.md` §6/§8 加 i18n 联动与 tofu/RTL 判 bug 条款
+8. **工具与降级**：`tools.md` 加 4 行专项工具（SBOM/签名/i18n/双租户）与探测循环，每行的降级都落到 `sha256sum`、`git grep`、静态审查，并强制 `BLOCKED` 而非 Pass
+9. **经验治理**：`global-lessons.md` 新增交付链 6 条、i18n 6 条、多租户 8 条共 20 条；i18n 提案结案，ROI / 移动端 / 桌面端顺延并写明理由
+10. **文档与版本**：`SKILL.md` / `README.md` / `CHANGELOG.md` 同步到 v1.2.0；README 文件结构 31 → 37、references 18 → 21、assets 7 → 10
+
+### 回归检查
+
+- [x] 五阶段模型闭环未变，`SKILL.md` 的 todo 示例（4 条 MRE、含越权 S1）逐字保留
+- [x] 四层能力模型语义未变（L1~L4 仍是四层，v1.2 内容以「横向叠加项」呈现，不构成 MAJOR）
+- [x] 记忆树 <100 行纪律保留；`assets/tree-template.md` 未改，仍 <100 行
+- [x] 「工具缺失不中止」降级原则保留，且 3 份新手册每份都有 L0 零依赖路径（`sha256sum`/`git grep`/静态审查）
+- [x] 运行时不擅自改本体的安全约束保留；权限裁决原文未改
+- [x] 原有文件引用路径未失效（由 `selfcheck.py` 断链检查验证）
+- [x] 新增路由不产生孤儿文档（由 `selfcheck.py` **§7b 真正的路由闭环检查**验证；v1.1 只查索引的缺口已修复）
+- [x] R-1~R-4 在 `SKILL.md`、`quality-gates.md` §3/§8、各手册结论三处口径一致（由 `selfcheck.py` §7c 验证）
+- [x] 六门禁 12 分与缺陷八字段、Flaky 治理等关键字段仍在（由 `selfcheck.py` 字段检查验证）
+
+### 自检结果
+
+`python scripts/selfcheck.py` → **PASS 21 / WARN 0 / FAIL 0 → GREEN**（退出码 0）；全局安装版复跑结果一致；源与全局安装 `diff -r` 完全一致（37 文件）。详见本轮交付报告。
+
+**门禁有效性负向测试**（在临时副本上篡改，全程不触碰源目录）：
+
+| 篡改动作 | 期望 | 实际结果 |
+|---|---|---|
+| 删除 `dissect.md` §8 中 `supply-chain-testing.md` 的路由行 | BLOCKED | `exit=1`，`[FAIL] 孤儿文档: supply-chain-testing.md: 缺 dissect.md §8 路由` |
+| 从 `SKILL.md` 悄悄删除 `R-4` 的规则定义行 | BLOCKED | `exit=1`，`[FAIL] quality-gates.md 出现 SKILL.md 未定义的规则（可能被悄悄删除或编号写错）: R-4` |
+
+两例都证明 §7b / §7c 是**可证伪的门禁**而非文字声明；§7c 特意做成「SKILL.md 定义集 ↔ quality-gates.md 引用集」双向比对，避免单向检查放过「删掉一条规则反而全绿」的情况。这也是对 v1.1「声称由自检验证但脚本没实现」的直接纠偏。
+
+> 门禁说明：按 `self-evolution.md` §3，FAIL > 0 即停止升版本/同步/提交。本轮严格按 ⑥ 自检 → ⑦ 版本 → ⑧ 同步 → ⑨ 提交的顺序执行；⑦ 与 ⑥ 的先后通过"先写版本再复跑自检"闭环验证。
+
+---
+
 ## [v1.1.0] — 2026-11-11 · 每日升级 #2
 
 **主题**：从「响应断言」扩展到「系统内部行为验证」——补齐可观测性/Trace 驱动、韧性与故障注入、数据一致性、非 REST 协议四块深水区，并吸收 v1.0 遗留的 GraphQL/gRPC 提案。

@@ -99,10 +99,42 @@
 - [手法] `DEADLINE_EXCEEDED` 时服务端可能已成功 — 应用：超时后查库验证幂等，别直接重试写操作
 - [流程] WS/SSE 只在握手鉴权不够 — 应用：换频道/room 测消息级越权，并验心跳、重连退避、`close` 退订
 
+## 交付链 / 制品完整性类（v1.2 蒸馏）
+
+- [手法] 组件没出现在 SBOM 里 ≠ 软件里没有它 — 应用：SBOM 必须写覆盖缺口声明，manifest 与最终制品要对账（OWASP Dependency Graph & SBOM CS）
+- [安全] 签名有效只证明声明的来源与完整性，不证明软件安全或 SBOM 准确 — 应用：报告写「该声明来源与完整性已验证」，禁止升级成「无漏洞」
+- [流程] SBOM 的生成与消费、provenance 的生成与验证必须成对自动化 — 应用：只做一半就标 BLOCKED，不算 R-3 通过
+- [手法] `npm ci` 在 package.json 与 lock 不一致时报错且不写回 lock — 应用：CI 用冻结安装，装完 `git diff --exit-code -- <lock>` 验未被改写
+- [流程] 「Silencing the scanner or bumping a version string is not remediation」 — 应用：补丁验证必须在未打补丁版本失败、打补丁版本通过，两种结果都留日志
+- [流程] 逐条核验的是 SLSA **v1.0** 的 levels/provenance/verifying-artifacts — 应用：OWASP 页面引 v1.2 链接时不要写成「已核验 v1.2」，口径要诚实
+
+## 国际化 / 本地化类（v1.2 蒸馏，吸收 #1 提案）
+
+- [手法] 伪本地化 `can never catch all issues` — 应用：结论只写「本次伪本地化未发现 X 类缺陷」，不写「多语言没问题」（Microsoft Learn）
+- [手法] 伪串没出现的地方就是硬编码串 — 应用：全量跑伪本地化版，专找截断/拼接/未外部化/图片内嵌文字/同串复用
+- [手法] base direction 用 HTML `dir` 而非 CSS，`lang` ≠ 方向 — 应用：静态查 `<html lang="ar" dir="rtl">`、logical properties、`dirname`、`<bdi>`，再真实渲染验镜像（W3C）
+- [手法] Turkish dotted/dotless `I` 与 `côte < coté` 说明排序不能按 Unicode 码点 — 应用：排序/搜索/大小写转换都调带 locale 的 collator，禁用裸 `sort()` / `toUpperCase()`
+- [流程] 数据互通要跨 app language × OS language 双向验 — 应用：F-2 DST 边界、F-5 CSV 分隔符、F-6 跨语言读写各留一条往返证据
+- [手法] tofu（字形缺失方框）是缺陷，静态 grep 出 `dir` 不等于 UI 已镜像 — 应用：字体回退与 RTL 布局必须真实渲染验证
+
+## 多租户隔离类（v1.2 蒸馏）
+
+- [安全] 客户端传的 tenant identifier 只是 selector，不是授权凭证 — 应用：改 header/query/body/token claim/message field 逐条打，服务端 membership 必须拒绝（OWASP Multi-Tenant Security CS）
+- [手法] 参数化 SQL 防注入不防跨租户访问 — 应用：夹具用 T1/T2 **相同 ID**，否则越权会碰巧返回空被误判为通过
+- [流程] 一条 `404` 不构成隔离通过 — 应用：cache/queue/search/audit/backup/admin 每条 tenant-owned path 都要否定路径证据（R-4）
+- [手法] 共享 queue/topic、对象 prefix 都不是授权边界 — 应用：Q-2 producer 伪造 tenant_id、F-1 prefix 越权、`tenants/acme/` 尾斜杠删除边界逐个测
+- [流程] 连接池复用是高频漏网鱼 — 应用：同一 pooled connection 先 T1 再 T2 再缺 context，验 `SET LOCAL` 而非 session 级 `SET`
+- [安全] `FORCE RLS` 不约束 superuser / `BYPASSRLS` — 应用：查**部署环境** `pg_roles.rolsuper`/`rolbypassrls`，别只看源码配置
+- [流程] 双租户 backup 恢复必须 restore into a separate resource + selectively recover — 应用：恢复后确认 T2 records absent，禁止把 shared snapshot 覆盖 live data
+- [安全] 故意共享与 platform admin 路径要测「exact permitted path 且 no broader access」 — 应用：不能只测拒绝，也要测授权路径不越界
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
 
 - [技能改进] ✅ **已吸收（v1.1）**：为 GraphQL / gRPC 补专项端点矩阵 → 落地为 `references/protocol-testing.md` + `assets/protocol-matrix-template.md`，并扩展到 WebSocket / SSE
 - [技能改进] 已驳回（v1.0，理由保留）：另建"统一证据采集模板" → 缺陷八字段已覆盖，Merge 过度不新增文件
-- [技能改进] 待后续轮次：测试成本 / ROI 度量、i18n 与本地化测试、移动端与桌面端专项（v1.1 未吸收）
+- [技能改进] ✅ **已吸收（v1.2）**：i18n 与本地化测试 → 落地为 `references/i18n-localization-testing.md` + `assets/i18n-matrix-template.md`，含伪本地化、W3C RTL、`dirname`/`<bdi>`、collation 与 F-1~F-8 格式往返
+- [技能改进] ✅ **已吸收（v1.2）**：补真正的「孤儿文档」门禁 → `scripts/selfcheck.py` 现在核对 `dissect.md` §8 路由表与 SKILL.md 叠加项，并补齐了 `performance-testing.md` 缺失的路由；此前 v1.1 CHANGELOG 声称由自检验证并不准确
+- [技能改进] 待后续轮次：测试成本 / ROI 度量、移动端与桌面端专项（v1.2 未吸收；本轮优先级让位给供应链/多租户深水区与 i18n 提案）
+- [技能改进] 待后续轮次：把制品/租户/locale 三类证据接进 `assets/report-template.md` 的固定字段（v1.2 先落在各自模板里，避免一次性改坏报告格式）

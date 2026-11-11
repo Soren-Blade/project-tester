@@ -74,6 +74,11 @@ npm audit --omit=dev ; pip-audit ; govulncheck ./... ; cargo audit
 | 发布前安全门禁（Gate 3）、回滚 | `fullstack-integration.md` |
 | 缺陷严重度、报告八字段 | `quality-gates.md` |
 | 越权/注入的具体"刁钻用户"动作 | `personas.md` |
+| **依赖清单完整性、SBOM、签名/provenance、CI 污染**（v1.2，R-3） | `supply-chain-testing.md`。本手册 §4 的 `npm audit` 只回答「依赖有没有已知漏洞」，**不回答**「我拿到的制品是不是被评审过的那个」；两者不可互相冒充 |
+| **跨租户泄漏、共享资源污染、平台管理员越界**（v1.2，R-4） | `multi-tenancy-testing.md`。本手册 §2 的 BOLA 只覆盖单租户内的对象越权；多租户还要求 cache/queue/search/backup/audit 每层否定路径 |
+| 伪本地化、RTL、locale 格式与 collation（v1.2） | `i18n-localization-testing.md` |
+
+> 分工一句话：**本手册测运行时的输入与权限，供应链手册测交付链的来源与完整性，租户手册测共享基础设施上的边界**。三者都报「安全通过」时，必须有各自独立的证据，不能互相引用充数。
 
 ## 6. 严重度判定
 

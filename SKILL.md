@@ -1,14 +1,16 @@
 ---
 name: project-tester
-version: 1.1.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""test this project""find bugs"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能。
+version: 1.2.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能。
 ---
 
-# 通用项目测试 (project-tester) · v1.1.0
+# 通用项目测试 (project-tester) · v1.2.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
 v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**——链路、副作用、依赖故障下的一致性，同样要有证据。
+
+v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」**——「我拿到的制品是不是我以为的那个」「换一套 locale / 书写方向后系统还正确吗」「共享基础设施上租户会不会串数据」。三条都配了可证伪规则 R-3 / R-4 与明确的不适用写法。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -17,14 +19,14 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 | 阶段 | 做什么 | 完成标志 |
 |---|---|---|
 | 0 读记忆 | 读项目记忆树 + 技能全局经验 | 明确本次只测增量/待办，或确认从零开始 |
-| 1 解剖 | 识别栈、入口、模块、可运行性、**测试设施、攻击面、观测面与依赖拓扑** | 项目画像 + 功能清单 + 能力层路由定稿 |
+| 1 解剖 | 识别栈、入口、模块、可运行性、**测试设施、攻击面、观测面、依赖拓扑、交付链、locale 面与租户边界** | 项目画像 + 功能清单 + 能力层路由定稿 |
 | 2 计划 | 功能清单 → 风险分 → 六维测试矩阵（P0/P1/P2） | 测试点列表确定（用户确认或按默认执行） |
 | 3 深测 | 日常用户 + 刁钻用户双视角，按能力层调用专项手册 | 每个测试点有 通过/失败/阻塞/待确认 结论 + 证据 |
 | 4 记忆与进化 | 写运行记录、更新树、沉淀教训、自检 | 记忆树反映最新状态，报告含 PASS/FAIL 与 Go/No-Go |
 
 **无论中途因什么结束（用户打断、环境阻塞、发现重大 bug），阶段 4 都必须执行**——没有落记忆的测试等于白测。
 
-## 能力分层与路由（v1.0 建立，v1.1 叠加专项）
+## 能力分层与路由（v1.0 建立，v1.1 / v1.2 叠加专项）
 
 阶段 1 结束时按项目形态选手册，避免"不管什么项目都同一套用例"（详见 `references/dissect.md` §8）：
 
@@ -45,7 +47,17 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 | GraphQL / gRPC / WebSocket / SSE | `references/protocol-testing.md` + `assets/protocol-matrix-template.md` | 按 operation/method 建矩阵（不按 URL）、协议特有错误与授权 |
 | 上线前验收 | `references/fullstack-integration.md` §6 + `assets/release-gate-template.md` | 六门禁 12 分，Gate 2/4/6 吸收观测、韧性与数据证据 |
 
+**v1.2 横向叠加项**（同样不新增层级；四层模型与五阶段语义未变）：
+
+| 触发条件 | 叠加手册 | 必做动作 |
+|---|---|---|
+| 有 lockfile / 依赖清单 / 容器镜像 / 发布产物 / CI 流水线 | `references/supply-chain-testing.md` + `assets/supply-chain-evidence-template.md` | 制品 `sha256` + SBOM 原件与覆盖缺口、签名/provenance 验证命令原文与退出码、锁文件冻结安装；**R-3**。纯源码/静态页只写「未做制品完整性验证」 |
+| 有多语言资源 / locale 切换 / 日期货币格式 / RTL / 跨国输入 | `references/i18n-localization-testing.md` + `assets/i18n-matrix-template.md` | 代表 locale × 六维矩阵、伪本地化四步、`dir`/`dirname`/`<bdi>`/logical properties、F-1~F-8 格式与数据往返；无浏览器时静态审查并标 `BLOCKED` |
+| SaaS / 多租户 / 共享 DB·cache·queue·storage / platform admin / 共享备份 | `references/multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md` | 双租户**相同 ID** 冲突夹具、TC/IDOR/DB/CACHE/QUEUE/FILE/BACKUP/ADMIN 否定路径、连接复用与 noisy-neighbor；**R-4**。单租户写「不适用：无租户边界」 |
+
 **先分清 "AI for QA"（用 AI 提效，横向）与 "Testing for AI"（测 AI 系统本身，L4）**——这是最容易混淆的一处。工具总表与降级见 `references/tools.md`。
+
+> 叠加纪律：`dissect.md` §8 路由表与本节叠加项是**同一份清单的两种视图**。每份专项手册必须能在两处都查到触发条件，否则 `scripts/selfcheck.py` 判「孤儿文档」并 FAIL；**不为凑维度造测试**，不适用就写明原因。
 
 ---
 
@@ -71,8 +83,8 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 1. **项目画像**：技术栈、入口文件、启动/测试命令——必须是真实跑通的命令，将来写进记忆树"命令速查"
 2. **功能清单**：README 宣称的功能 + 代码实际暴露的功能，**两者的差异本身就是测试点**（文档过时？功能没实现？）
 3. **优先级**：风险分 = 影响 × 概率 × 暴露面（见 `test-design.md` §4），P0 核心 / P1 主要 / P2 边缘
-4. **测试设施、攻击面、观测面与依赖拓扑**：框架、规范文件、CI、E2E；认证位置、对象 ID、配置/密钥、影子端点；日志/埋点/健康检查、外部依赖清单与故障域（`dissect.md` §6~7）
-5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 叠加项）
+4. **测试设施、攻击面、观测面与依赖拓扑**：框架、规范文件、CI、E2E；认证位置、对象 ID、配置/密钥、影子端点；日志/埋点/健康检查、外部依赖清单与故障域；**交付链**（lockfile / 镜像 / 产物 / 签名 / SBOM）、**locale 面**（资源文件 / 格式化调用 / `dir`/`lang`）、**租户边界**（tenant 标识来源 / 共享资源清单 / 隔离策略声明）——见 `dissect.md` §6~7
+5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 叠加项）
 
 原则：解剖够用即止——能支撑测试计划就停，不做无死角的代码审读。大型项目只解剖本次范围内的模块。
 
@@ -104,6 +116,9 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 - **韧性**（v1.1）→ 稳态假设、故障注入矩阵、恢复验证 → `chaos-resilience.md`
 - **数据**（v1.1）→ 三重断言、迁移 up/down、事务隔离与并发不变量 → `data-integrity-testing.md`
 - **非 REST 协议**（v1.1）→ GraphQL/gRPC/WS/SSE 逐 operation 矩阵 → `protocol-testing.md` + `assets/protocol-matrix-template.md`
+- **交付链与制品**（v1.2）→ 依赖冻结、SBOM 覆盖缺口、签名/provenance 验证、CI 完整性 → `supply-chain-testing.md` + `assets/supply-chain-evidence-template.md`
+- **国际化 / 本地化**（v1.2）→ locale × 六维矩阵、伪本地化、RTL 与双向文本、格式往返 → `i18n-localization-testing.md` + `assets/i18n-matrix-template.md`
+- **多租户隔离**（v1.2）→ 双租户否定路径、共享资源、连接复用、备份恢复、平台管理员 → `multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -113,6 +128,7 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 4. 安全漏洞（注入、越权、泄漏）
 5. 明显不符文档宣称的行为
 6. 前端五态缺失 / 焦点不可见 / 仅靠颜色表达状态 / 占位资源未替换（`frontend-testing.md` §8）
+7. **跨租户数据或副作用泄漏**（`multi-tenancy-testing.md` §2）、**制品 digest/SBOM/签名对不上**（`supply-chain-testing.md` §7）、**locale 切换后格式漂移或 RTL 未镜像**（`i18n-localization-testing.md` §1/§5）
 
 严重度 S1 数据损坏·安全·崩溃 ＞ S2 功能错误但有绕过 ＞ S3 体验/提示。缺陷按 `assets/bug-report-template.md` 八字段记录。
 
@@ -120,16 +136,18 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 
 **证据纪律**：每个"失败"结论必须附 MRE 最小复现步骤 + 实际输出（命令、输出原文、截图路径）。推测标"待确认"，不得写成事实。指标写清分子/分母/口径。临时探针放 `.test-memory/tmp/`，用完即删。AI 生成的用例与"自愈"后的断言必须人工复核（`ai-native-testing.md` §3）。
 
-**安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。
+**安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。**多租户测试须构造自己的合成租户与数据，禁止拿真实客户数据做越权验证**（`multi-tenancy-testing.md` §1）。
 
-**两条可证伪规则（v1.1 引入）**——规则的价值在于写清「什么时候不适用」：
+**四条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4）——规则的价值在于写清「什么时候不适用」：
 
 | 规则 | 结论必须附的证据 | 不适用时的写法 |
 |---|---|---|
 | **R-1 链路** | 声称"链路完整 / 副作用已发生"，须有同一 `trace_id` 或 `request_id` 贯穿 **≥2 个组件**的原始日志行或 span，并写明采样窗口与样本数 | 单进程、无日志/埋点的 CLI/库/静态页 → 只写「可观测性缺口 / 未做链路验证」，**不得**判 Pass |
 | **R-2 韧性** | 声称"依赖故障下仍可用 / 具备韧性"，须附可复现的故障注入记录：注入点、时长、爆炸半径、稳态前后值、对照组、恢复时长、撤销证据 | 无外部依赖、或用户禁止变更环境 → 只写「未做故障注入验证」，**不得**写「具备韧性」 |
+| **R-3 制品完整性** | 声称"交付物可信 / 依赖清单完整 / 供应链安全"，须附每个制品的 `sha256` + SBOM 原件（含 direct/transitive、生成器版本、覆盖缺口）+ 签名或 provenance 验证的**命令原文、退出码、输出行** + 扫描输出（工具版本、数据源、时间戳、per-CVE 抑制理由） | 纯源码/脚本/静态页、无构建产物、离线 → 只写「未做制品完整性验证」，**不得**写「供应链安全 / 无已知漏洞」 |
+| **R-4 租户隔离** | 声称"租户隔离有效 / 无跨租户泄漏"，须附双租户相同 ID 夹具 + 一票否决四条逐条否定路径结果 + 连接复用、noisy-neighbor、双租户备份恢复三项原始输出 + intentional sharing 的 "no broader access" 证据 | 单租户、无共享资源、禁止构造第二租户 → 只写「未做租户隔离验证 / 不适用」，**不得**写「隔离良好」 |
 
-详见 `references/observability-testing.md` §8 与 `references/chaos-resilience.md` §8。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**。
+详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过。
 
 ## 阶段 4：记忆与进化（本技能的灵魂）
 
@@ -137,7 +155,7 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 2. **更新 tree.md**：模块叶节点状态、严重度与回归用例、新增模块、已知问题表、"下次待办"三类（回归/待测/阻塞）
 3. **沉淀教训**：项目级 → `.test-memory/lessons.md`；跨项目 → 本技能 `memory/global-lessons.md`
 4. **进化检查四问**（`references/evolution.md` §1）：踩了什么坑、什么手法有效、证据够不够、流程哪里不足 → 通用项写 global-lessons.md，`[技能改进]` 提案进提案区
-5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），并核对 R-1/R-2 是否在不适用的场景里被误判为通过
+5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），并核对 R-1/R-2/R-3/R-4 是否在不适用的场景里被误判为通过
 
 最后用 `assets/report-template.md` 输出测试报告，**必须给出明确的 `PASS/FAIL` 与 `Go/No-Go`**，禁止"基本可以"。发布验收用 `assets/release-gate-template.md` 打 12 分。
 
@@ -171,7 +189,7 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 
 | 文件 | 内容 |
 |---|---|
-| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、能力层路由 |
+| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、交付链/locale/租户边界、能力层路由 |
 | `references/tools.md` | 工具总表、专项工具、可用性探测、降级策略、shell 断言模板 |
 | `references/personas.md` | 7 日常 + 8 刁钻画像、判 bug 标准、手册映射 |
 | `references/test-design.md` | 测试设计九式、六维矩阵 v2、风险分、覆盖准则与退出标准 |
@@ -186,6 +204,9 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 | `references/chaos-resilience.md` | 稳态假设、故障注入矩阵、三级工具阶梯、恢复判据、R-2 可证伪规则 |
 | `references/data-integrity-testing.md` | 三重断言、迁移 up/down、事务隔离与并发异常、缓存与事件一致性 |
 | `references/protocol-testing.md` | GraphQL/gRPC/WebSocket/SSE 逐类型用例清单与命令 |
+| `references/supply-chain-testing.md` | 依赖冻结、SBOM 与 NTIA 七要素、签名/provenance、SLSA Build L0~L3、CI 完整性、R-3 |
+| `references/i18n-localization-testing.md` | locale × 六维矩阵、伪本地化与伪镜像、collation、W3C RTL/`dir`/`dirname`/`<bdi>`、F-1~F-8 |
+| `references/multi-tenancy-testing.md` | 双租户夹具、TC/IDOR/DB/CACHE/QUEUE/FILE/BACKUP/ADMIN 否定路径、R-4 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
@@ -196,8 +217,11 @@ v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**�
 | `assets/release-gate-template.md` | 六门禁 12 分发布验收模板 |
 | `assets/protocol-matrix-template.md` | 非 REST 端点矩阵（逐 operation/method + 证据列） |
 | `assets/resilience-runbook-template.md` | 故障注入演练记录（稳态/爆炸半径/中止条件/恢复核对） |
+| `assets/supply-chain-evidence-template.md` | 制品 digest、SBOM 元数据、验证命令原文、provenance 对照、R-3 结论 |
+| `assets/i18n-matrix-template.md` | locale × 六维矩阵、伪本地化、RTL 静态+渲染、F-1~F-8 |
+| `assets/tenant-isolation-matrix-template.md` | 双租户否定路径矩阵、特权路径登记、R-4 结论 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
-| `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段 |
+| `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、**路由闭环与可证伪规则同步** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |
 
 ## 示例（锁定行为）
