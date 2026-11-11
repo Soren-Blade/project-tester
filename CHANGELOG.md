@@ -5,6 +5,82 @@
 
 ---
 
+## [v1.3.0] — 2026-11-11 · 每日升级 #4
+
+**主题**：从「边界正确性」扩展到「演进与合规正确性」——补齐 API 契约演进兼容性、隐私与数据生命周期、测试有效性度量三块深水区，并落地提案区的「证据矩阵接进报告」。
+
+**遵循上轮建议**：未重写已覆盖主题（测试设计、OWASP API、性能、前端、全栈发布、AI 原生、可观测性、韧性、数据一致性、非 REST 协议、供应链、i18n、多租户），以 **Enhance 为主、New 为辅**；四层模型与五阶段流程**未改语义**（故按 `self-evolution.md` §7 只升 MINOR）；每轮至少补一条可证伪规则 → 本轮引入 **R-5 / R-6**（共 2 条）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/contract-evolution-testing.md`、`references/privacy-compliance-testing.md`、`references/test-effectiveness-testing.md`、`assets/contract-evolution-matrix-template.md`、`assets/privacy-matrix-template.md`、`assets/test-effectiveness-template.md` |
+| **Enhance** | `SKILL.md`（version 1.3.0、description 触发词、v1.3 增量说明、v1.3 叠加项表、阶段 3 专项维度、R-5/R-6 规则行、参考索引）、`README.md`（徽章 21→24/10→13、问题表 3 行、结构 37→43、速查 3 行、设计要点 R-1~R-6、版本史）、`references/dissect.md`（§8 三条新路由）、`references/quality-gates.md`（§3 R-5/R-6 两行、§8 核对扩为 R-1~R-6）、`assets/report-template.md`（证据矩阵段，落地提案区）、`scripts/selfcheck.py`（§5 三份新模板关键字段检查） |
+| **Merge** | `memory/global-lessons.md`：新增 3 组共 18 条 v1.3 教训（契约/隐私/有效性），仍单文件不膨胀；提案区「证据矩阵接进报告」结案为「已吸收」，ROI/移动端/桌面端顺延并续写理由 |
+| **Match** | 3 份新手册均在 `dissect.md` §8 与 `SKILL.md` v1.3 叠加项有触发条件；R-5/R-6 在 `SKILL.md`、`quality-gates.md` §3/§8 两处口径一致。以上由 `selfcheck.py` **代码强制**（§7b 路由闭环、§7c 规则双向同步） |
+| **Existing** | 五阶段模型、四层能力模型、记忆树 <100 行纪律、双视角、"工具缺失不中止"降级原则、六门禁 12 分、缺陷八字段、R-1~R-4 规则、权限裁决 —— 全部保留，未改语义 |
+
+### 蒸馏来源（本轮实查，均可核查）
+
+| 来源 | URL / 位置 | 关键结论 |
+|---|---|---|
+| oasdiff（GitHub + 官方站 + raw README） | https://github.com/oasdiff/oasdiff · https://www.oasdiff.com/ | `oasdiff breaking base.yaml revision.yaml` 对 OpenAPI v2/v3 做破坏性变更检测；`--fail-on=ERR` 设为 CI 门禁（非 0 退出即阻断）；`changelog`/`diff` 子命令；支持 v2/v3 |
+| Pact 官方文档 / can-i-deploy | https://docs.pact.io/ · https://docs.pact.io/pact_broker/can_i_deploy | 消费者定义契约（只测实际被用到的通信）、提供方 verify、Broker 记录验证结果；`can-i-deploy --pacticipant <name> --version <ver> --to-environment <env>` 退出码非 0 即禁止部署 |
+| Zalando RESTful API Guidelines | https://zalando.github.io/restful-api-guidelines/ | MUST NOT break backward compatibility；客户端 MUST 容忍兼容扩展（忽略未知字段）；API 版本放 URL 路径 `/v1/`；弃用须公告 + 过渡期 |
+| SemVer 规范 | https://semver.org/ | MAJOR=向后不兼容、MINOR=向后兼容新增、PATCH=向后兼容修复；与 API 变更性质对齐 |
+| OWASP API Security Top 10:2023 — API3:2023 | https://owasp.org/API-Security/editions/2023/en/0x11-t10/ | Broken Object Property Level Authorization：过度数据暴露（响应夹带敏感字段）+ 批量分配（请求体塞敏感属性） |
+| OWASP Top 10 Privacy Risks | https://owasp.org/www-project-top-10-privacy-risks/ | P1 传输同意 / P2 处理同意 / P3 无理监视 / P4 不安全存储 / P5 不安全传输 / P6 不透明政策 / P7 二次利用 / P8 主动联系 / P9 数据泄露 / P10 不合规 |
+| GDPR 第 5 条 / 第 17 条 | https://gdpr-info.eu/art-5-gdpr/ · https://gdpr-info.eu/art-17-gdpr/ | Art.5：数据最小化、目的限制、存储限制、完整性与保密性；Art.17：被遗忘权——无不当延迟删除、对接收方/链接/副本/复制的处置义务 |
+| OWASP Logging Cheat Sheet | https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html | 不记录 PII/令牌/密码；防范日志注入（转义换行/分隔符）；日志数据最小化 |
+| DORA 指标（Google / dora.dev） | https://dora.dev/guides/dora-metrics/ · https://sre.google/sre-book/service-level-objectives/ | 四指标：部署频率、变更前置时间、**变更失败率 CFR=失败部署/总部署（Elite 0–15%）**、恢复时长 MTTR（Elite <1h） |
+| Google 测试博客（flaky tests） | https://testing.googleblog.com/2016/05/flaky-tests-at-google-and-how-we.html | 约 1–2% 测试会 flaky；靠重复运行检测；quarantine 而非无限重试；flaky 会延迟真实回归发现 |
+| Martin Fowler《Eradicating Non-Determinism in Tests》 | https://martinfowler.com/articles/nonDeterminism.html | 非确定性根因：时钟/时间、随机数、外部依赖、共享状态、异步等待；修复：注入时钟、固定种子、mock、自清理、显式等待 |
+| 变异测试工具（Stryker / mutmut / Pitest / cargo-mutants） | 各自官方文档 | 变异得分 = 被杀死变异体/变异体总数；低分 = 伪测试；与覆盖率互补 |
+
+**口径诚实标注**：oasdiff 破坏性变更规则集以 `--fail-on=ERR` 退出码为准，手册未逐条罗列全部规则项（已列最常见类别并注明「以退出码为准」）；OWASP 隐私 Top10 的 P1–P10 编号取自该列表原始命名，落地时按项目实际数据处理链路核对，不要求全中；Pact 的 `can-i-deploy` 命令以官方页面给出的语法为准，具体 provider verify CLI 随语言而定（手册未臆造参数）。
+
+### 主要改动
+
+1. **API 契约演进兼容性**（`contract-evolution-testing.md` + 证据模板）：三条认知（本地能跑≠老客户端不挂、没改路径≠没改契约、双方同规范≠都遵守）、oasdiff `breaking --fail-on=ERR` 命令原文与退出码、Pact 消费者驱动契约与 `can-i-deploy` 闸门、Zalando 兼容演进规范与容忍读取、C-1~C-12 测试卡
+2. **R-5 契约演进**：声称「向后兼容 / 可安全部署」须附 oasdiff 退出码 + 输出行 + Pact verify/can-i-deploy + 容忍读取验证；明确定义不适用写法（无对外契约的单体工具）
+3. **隐私与数据生命周期**（`privacy-compliance-testing.md` + 证据模板）：PII 字段分类与最小化（GDPR Art.5）、API3 过度暴露/批量分配、删除权端到端验证（GDPR Art.17，主库+缓存/索引/副本）、日志 PII 与注入（OWASP Logging CS）、OWASP 隐私 Top10 映射、P-1~P-12 测试卡
+4. **R-6 隐私与数据生命周期**：声称「隐私合规 / 数据可删除」须附 PII 分类 + 响应白名单 + 删除权端到端 + 日志脱敏；明确「接口 200 不能推出没多给、主库删了不能推出全链路删干净」
+5. **测试有效性度量**（`test-effectiveness-testing.md` + 模板）：DORA 四指标（CFR/MTTR 口径）、缺陷逃逸率、flaky 配额与 quarantine（反模式：retries 掩盖）、变异得分对照覆盖率、E-1~E-10 度量卡；作为度量纪律支撑 Go/No-Go（本轮未单列 R-7，避免与已有六条规则过度膨胀）
+6. **证据矩阵接进报告**（落地提案区）：`report-template.md` 新增「证据矩阵」段，把 R-1~R-6 结论与六份证据模板固定挂接，缺证据即标 BLOCKED；同时 `selfcheck.py` §5 补三份新模板关键字段检查
+7. **路由闭环与规则同步**：3 份新手册均接入 `dissect.md` §8 + `SKILL.md` v1.3 叠加项；R-5/R-6 在 `SKILL.md`、`quality-gates.md` §3/§8 三处口径一致，由 `selfcheck.py` §7b/§7c 代码强制
+8. **经验治理**：`global-lessons.md` 新增契约 6 条、隐私 7 条、有效性 5 条共 18 条；提案区「证据矩阵接进报告」结案，ROI/移动端/桌面端顺延并续写理由
+
+### 回归检查
+
+- [x] 五阶段模型闭环未变，`SKILL.md` 的 todo 示例（4 条 MRE、含越权 S1）逐字保留
+- [x] 四层能力模型语义未变（L1~L4 仍是四层，v1.3 内容以「横向叠加项」呈现，不构成 MAJOR）
+- [x] 记忆树 <100 行纪律保留；`assets/tree-template.md` 未改，仍 <100 行
+- [x] 「工具缺失不中止」降级原则保留，且 3 份新手册每份都有 L0 零依赖路径（diff / git show / git grep）
+- [x] 运行时不擅自改本体的安全约束保留；权限裁决原文未改
+- [x] 原有文件引用路径未失效（由 `selfcheck.py` 断链检查验证）
+- [x] 新增路由不产生孤儿文档（由 `selfcheck.py` §7b 路由闭环验证）
+- [x] R-1~R-6 在 `SKILL.md`、`quality-gates.md` §3/§8 两处口径一致（由 `selfcheck.py` §7c 双向同步验证）
+- [x] 六门禁 12 分、缺陷八字段、Flaky 治理、变异测试等关键字段仍在（由 `selfcheck.py` 字段检查验证）
+- [x] 报告模板新增证据矩阵段未破坏原有 PASS/FAIL 与 Go/No-Go 结构
+
+### 自检结果
+
+`python scripts/selfcheck.py` → **PASS / WARN 0 / FAIL 0 → GREEN**（退出码 0）；全局安装版复跑结果一致；源与全局安装 `diff -r` 完全一致（43 文件）。
+
+**门禁有效性负向测试**（在临时副本上篡改，全程不触碰源目录）：
+
+| 篡改动作 | 期望 | 实际结果 |
+|---|---|---|
+| 从 `SKILL.md` 悄悄删除 `R-5` 的规则定义行 | BLOCKED | `exit=1`，`[FAIL] quality-gates.md 出现 SKILL.md 未定义的规则（可能被悄悄删除或编号写错）` 类失败（§7c 双向比对） |
+| 删除 `dissect.md` §8 中 `contract-evolution-testing.md` 的路由行 | BLOCKED | `exit=1`，`[FAIL] 孤儿文档: contract-evolution-testing.md: 缺 dissect.md §8 路由`（§7b） |
+
+两例都证明 §7b / §7c 是**可证伪的门禁**而非文字声明；§7c 仍是「SKILL.md 定义集 ↔ quality-gates.md 引用集」双向比对，避免「删掉一条规则反而全绿」。
+
+> 门禁说明：按 `self-evolution.md` §3，FAIL > 0 即停止升版本/同步/提交。本轮严格按 ⑥ 自检 → ⑦ 版本 → ⑧ 同步 → ⑨ 提交的顺序执行。
+
+---
+
 ## [v1.2.0] — 2026-11-11 · 每日升级 #3
 
 **主题**：从「系统行为」扩展到「交付链与边界正确性」——补齐软件供应链/制品完整性、国际化与本地化、多租户隔离三块深水区，并吸收提案区的 i18n 提案。

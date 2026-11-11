@@ -125,6 +125,9 @@
 | **有 lockfile / 镜像 / 发布产物 / CI 流水线**（v1.2） | `references/supply-chain-testing.md` + `assets/supply-chain-evidence-template.md` | 制品 `sha256` + SBOM 原件与覆盖缺口 + 签名/provenance 验证命令原文与退出码（R-3）；纯源码/静态页标「不适用」 |
 | **多语言资源 / locale 切换 / RTL / 跨国格式**（v1.2） | `references/i18n-localization-testing.md` + `assets/i18n-matrix-template.md` | 代表 locale × 六维矩阵、伪本地化、`dir`/`dirname`/`<bdi>`、F-1~F-8 格式往返；无浏览器时静态审查并标 BLOCKED |
 | **多租户 / SaaS / 共享 DB·cache·queue·storage / platform admin**（v1.2） | `references/multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md` | 双租户相同 ID 夹具、分层否定路径、连接复用与双租户备份恢复（R-4）；单租户标「不适用」 |
+| **有 OpenAPI/GraphQL/proto 规范且多客户端/多版本在跑**（v1.3） | `references/contract-evolution-testing.md` + `assets/contract-evolution-matrix-template.md` | `oasdiff breaking --fail-on=ERR` 退出码 + 输出行、Pact 消费者契约与 `can-i-deploy` 闸门、容忍读取验证（R-5）；无对外契约的单体工具标「不适用」 |
+| **处理个人数据 / PII / 用户生成内容、有隐私政策或合规要求**（v1.3） | `references/privacy-compliance-testing.md` + `assets/privacy-matrix-template.md` | 字段级 PII 分类 + 读接口响应白名单比对、批量分配、删除权端到端验证、日志脱敏核查（R-6）；不处理 PII 的纯技术工具标「不适用」 |
+| **有 CI / 测试套件 / 发布流程，需量化测试有效性**（v1.3） | `references/test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` | DORA 四指标（CFR/MTTR）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率；结论支撑 Go/No-Go；无自动化测试标「无测试度量基础」 |
 
 路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 

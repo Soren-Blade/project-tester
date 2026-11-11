@@ -1,16 +1,18 @@
 ---
 name: project-tester
-version: 1.2.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能。
+version: 1.3.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）。
 ---
 
-# 通用项目测试 (project-tester) · v1.2.0
+# 通用项目测试 (project-tester) · v1.3.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
 v1.1 增量：**从「响应断言」扩展到「系统内部行为验证」**——链路、副作用、依赖故障下的一致性，同样要有证据。
 
 v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」**——「我拿到的制品是不是我以为的那个」「换一套 locale / 书写方向后系统还正确吗」「共享基础设施上租户会不会串数据」。三条都配了可证伪规则 R-3 / R-4 与明确的不适用写法。
+
+v1.3 增量：**从「边界正确性」扩展到「演进与合规正确性」**——「改了之后老客户端会不会挂」「系统该不该存这些个人数据、存了能不能删、返回时有没有多给」「你这一堆测试到底有没有用」。三条都配了可证伪规则 R-5 / R-6（R-5 契约演进 + R-6 隐私与数据生命周期；测试有效性作为度量纪律支撑 Go/No-Go），与前四者共用「不适用就降级、不得冒充通过」的写法。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -54,6 +56,9 @@ v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」*
 | 有 lockfile / 依赖清单 / 容器镜像 / 发布产物 / CI 流水线 | `references/supply-chain-testing.md` + `assets/supply-chain-evidence-template.md` | 制品 `sha256` + SBOM 原件与覆盖缺口、签名/provenance 验证命令原文与退出码、锁文件冻结安装；**R-3**。纯源码/静态页只写「未做制品完整性验证」 |
 | 有多语言资源 / locale 切换 / 日期货币格式 / RTL / 跨国输入 | `references/i18n-localization-testing.md` + `assets/i18n-matrix-template.md` | 代表 locale × 六维矩阵、伪本地化四步、`dir`/`dirname`/`<bdi>`/logical properties、F-1~F-8 格式与数据往返；无浏览器时静态审查并标 `BLOCKED` |
 | SaaS / 多租户 / 共享 DB·cache·queue·storage / platform admin / 共享备份 | `references/multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md` | 双租户**相同 ID** 冲突夹具、TC/IDOR/DB/CACHE/QUEUE/FILE/BACKUP/ADMIN 否定路径、连接复用与 noisy-neighbor；**R-4**。单租户写「不适用：无租户边界」 |
+| 有 OpenAPI/GraphQL/proto 规范且多客户端/多版本在跑、需持续迭代 | `references/contract-evolution-testing.md` + `assets/contract-evolution-matrix-template.md` | `oasdiff breaking --fail-on=ERR` 退出码 + 输出行、Pact 消费者契约与 `can-i-deploy` 闸门、容忍读取验证；**R-5**。无对外契约的单体工具写「未做契约演进验证」 |
+| 处理个人数据 / PII / 用户生成内容、有隐私政策或合规要求 | `references/privacy-compliance-testing.md` + `assets/privacy-matrix-template.md` | 字段级 PII 分类 + 读接口响应白名单比对、批量分配、删除权端到端验证、日志脱敏核查；**R-6**。不处理 PII 的纯技术工具写「未做隐私合规验证」 |
+| 有 CI / 测试套件 / 发布流程，需量化「测试值不值」 | `references/test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` | DORA 四指标（CFR/MTTR 等）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率；结论支撑 Go/No-Go。无自动化测试写「无测试度量基础」 |
 
 **先分清 "AI for QA"（用 AI 提效，横向）与 "Testing for AI"（测 AI 系统本身，L4）**——这是最容易混淆的一处。工具总表与降级见 `references/tools.md`。
 
@@ -119,6 +124,9 @@ v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」*
 - **交付链与制品**（v1.2）→ 依赖冻结、SBOM 覆盖缺口、签名/provenance 验证、CI 完整性 → `supply-chain-testing.md` + `assets/supply-chain-evidence-template.md`
 - **国际化 / 本地化**（v1.2）→ locale × 六维矩阵、伪本地化、RTL 与双向文本、格式往返 → `i18n-localization-testing.md` + `assets/i18n-matrix-template.md`
 - **多租户隔离**（v1.2）→ 双租户否定路径、共享资源、连接复用、备份恢复、平台管理员 → `multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md`
+- **契约演进兼容性**（v1.3）→ oasdiff 破坏性变更、`--fail-on=ERR` 退出码、Pact 消费者契约与 can-i-deploy、容忍读取 → `contract-evolution-testing.md` + `assets/contract-evolution-matrix-template.md`
+- **隐私与数据生命周期**（v1.3）→ PII 分类、响应白名单、批量分配、删除权端到端、日志脱敏 → `privacy-compliance-testing.md` + `assets/privacy-matrix-template.md`
+- **测试有效性度量**（v1.3）→ DORA 四指标、缺陷逃逸率、flaky 配额、变异得分对照覆盖率 → `test-effectiveness-testing.md` + `assets/test-effectiveness-template.md`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -146,6 +154,8 @@ v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」*
 | **R-2 韧性** | 声称"依赖故障下仍可用 / 具备韧性"，须附可复现的故障注入记录：注入点、时长、爆炸半径、稳态前后值、对照组、恢复时长、撤销证据 | 无外部依赖、或用户禁止变更环境 → 只写「未做故障注入验证」，**不得**写「具备韧性」 |
 | **R-3 制品完整性** | 声称"交付物可信 / 依赖清单完整 / 供应链安全"，须附每个制品的 `sha256` + SBOM 原件（含 direct/transitive、生成器版本、覆盖缺口）+ 签名或 provenance 验证的**命令原文、退出码、输出行** + 扫描输出（工具版本、数据源、时间戳、per-CVE 抑制理由） | 纯源码/脚本/静态页、无构建产物、离线 → 只写「未做制品完整性验证」，**不得**写「供应链安全 / 无已知漏洞」 |
 | **R-4 租户隔离** | 声称"租户隔离有效 / 无跨租户泄漏"，须附双租户相同 ID 夹具 + 一票否决四条逐条否定路径结果 + 连接复用、noisy-neighbor、双租户备份恢复三项原始输出 + intentional sharing 的 "no broader access" 证据 | 单租户、无共享资源、禁止构造第二租户 → 只写「未做租户隔离验证 / 不适用」，**不得**写「隔离良好」 |
+| **R-5 契约演进** | 声称"API 向后兼容 / 升级可安全部署 / 老客户端不受影响"，须附 ① `oasdiff breaking --fail-on=ERR` 的命令原文 + 退出码 + 输出行（baseline 与修订版明确）；② 若有消费者，Pact verify 绿 + `can-i-deploy` 目标环境退出码 0；③ 容忍读取验证（老客户端对新增字段不报错） | 无对外契约的单体工具、无版本概念 demo → 只写「未做契约演进验证」，**不得**写「向后兼容 / 老客户端不受影响」 |
+| **R-6 隐私与数据生命周期** | 声称"隐私合规 / 数据可删除 / 无过度暴露 / 满足 GDPR·个保法"，须附 ① 字段级 PII 分类表 + 每个读接口响应白名单比对（无越权敏感字段）；② 删除权验证（删除后主库 + 缓存/索引/副本不可复原证据）；③ 数据最小化与存储限制证据；④ 日志脱敏核查 | 不处理任何个人数据的纯技术工具、无 PII 离线脚本 → 只写「未做隐私合规验证」，**不得**写「隐私合规 / 满足 GDPR」 |
 
 详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过。
 
@@ -207,6 +217,9 @@ v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」*
 | `references/supply-chain-testing.md` | 依赖冻结、SBOM 与 NTIA 七要素、签名/provenance、SLSA Build L0~L3、CI 完整性、R-3 |
 | `references/i18n-localization-testing.md` | locale × 六维矩阵、伪本地化与伪镜像、collation、W3C RTL/`dir`/`dirname`/`<bdi>`、F-1~F-8 |
 | `references/multi-tenancy-testing.md` | 双租户夹具、TC/IDOR/DB/CACHE/QUEUE/FILE/BACKUP/ADMIN 否定路径、R-4 |
+| `references/contract-evolution-testing.md` | oasdiff 破坏性变更、Pact 消费者契约、can-i-deploy 闸门、Zalando/SemVer 兼容演进、容忍读取、R-5 |
+| `references/privacy-compliance-testing.md` | PII 分类与最小化、API3 过度暴露/批量分配、GDPR Art5/17、日志 PII、OWASP 隐私 Top10、R-6 |
+| `references/test-effectiveness-testing.md` | DORA 四指标、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率、度量纪律 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
@@ -220,6 +233,9 @@ v1.2 增量：**从「系统行为」扩展到「交付链与边界正确性」*
 | `assets/supply-chain-evidence-template.md` | 制品 digest、SBOM 元数据、验证命令原文、provenance 对照、R-3 结论 |
 | `assets/i18n-matrix-template.md` | locale × 六维矩阵、伪本地化、RTL 静态+渲染、F-1~F-8 |
 | `assets/tenant-isolation-matrix-template.md` | 双租户否定路径矩阵、特权路径登记、R-4 结论 |
+| `assets/contract-evolution-matrix-template.md` | 契约演进矩阵：oasdiff 退出码、Pact/can-i-deploy、容忍读取、R-5 结论 |
+| `assets/privacy-matrix-template.md` | 隐私矩阵：PII 分类、响应白名单、删除权、日志脱敏、R-6 结论 |
+| `assets/test-effectiveness-template.md` | 测试有效性：DORA 四指标、逃逸率、flaky、变异得分 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
 | `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、**路由闭环与可证伪规则同步** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |

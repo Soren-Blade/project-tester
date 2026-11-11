@@ -122,6 +122,9 @@ checks = {
     "assets/supply-chain-evidence-template.md": ["R-3", "sha256", "provenance"],
     "assets/i18n-matrix-template.md": ["locale", "RTL", "伪本地化"],
     "assets/tenant-isolation-matrix-template.md": ["R-4", "否定路径", "BLOCKED"],
+    "assets/contract-evolution-matrix-template.md": ["R-5", "oasdiff", "can-i-deploy"],
+    "assets/privacy-matrix-template.md": ["R-6", "PII", "删除权"],
+    "assets/test-effectiveness-template.md": ["DORA", "flaky", "变异得分"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }

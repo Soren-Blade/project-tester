@@ -2,9 +2,9 @@
 
 > 一个会**自我进化**的测试 Skill：解剖任意项目 → 按风险生成测试需求 → 双视角深测 → 记忆树接力 → 每日蒸馏升级。不绑定语言、框架或 agent。
 
-![version](https://img.shields.io/badge/version-v1.2.0-1677ff)
-![references](https://img.shields.io/badge/reference_files-21-2ea44f)
-![assets](https://img.shields.io/badge/templates-10-e60023)
+![version](https://img.shields.io/badge/version-v1.3.0-1677ff)
+![references](https://img.shields.io/badge/reference_files-24-2ea44f)
+![assets](https://img.shields.io/badge/templates-13-e60023)
 ![updated](https://img.shields.io/badge/updated-2026-11-11-6e7781)
 
 ---
@@ -29,20 +29,23 @@
 | **功能全绿，但部署的制品不是被验证过的那个** | `supply-chain-testing.md`：制品 digest、SBOM 覆盖缺口、签名/provenance 验证、SLSA Build 判级、CI 完整性；R-3 要求命令原文 + 退出码 + 输出行 |
 | **换个语言/地区就截断、串格式、RTL 没镜像** | `i18n-localization-testing.md`：代表 locale × 六维矩阵、伪本地化四步、W3C `dir`/`dirname`/`<bdi>`、F-1~F-8 格式与数据往返 |
 | **共享 DB/cache/queue 上一个租户串到另一个** | `multi-tenancy-testing.md`：双租户相同 ID 夹具、分层否定路径、连接池复用、备份恢复、平台管理员越界；R-4 不认"一条 404" |
+| **改了代码老客户端全挂 / API 升级不敢发** | `contract-evolution-testing.md`：oasdiff 破坏性变更检测、`--fail-on=ERR` 退出码、Pact 消费者契约与 can-i-deploy 闸门、容忍读取；R-5 不认"本地能跑" |
+| **返回里夹带密码/多给数据 / 数据删不干净 / 日志漏 PII** | `privacy-compliance-testing.md`：PII 字段分类、响应白名单比对、批量分配、删除权端到端、GDPR Art5/17、日志脱敏；R-6 不认"接口 200" |
+| **测试一堆但发布还翻车 / 覆盖率虚高** | `test-effectiveness-testing.md`：DORA 四指标（CFR/MTTR）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率 |
 | 工具装不齐就测不下去 | `tools.md` 全表带降级路径，零依赖也能走完五阶段 |
 | 升级无记录、越更越乱 | `self-evolution.md` 十步门禁 + `CHANGELOG.md` + `scripts/selfcheck.py` 自检（含路由闭环与可证伪规则同步） |
 
 ---
 
-## 文件结构（37 个文件）
+## 文件结构（43 个文件）
 
 ```
 project-tester/
-├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-4 + 参考索引
+├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-6 + 参考索引
 ├── README.md                         # 本文件
 ├── CHANGELOG.md                      # 每日升级记录（来源 / 改动 / 自检）
 ├── .gitignore
-├── references/                       # 21 份手册（渐进披露，按需读）
+├── references/                       # 24 份手册（渐进披露，按需读）
 │   ├── dissect.md                    # 解剖：栈指纹 / 入口 / 测试设施 / 攻击面 / 观测面 / 交付链 / locale / 租户边界 / 路由
 │   ├── tools.md                      # 工具总表 / 专项工具 / 可用性探测 / 降级纪律
 │   ├── personas.md                   # 7 日常 + 8 刁钻画像 / 判 bug 标准 / 手册映射
@@ -61,12 +64,15 @@ project-tester/
 │   ├── supply-chain-testing.md       # 依赖冻结 / SBOM 与 NTIA 七要素 / 签名与 SLSA provenance / CI 完整性 / R-3
 │   ├── i18n-localization-testing.md  # locale × 六维矩阵 / 伪本地化与伪镜像 / collation / W3C RTL / F-1~F-8
 │   ├── multi-tenancy-testing.md      # 双租户夹具 / TC·IDOR·DB·CACHE·QUEUE·FILE·BACKUP·ADMIN 否定路径 / R-4
+│   ├── contract-evolution-testing.md # oasdiff 破坏性变更 / Pact 消费者契约 / can-i-deploy / Zalando·SemVer / R-5
+│   ├── privacy-compliance-testing.md # PII 分类与最小化 / API3 过度暴露·批量分配 / GDPR Art5·17 / 日志 PII / R-6
+│   ├── test-effectiveness-testing.md # DORA 四指标 / 缺陷逃逸率 / flaky 配额 / 变异得分 / 度量纪律
 │   ├── memory-tree.md                # 记忆树规范 / runs 格式 / 省 token 三律
 │   ├── evolution.md                  # 运行时进化回路 / 四问 / 三层记忆
 │   └── self-evolution.md             # 每日升级十步协议 / 权限裁决 / 版本与蒸馏门槛
-├── assets/                           # 10 份模板
+├── assets/                           # 13 份模板
 │   ├── tree-template.md              # 项目记忆树初始化
-│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go）
+│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含证据矩阵）
 │   ├── bug-report-template.md        # 缺陷报告八字段 + MRE
 │   ├── test-plan-template.md         # 测试计划 / 六维矩阵
 │   ├── release-gate-template.md      # 六门禁 12 分发布验收
@@ -74,7 +80,10 @@ project-tester/
 │   ├── resilience-runbook-template.md # 故障注入演练记录（稳态 / 爆炸半径 / 中止 / 恢复）
 │   ├── supply-chain-evidence-template.md  # 制品 digest / SBOM / 验证命令原文 / provenance 对照 / R-3
 │   ├── i18n-matrix-template.md       # locale × 六维矩阵 / 伪本地化 / RTL 静态+渲染 / F-1~F-8
-│   └── tenant-isolation-matrix-template.md # 双租户否定路径矩阵 / 特权路径登记 / R-4
+│   ├── tenant-isolation-matrix-template.md # 双租户否定路径矩阵 / 特权路径登记 / R-4
+│   ├── contract-evolution-matrix-template.md # oasdiff 退出码 / Pact·can-i-deploy / 容忍读取 / R-5
+│   ├── privacy-matrix-template.md    # PII 分类 / 响应白名单 / 删除权 / 日志脱敏 / R-6
+│   └── test-effectiveness-template.md # DORA 四指标 / 逃逸率 / flaky / 变异得分
 ├── memory/
 │   └── global-lessons.md             # 跨项目经验（开局即读，自我进化载体）
 └── scripts/
@@ -98,6 +107,9 @@ project-tester/
 | 验制品是不是被改过 / SBOM 全不全 | `supply-chain-testing.md` + `assets/supply-chain-evidence-template.md`（R-3） |
 | 测多语言 / RTL / 跨国格式 | `i18n-localization-testing.md` + `assets/i18n-matrix-template.md` |
 | 测多租户会不会串数据 | `multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md`（R-4） |
+| 验 API 升级老客户端会不会挂 / 契约向后兼容 | `contract-evolution-testing.md` + `assets/contract-evolution-matrix-template.md`（R-5） |
+| 验隐私合规 / 数据可删除 / 返回没多给 / 日志无 PII | `privacy-compliance-testing.md` + `assets/privacy-matrix-template.md`（R-6） |
+| 量化测试有效性 / 变更失败率 / flaky / 变异得分 | `test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` |
 | 不知道该测哪些点 | `test-design.md` + `test-plan-template.md` |
 | 写缺陷报告 | `bug-report-template.md` + `quality-gates.md` §2 |
 | 判断测试是否可信 | `quality-gates.md` §5 + SKILL.md 的 R-1~R-4 可证伪规则 |
@@ -110,7 +122,7 @@ project-tester/
 - **证据优先**：每个失败结论必须有 MRE + 实际输出；指标写清分子/分母；报告强制给出 `PASS/FAIL` 与 `Go/No-Go`
 - **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 再叠加交付链/本地化/租户隔离，均不新增层级
 - **路由闭环**：每份专项手册必须同时出现在 `dissect.md` §8 路由表与 `SKILL.md` 叠加项，由 `scripts/selfcheck.py` 逐份核对，缺一即 FAIL（不再只是文字约定）
-- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）四条规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"
+- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）六条规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"
 - **自我进化**：项目教训 → `.test-memory/lessons.md`；通用教训 → `memory/global-lessons.md`；每日升级 → `CHANGELOG.md` + 版本号
 - **权限裁决**：**测项目时不自治**（运行时只提 `[技能改进]` 提案），**升级技能时授权自治**（用户明确授权的每日任务，走十步门禁）
 
@@ -147,6 +159,7 @@ cd "D:/My Skills/project-tester" && python scripts/selfcheck.py
 
 | 版本 | 日期 | 主题 |
 |---|---|---|
+| v1.3.0 | 2026-11-11 | 每日升级 #4：从「边界正确性」扩展到「演进与合规正确性」——API 契约演进兼容性（oasdiff/Pact/SemVer）、隐私与数据生命周期（PII/GDPR/日志）、测试有效性度量（DORA/flaky/变异得分）；新增 R-5/R-6；把证据矩阵接进 `report-template.md`（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.2.0 | 2026-11-11 | 每日升级 #3：从「系统行为」扩展到「交付链与边界正确性」——软件供应链/制品完整性、i18n 与本地化、多租户隔离；吸收 i18n 提案，新增 R-3/R-4；把「孤儿文档门禁」真正落进 `selfcheck.py` 并补齐 `performance-testing.md` 路由（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.1.0 | 2026-11-11 | 每日升级 #2：从「响应断言」扩展到「系统内部行为验证」——可观测性/Trace 驱动、韧性与故障注入、数据一致性、非 REST 协议端点；吸收 GraphQL/gRPC 提案；新增 R-1/R-2 可证伪规则（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.0.0 | 2026-11-11 | 每日升级 #1：分层能力 + 9 份专项手册 + 3 份模板 + 证据化门禁 + 自我进化协议 + 自检脚本（[详见 CHANGELOG](CHANGELOG.md)） |

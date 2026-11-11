@@ -17,6 +17,19 @@
 | 性能 | p50/p95/p99 = __/__/__ms ｜ 错误率 __% ｜ <注明"单点观测"或负载类型> |
 | 证据完整率 | 失败结论中带 MRE + 实际输出的比例 __% |
 
+## 证据矩阵（可证伪规则结论，缺则标 BLOCKED / 不适用）
+
+| 规则 | 本次结论 | 关键证据 / 不适用声明 |
+|---|---|---|
+| R-1 链路 | PASS / 待确认 / 不适用 | <trace_id 贯通 ≥2 组件 证据 or 可观测性缺口> |
+| R-2 韧性 | PASS / 待确认 / 不适用 | <故障注入记录 or 未做验证> |
+| R-3 制品完整性 | PASS / 待确认 / 不适用 | <sha256+SBOM+验证命令原文 or 未做验证> |
+| R-4 租户隔离 | PASS / 待确认 / 不适用 | <双租户否定路径 or 不适用> |
+| R-5 契约演进 | PASS / 待确认 / 不适用 | <oasdiff 退出码+can-i-deploy or 未做验证> |
+| R-6 隐私与数据生命周期 | PASS / 待确认 / 不适用 | <PII 分类+删除权+日志脱敏 or 未做验证> |
+
+> 详细证据填各专项模板：`supply-chain-evidence-template.md` / `i18n-matrix-template.md` / `tenant-isolation-matrix-template.md` / `contract-evolution-matrix-template.md` / `privacy-matrix-template.md` / `test-effectiveness-template.md`。任一条声称通过却无证据 → 该结论作废降为「待确认」。
+
 ## 缺陷清单（按严重度排序）
 
 ### BUG#n [S1 严重] <标题>
