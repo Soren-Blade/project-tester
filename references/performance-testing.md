@@ -33,6 +33,8 @@
 
 > 陷阱：平均值会骗人。1% 的 10 秒请求被 99 个 100ms 请求平均掉后只显示 ~200ms。**必须报分位数**。
 
+> **v1.1 边界**：本手册测「单次负载下的表现」（分位数、吞吐、瓶颈）；`references/observability-testing.md` §4 测「时间窗内的 SLO 达成与错误预算」，用于发布决策。分位数是 SLI 的推荐表述形式，但 SLO 还必须写清 `valid events` / `good events` / 时间窗 / 测量点才算可证伪；依赖故障下的行为归 `references/chaos-resilience.md`。
+
 ## 3. 轻量探测（零依赖，任何环境可用）
 
 ```bash

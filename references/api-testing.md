@@ -114,6 +114,8 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST \
 
 Schemathesis 支持 OpenAPI 2.0/3.0/3.1/3.2、GraphQL、gRPC；每个发现自带最小 `curl`/`grpcurl` 复现命令——这正好符合本技能"失败必须附证据"的纪律。**无规范文件时降级**：手写异常参数矩阵（§2 第 5 项）。
 
+> **v1.1 分流**：以上十项必测是 **REST 底座**。目标是 GraphQL / gRPC / WebSocket / SSE 时**不要按 URL 建矩阵**，改用 `references/protocol-testing.md` 的逐类型测试卡与 `assets/protocol-matrix-template.md`（introspection、深度/复杂度、batching、resolver 授权、`grpc-status` 映射、WS 重连退订等）。写操作的数据一致性另见 `references/data-integrity-testing.md`；链路贯通与副作用验证见 `references/observability-testing.md` §3。
+
 ## 8. 限流与资源消耗（API4 / API6）
 
 - 短时间内连续请求登录/短信/导出/搜索 → 期望 `429` + `Retry-After`

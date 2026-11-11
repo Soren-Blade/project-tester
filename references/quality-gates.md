@@ -39,6 +39,9 @@
 | P1 覆盖 < 80% | 写明剩余风险 |
 | 失败结论无证据 | 该结论作废，不算覆盖 |
 | 发布验收场景 | 走 `fullstack-integration.md` §6 的 12 分门禁 |
+| 声称链路完整 / 副作用已发生但无 R-1 证据 | 结论作废，降为「待确认」（`observability-testing.md` §8） |
+| 声称具备韧性但无 R-2 故障注入记录 | 结论作废，只写「未做故障注入验证」（`chaos-resilience.md` §8） |
+| 错误预算已耗尽 | 即使功能全绿也 **No-Go**（`observability-testing.md` §4） |
 
 报告末尾必须给一句明确结论：`质量状态：PASS / FAIL` + `发布建议：Go / No-Go` + 一句话理由。禁止"基本可以""问题不大"。
 
@@ -107,3 +110,4 @@ cargo mutants                     # Rust
 - [ ] 报告按 `assets/report-template.md` 输出，含 PASS/FAIL 与 Go/No-Go
 - [ ] 临时探针清理完毕
 - [ ] 若本轮触发了技能本体改进提案 → 写进 `global-lessons.md` 的 `[技能改进]`，由用户决定（见 `self-evolution.md`）
+- [ ] R-1 / R-2 可证伪规则未被误判为通过：不适用项已写明原因，证据不足的结论已降级为「待确认」，而非填 0 分假装测过

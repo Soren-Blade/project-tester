@@ -71,6 +71,8 @@
 | 优雅降级 | 非核心依赖挂掉时主流程仍可用（断路器） |
 | 幂等 | 后台任务重复执行结果一致（不能"假定恰好一次"） |
 
+**v1.1 分流**：§5 是「测得到」的最小前提清单；要把每项变成断言，见 `references/observability-testing.md`（链路贯通、span、SLI/SLO 与错误预算）；要验证依赖挂掉时的行为，见 `references/chaos-resilience.md`（稳态假设 + 故障注入 + 恢复验证）；写入后的库/缓存/事件一致性见 `references/data-integrity-testing.md`。Gate 2（非功能）、Gate 4（部署与回滚）、Gate 6（发布后验证）应吸收这三类证据，并在 `assets/release-gate-template.md` 逐门留证。
+
 ## 6. 六道发布门禁（12 分 Go/No-Go）
 
 每道 0~2 分：`0` 未检查 ｜ `1` 部分检查 ｜ `2` 有证据地完整验证。

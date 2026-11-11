@@ -39,6 +39,21 @@ await page.route('**/api/orders', async r => { await new Promise(x => setTimeout
 | 焦点可见 | `outline` 未被 `none` 杀掉；Tab 顺序与视觉顺序一致 | WCAG 2.4.7 / 2.4.11 |
 | ARIA | 动态内容有 `aria-live="polite"`；图标按钮有可访问名 | WCAG 4.1.2 |
 
+### 2.1 运行时动效与资源实测（v1.1 新增，`frontend-dev` 二次蒸馏）
+
+§2 是静态可查的；以下必须在**真实渲染**下观察，静态 grep 不能替代：
+
+| 动作 | 观察点 | 通过判据 |
+|---|---|---|
+| 首屏加载 | Network 面板资源清单 | Lottie / GSAP / Three.js 等重库按需加载，不在首屏 bundle |
+| 持续动画 30~60s | 内存 / FPS / CPU | 无持续上升；无限微动画隔离在 `React.memo` 叶组件；`will-change` 仅在动画期间存在 |
+| 路由切换 / 组件卸载 | 监听器、RAF、定时器 | 每个含 GSAP/observer 的 `useEffect` 都 `return () => ctx.revert()`；无残留 RAF 与重复订阅 |
+| 动态视口 resize | 390 / 768 / 1440 三档 + 移动端地址栏收起 | 无横向滚动、无重叠；`pointer: coarse` 下禁用 parallax/3D 与 GSAP pin |
+| 自动播放媒体 | 暂停控件 | 有可见暂停按钮；`prefers-reduced-motion: reduce` 下动画停止；闪烁 ≤ 3 次/秒 |
+| 动画属性 | 计算样式 / Performance 面板 | 只动 `transform/opacity/filter/clip-path`；出现 `width/height/top/left` 动画即 FAIL |
+
+降级：无浏览器自动化时，至少静态核对 `prefers-reduced-motion` 分支、`useEffect` cleanup 返回值与 `lazy`/`dynamic` 导入，并注明「未做运行时渲染验证」——**静态核对不得冒充运行时结论**。
+
 ## 3. 可访问性实测（WCAG 2.2 口径）
 
 | 维度 | 最小测试动作 |

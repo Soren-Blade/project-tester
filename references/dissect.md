@@ -15,7 +15,9 @@
 | Gemfile | Ruby | Rails / Sinatra |
 | index.html 且无打包器 | 静态前端 | `<script>` 引用链、内联逻辑 |
 | CMakeLists.txt / Makefile | C / C++ | make 目标、可执行文件名 |
-| Dockerfile | 任意（容器化） | ENTRYPOINT、EXPOSE 端口 |
+| Dockerfile / docker-compose.yml | 任意（容器化 / 多服务） | ENTRYPOINT、EXPOSE 端口、**服务间依赖边** |
+| `*.proto` / `*.graphql` / `openapi.yaml` | 非 REST 协议 | 服务/operation 清单，见 `references/protocol-testing.md` |
+| `migrations/` / `alembic/` / `prisma/` | 有持久化与迁移 | 迁移文件数量、是否可回滚，见 `references/data-integrity-testing.md` |
 
 混合项目 / monorepo：对每个子目录（packages/、apps/、services/）重复此表，逐个记录。
 
@@ -23,6 +25,9 @@
 
 - README 的 quickstart 命令 → 那就是真实入口，优先级最高
 - Web 服务：路由定义处（routes/、router/、controllers/、urls.py、app.py 的路由装饰器）
+- GraphQL：schema + resolver 注册处（**单端点承载全部操作，按 operation 盘点**）
+- gRPC：`.proto` 的 service/method + 服务端注册处（是否开 reflection）
+- 实时：`/ws` upgrade、`EventSource` / `text/event-stream` 端点、订阅频道名
 - CLI：命令注册处（commander / click / argparse / cobra 的子命令清单）
 - 前端：菜单与路由（router/index、App.* 的导航结构）——菜单项 ≈ 功能清单
 - 库：导出面（index.ts 的 export、`__init__.py`、lib.rs 的 pub）——导出 ≈ 可测 API
@@ -62,7 +67,7 @@
 - 中型：解剖入口 + 路由 + 核心模块，其余按目录名推定，测到再深入
 - 大型：完全依赖记忆树接力，只解剖本次范围内的模块；没有记忆树时先建"骨架树"（目录级），随测试逐模块充实
 
-## 6. 测试设施盘点（v1.0 新增）
+## 6. 测试设施盘点（v1.0 新增，v1.1 扩充）
 
 解剖时顺手记录「项目已经有什么」，决定阶段 3 是复用还是降级：
 
@@ -70,13 +75,15 @@
 |---|---|---|
 | 测试框架与脚本 | `package.json scripts`、`pyproject.toml`、`Makefile`、`*_test.go` | 有就先跑通它的套件 |
 | 测试/覆盖率配置 | `vitest.config.*`、`jest.config.*`、`pytest.ini`、`coverage` 字段 | 覆盖准则的口径来源 |
-| 契约/规范文件 | `openapi.yaml`、`swagger.json`、`*.graphql`、`*.proto` | 有规范就可上 schemathesis / 契约测试（`api-testing.md` §7） |
+| 契约/规范文件 | `openapi.yaml`、`swagger.json`、`*.graphql`、`*.proto` | 有规范就可上 schemathesis / 契约测试（`api-testing.md` §7）；非 REST 走 `references/protocol-testing.md` |
 | 性能脚本 | `k6/`、`*.js` with `import http from 'k6/http'`、`locustfile.py` | 有基线就直接对比 |
 | E2E 与 fixtures | `playwright.config.*`、`tests/seed.spec.ts`、`specs/*.md` | Playwright Test Agents 是否已初始化（`ai-native-testing.md` §2） |
 | CI 配置 | `.github/workflows/*`、`.gitlab-ci.yml`、`Jenkinsfile` | 质量门禁现状（`quality-gates.md` §6） |
 | 依赖锁文件 | `package-lock.json`、`poetry.lock`、`go.sum` | 依赖审计能否跑 |
+| **可观测性配置**（v1.1） | OTel SDK / Collector 配置、`traceparent` 处理、结构化 logger、`/health` `/ready`、Prometheus/SLO 定义 | 决定能否做链路断言与 SLO 门禁（`references/observability-testing.md`）；没有就记「可观测性缺口」 |
+| **迁移与数据设施**（v1.1） | `migrations/`、`alembic/`、`prisma/`、`*.protoset`、缓存配置、CDC/队列定义 | 决定数据一致性与迁移测试的入口（`references/data-integrity-testing.md`） |
 
-## 7. 攻击面与配置指纹（v1.0 新增）
+## 7. 攻击面、观测面与依赖拓扑（v1.0 新增，v1.1 扩充）
 
 一眼扫出高风险区，直接喂给测试矩阵的安全维度：
 
@@ -86,21 +93,27 @@
 - **配置**：`.env.example` 是否存在、`CORS` 是否 `*`、是否有 `/health` `/ready`、是否有调试端点
 - **密钥**：`git grep -nEi '(api[_-]?key|secret|password|BEGIN .*PRIVATE KEY)'`
 - **影子端点**：`/v1/` 与 `/v2/` 并存、`/debug`、`/swagger`、`/actuator`
+- **观测面**（v1.1）：日志是否结构化、是否带 `request_id` / `trace_id`、跨服务是否转发 `traceparent`、span 属性是否脱敏；错误响应是否泄漏堆栈
+- **依赖拓扑与故障域**（v1.1）：列出所有外部依赖（DB / 缓存 / 队列 / 第三方 API / 文件系统），逐个记「是否设 timeout、是否重试、是否有降级、是否幂等」。这张表就是 `references/chaos-resilience.md` §3 故障注入矩阵的输入；**没有外部依赖的单体项目不必叠加韧性专项**
 
 这些是**静态也能做的测试**，项目跑不起来时尤其有价值。
 
-## 8. 项目形态 → 能力层路由（v1.0 新增）
+## 8. 项目形态 → 能力层路由（v1.0 新增，v1.1 扩充）
 
 | 形态 | 主用手册 | 必做动作 |
 |---|---|---|
 | REST / GraphQL / gRPC 服务 | `api-testing.md` + `security-testing.md` | 端点矩阵、认证授权矩阵、错误契约、幂等 |
+| **GraphQL / gRPC / WS / SSE** | `references/protocol-testing.md` + `assets/protocol-matrix-template.md` | 按 operation/method 建矩阵；协议特有错误码、resolver/metadata 鉴权、重连退订 |
 | 全栈应用（前后端） | `fullstack-integration.md` + `frontend-testing.md` | 构建/冒烟/CORS/auth 携带 + 五态矩阵 |
 | 纯前端 / 静态页 | `frontend-testing.md` | 五态、a11y、窄屏、无占位资源、CWV |
 | CLI / 脚本 / 库 | `tools.md` + `test-design.md` | 退出码、`--help`、边界值、属性测试不变量 |
 | LLM / Agent / RAG 应用 | `ai-native-testing.md` | 评测集、蜕变关系、注入、工具权限、非确定性 |
+| **微服务 / 多组件 / 异步链路** | `references/observability-testing.md` | trace_id/request_id 贯通 ≥2 组件、副作用 span、SLO 与错误预算 |
+| **有外部依赖、需验容错** | `references/chaos-resilience.md` + `assets/resilience-runbook-template.md` | 稳态假设 → 最小爆炸半径注入 → 恢复验证（R-2） |
+| **有 DB / 迁移 / 缓存 / 多副本** | `references/data-integrity-testing.md` | 三重断言、迁移 up/down、并发不变量 |
 | 上线前验收 / 发布 | `fullstack-integration.md` §6 + `quality-gates.md` | 六门禁 12 分打分、Go/No-Go |
 
-路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。
+路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 
 ## 产出格式
 
@@ -112,6 +125,8 @@
 宣称 vs 实际差异：___（无则写"一致"）
 测试设施：框架___ 规范文件___ CI___ E2E___
 攻击面：认证位置___ 对象ID___ 配置/密钥___
-能力层路由：___（对应手册 ___）
-风险初判：___（如"无任何输入校验""秘密硬编码"）
+观测面：结构化日志___ trace_id/request_id___ 健康检查___（无则写"缺口"）
+依赖拓扑：DB___ 缓存___ 队列___ 第三方API___；各自 timeout/重试/降级/幂等 ___
+能力层路由：___（对应手册 ___；v1.1 叠加项 ___，不适用原因 ___）
+风险初判：___（如"无任何输入校验""秘密硬编码""无链路埋点""下游调用无 timeout"）
 ```

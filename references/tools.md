@@ -63,6 +63,11 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | 变异测试 | `npx stryker run` / `mutmut run` / PIT / `cargo mutants` | 人工抽查断言强度（伪测试清单） | `quality-gates.md` §5 |
 | AI 辅助 E2E | `npx playwright init-agents --loop=vscode`（v1.56+） | 手写用例 / HTTP 层验证 | `ai-native-testing.md` §2 |
 | 浏览器自动化 | Playwright / 环境自带浏览器能力 | `curl -s URL` 断言 HTML 关键元素 + 表单 POST 实测 | SKILL.md 阶段 3 |
+| Trace / 链路断言 | Tracetest `tracetest run test --file <yaml>`（可选） | curl 带 `traceparent` + `grep` 同一 id 跨组件日志 | `observability-testing.md` §3 |
+| 确定性网络故障 | Toxiproxy（HTTP API `:8474`）/ `toxiproxy-cli` | 本地起一个永不返回的依赖 + `time curl` 验 timeout | `chaos-resilience.md` §4 |
+| K8s 故障编排 | Chaos Mesh CRD / LitmusChaos `ChaosEngine` | 静态审查 timeout / 重试 / SIGTERM 配置 | `chaos-resilience.md` §4 |
+| 非 REST 实调 | `grpcurl -plaintext -d '{...}' host:port Service/Method`（reflection 或 `-protoset`） | 用项目自带 client / 静态读 `.proto`、`*.graphql` | `protocol-testing.md` §3 |
+| DB 对账与并发 | `psql -tAc "SELECT count(*)"` + shell 后台并发 | 通过 API 读回比对，标注「间接验证」 | `data-integrity-testing.md` §4/§6 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
