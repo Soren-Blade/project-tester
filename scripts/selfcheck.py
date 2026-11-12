@@ -8,7 +8,7 @@
 
 检查项：frontmatter / 版本一致 / 本地引用完整性 / 占位资源 URL /
 关键字段 / 模板行数 / 索引覆盖 / **路由闭环（孤儿文档）** / **可证伪规则同步** /
-global-lessons 格式。
+**报告证据矩阵同步（§7d）** / **规则例外声明（§7e）** / global-lessons 格式。
 """
 from __future__ import annotations
 
@@ -124,7 +124,9 @@ checks = {
     "assets/tenant-isolation-matrix-template.md": ["R-4", "否定路径", "BLOCKED"],
     "assets/contract-evolution-matrix-template.md": ["R-5", "oasdiff", "can-i-deploy"],
     "assets/privacy-matrix-template.md": ["R-6", "PII", "删除权"],
-    "assets/test-effectiveness-template.md": ["DORA", "flaky", "变异得分"],
+    "assets/test-effectiveness-template.md": ["DORA", "flaky", "变异得分", "ROI", "建设成本"],
+    "assets/accessibility-matrix-template.md": ["R-7", "WCAG 2.2", "incomplete", "读屏"],
+    "assets/device-matrix-template.md": ["R-8", "real", "设备矩阵", "网络档位"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -194,6 +196,37 @@ elif orphan_qg:
     fail("quality-gates.md 出现 SKILL.md 未定义的规则（可能被悄悄删除或编号写错）: " + ", ".join(orphan_qg))
 else:
     ok(f"可证伪规则双向同步：{', '.join(rules)} 共 {len(rules)} 条，SKILL.md 与 quality-gates.md 集合一致")
+
+# 7d) 报告证据矩阵同步：报告模板的证据矩阵段必须覆盖 SKILL.md 定义的全部规则，
+#     且不得出现未定义编号。防止「新增 R-N 却忘了在报告里留证据槽位」。
+report_tpl = read(ROOT / "assets/report-template.md")
+matrix_marker = "## 证据矩阵"
+if matrix_marker in report_tpl:
+    matrix_section = report_tpl.split(matrix_marker, 1)[1].split("\n## ", 1)[0]
+else:
+    matrix_section = ""
+    fail("assets/report-template.md 缺少「## 证据矩阵」段，无法校验规则覆盖")
+matrix_rules = sorted(set(re.findall(r"R-\d+", matrix_section)))
+missing_matrix = [r for r in rules if r not in matrix_rules]
+extra_matrix = [r for r in matrix_rules if r not in rules]
+if missing_matrix:
+    fail("报告证据矩阵缺少规则行: " + ", ".join(missing_matrix))
+elif extra_matrix:
+    fail("报告证据矩阵出现 SKILL.md 未定义的规则: " + ", ".join(extra_matrix))
+else:
+    ok(f"报告证据矩阵同步：{', '.join(matrix_rules)} 共 {len(matrix_rules)} 条，与 SKILL.md 规则集一致")
+
+# 7e) 规则例外声明：每条规则定义行都必须写清「不适用时不得冒充通过」的降级写法。
+#     只加一句「要有证据」而不写禁止冒充声明，规则仍不可证伪。
+rule_rows = [ln for ln in skill.splitlines() if re.match(r"^\|\s*\*\*R-\d+\s", ln)]
+if len(rule_rows) != len(rules):
+    fail(f"SKILL.md 规则表行数 {len(rule_rows)} 与规则集 {len(rules)} 不一致（漏定义或编号重复）")
+else:
+    bad_rows = [re.search(r"R-\d+", ln).group(0) for ln in rule_rows if "不得" not in ln]
+    if bad_rows:
+        fail("规则缺少「不适用时的禁止冒充声明」（须含『不得』）: " + ", ".join(bad_rows))
+    else:
+        ok(f"规则例外声明齐备：{len(rule_rows)} 条规则均写清禁止冒充的降级写法")
 
 # 8) global-lessons 格式（软约束）
 gl = read(ROOT / "memory/global-lessons.md")

@@ -155,6 +155,40 @@
 - [指标] 缺陷逃逸率 = 生产缺陷/(生产+发布前) — 应用：走高即测试门禁没拦住该类，回看测试设计覆盖准则
 - [手法] 非确定性根因：时钟/随机数/外部依赖/共享状态/异步等待 — 应用：定位 flaky 按这五类查，而非无脑重试（Martin Fowler）
 
+## 无障碍可达性类（v1.4 蒸馏）
+
+- [手法] axe 平均只能自动发现约 57% 的 WCAG 问题，且 `incomplete` 需人工复核 — 应用：0 violations 只写「本次扫描未发现」，不得写「符合 WCAG」（Deque axe-core README，R-7）
+- [手法] WCAG 2.2 相对 2.1 新增 9 条成功标准，4.1.1 Parsing 已移除 — 应用：先核对验证基线版本，别拿 2.1 清单验 2.2（W3C What's New in WCAG 2.2）
+- [手法] 2.5.8 门槛是 24×24 CSS px，44×44 是 2.5.5 的 AAA 增强 — 应用：报目标尺寸时写清条款号与级别，别误引标准
+- [手法] 3.3.8 把手动转录验证码视为 cognitive function test，密码管理器/可粘贴属 Mechanism 例外 — 应用：认证流程逐环节查有无替代路径
+- [流程] 焦点被 sticky header 整体遮住（2.4.11）不会让任何功能用例变红 — 应用：键盘路径逐步记 `activeElement` 与遮挡判定
+- [流程] 读屏结果按 passed/failed/not checked/not present 四类标注，`not checked` 不计入通过 — 应用：至少覆盖一组 reader + browser + OS 组合并留证据（DWP Accessibility Manual）
+- [手法] `toMatchAriaSnapshot` 断的是 accessibility tree 而非像素 — 应用：按组件粒度断言，快照变红先判「退化还是文案变化」再决定更新（Playwright）
+
+## 跨端与设备形态类（v1.4 蒸馏）
+
+- [手法] `devices['iPhone 13']` 是一组 viewport/UA/hasTouch 预设，不是真机 — 应用：矩阵逐台标 real/emulator/browser-emulation，仿真绿不得写成真机通过（R-8）
+- [流程] 设备矩阵来源应是 install-base analytics 并覆盖约 80% installs — 应用：报告写数据源与时间窗，别拍脑袋列机型；季度复审
+- [手法] 低配 Android / 最老受支持 OS / 厂商皮肤 / 折叠屏平板是占比小但出事多的长尾 — 应用：主干之外强制补这四类，未覆盖要显式写
+- [流程] 三个 Chromium 套壳不构成跨浏览器覆盖 — 应用：至少覆盖两类真实内核（Chromium / WebKit / Gecko）
+- [手法] battery/thermal/sensors/biometrics/real network 只能在真机验 — 应用：发布门禁前至少 1 组 real device 记录
+- [流程] 「弱网测过」不是证据 — 应用：每档写上下行/时延数值 + 执行载体 + 观察结果
+- [手法] 前后台切换、进程回收、权限「拒绝后不再询问」、旋转折叠、深链冷启动是桌面 Web 用例天然不覆盖的面 — 应用：端侧特有面逐条留输出
+
+## 测试经济性 / ROI 类（v1.4 蒸馏）
+
+- [指标] 成本分建设/运行/维护三类，收益分反馈时间/逃逸避免/优化三类 — 应用：ROI 写清分子分母与时间窗，别只报「自动化率」（`test-effectiveness-testing.md` §5A）
+- [流程] 估计值必须标「估计」，不得写成实测账单 — 应用：缺 CI 账单时固定写「成本为估计值」
+- [手法] 套件变快但变异得分下降或逃逸率上升 = 负收益 — 应用：报时长收益时同列有效性指标，防止「删用例换速度」
+- [流程] ROI 是投入决策依据，不直接阻断单次发布 — 应用：套件时长/维护成本失控时回写 CI 门禁，而非拿 ROI 卡一次上线
+
+## 可复现构建 / 影子流量类（v1.4 蒸馏）
+
+- [手法] 可复现 = 相同 source / build environment / build instructions 重建出 bit-by-bit identical 产物 — 应用：两次干净构建逐位或 hash 比对，三类输入都要留档（Reproducible Builds）
+- [流程] digest 不一致必须归因到具体输入，归因不了写「待确认」 — 应用：时间戳、随机排序、绝对路径、并行顺序逐个排查
+- [安全] 影子流量只做只读镜像比对，不得影响真实用户或引入写副作用 — 应用：PII/token 先脱敏，写明采样率与时间窗
+- [手法] 契约绿但影子 diff 出现非预期项 = 契约覆盖有缺口 — 应用：回看 Pact 交互清单，别把影子流量当 R-5 的替代品
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -164,5 +198,8 @@
 - [技能改进] ✅ **已吸收（v1.2）**：i18n 与本地化测试 → 落地为 `references/i18n-localization-testing.md` + `assets/i18n-matrix-template.md`，含伪本地化、W3C RTL、`dirname`/`<bdi>`、collation 与 F-1~F-8 格式往返
 - [技能改进] ✅ **已吸收（v1.2）**：补真正的「孤儿文档」门禁 → `scripts/selfcheck.py` 现在核对 `dissect.md` §8 路由表与 SKILL.md 叠加项，并补齐了 `performance-testing.md` 缺失的路由；此前 v1.1 CHANGELOG 声称由自检验证并不准确
 - [技能改进] ✅ **已吸收（v1.3）**：把证据矩阵接进 `assets/report-template.md` 固定字段 → 报告新增「证据矩阵」段挂接 R-1~R-6 与六份证据模板，缺证据即标 BLOCKED（早于 v1.2 先落各自模板的承诺）
-- [技能改进] 待后续轮次：测试成本 / ROI 度量（v1.3 未吸收；本轮优先级让位给契约演进/隐私/有效性深水区，ROI 与有效性度量可后续合并）
-- [技能改进] 待后续轮次：移动端与桌面端专项（v1.3 未吸收；仍列在深水区，待有更权威的实测来源再落地，避免臆造平台特有断言）
+- [技能改进] ✅ **已吸收（v1.4）**：测试成本 / ROI 度量 → **合并**进 `references/test-effectiveness-testing.md` §5A（不另起文件），模板加三类成本/三类收益与 E-11~E-14；理由：与有效性度量是同一把尺的两面，另起文件会膨胀目录
+- [技能改进] ✅ **已吸收（v1.4）**：移动端与桌面端专项 → 落地为 `references/cross-platform-testing.md` + `assets/device-matrix-template.md`，以 R-8 固定「仿真 ≠ 真机」；理由：本轮实查 Playwright Emulation 官方能力与 install-base 设备矩阵口径，不再靠臆造平台特有断言
+- [技能改进] ✅ **已吸收（v1.4）**：无障碍自动化实测的边界 → 落地为 `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md`，以 R-7 固定「axe 0 violations ≠ 合规」；来源 W3C WCAG 2.2 / Deque axe-core / DWP / Playwright
+- [技能改进] 待后续轮次：把「合规性声明」（如 SOC2 / 等保）与证据链自动对账 → 目前 R-3/R-6 已覆盖制品与隐私两类，泛化前需更多权威映射来源，避免造空泛清单
+- [技能改进] 待后续轮次：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 依赖具体 analytics 平台，先保留人工填口径的模板，不臆造 API

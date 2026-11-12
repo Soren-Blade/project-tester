@@ -33,9 +33,11 @@
             优先 Enhance 已有文件，控制目录膨胀
 ⑤ 落盘     只改 project-tester/ 内文件；不改其他文件夹
 ⑥ 自检     python scripts/selfcheck.py（frontmatter、引用完整、版本一致、无占位 URL、行数、
-            模板字段、索引覆盖、**§7b 路由闭环/孤儿文档**、**§7c 可证伪规则同步**）
+            模板字段、索引覆盖、**§7b 路由闭环/孤儿文档**、**§7c 可证伪规则同步**、
+            **§7d 报告证据矩阵同步**、**§7e 规则例外声明**）
             + 回归：旧示例是否仍成立、五阶段是否仍闭环、记忆树 <100 行纪律是否保留、
-            新增手册是否都有 §8 路由、R-N 是否接入 quality-gates.md
+            新增手册是否都有 §8 路由、R-N 是否接入 quality-gates.md / report-template.md /
+            规则表是否写清禁止冒充声明 + 负向测试证明新增门禁确实会 FAIL
 ⑦ 版本     SKILL.md frontmatter version +1；CHANGELOG.md 追加一条（日期/版本/来源/改动/自检结果）
 ⑧ 同步     cp -r 源 → ~/.agents/skills/project-tester/，diff 校验一致
 ⑨ 提交     git add / commit（约定 `feat(vN): 每日升级 #M <主题>`）/ push 到 GitHub
@@ -68,8 +70,9 @@
 | 引入一个跑不起来的重型工具当默认 | 保留零依赖降级路径（`tools.md` 纪律） |
 | 只加不删，目录无限膨胀 | Merge 冗余、归档 30 天未用条目 |
 | 新增手册无人路由得到 | 每份专项手册必须**同时**在 `dissect.md` §8 路由表与 SKILL.md 横向叠加项里有明确触发条件，否则判为「孤儿文档」；`scripts/selfcheck.py` §7b 逐份核对并 **FAIL**，本轮升级不算完成（v1.2 起由代码强制，不再只是文字约定） |
+| 新增规则却没留证据槽位 / 没写清降级路径 | `selfcheck.py` §7d 逐条比对 `report-template.md` 证据矩阵与 SKILL.md 规则集、§7e 逐条检查规则行的禁止冒充声明，缺一处即 **FAIL**（v1.4 起）；新增规则必须同时落三处：SKILL.md 定义、quality-gates.md Go/No-Go、报告矩阵 |
 
-**每轮至少留一条可证伪的规则**：写清"在什么情况下这条规则不适用"，比多抄十条标准更有价值。
+**每轮至少留一条可证伪的规则**：写清"在什么情况下这条规则不适用"，比多抄十条标准更有价值。每轮升级后做一次**负向测试**（在临时副本里故意破坏一处，确认自检确实 FAIL），证明门禁不是摆设。
 
 ## 6. global-lessons.md 的维护
 

@@ -5,6 +5,70 @@
 
 ---
 
+## [v1.4.0] — 2026-11-12 · 每日升级 #5
+
+**主题**：从「系统正确」扩展到「**人人可用 · 处处可用 · 值得测**」——补齐无障碍可达性深度实测、跨端与设备形态真实性、测试经济性/ROI 三块深水区，落地三个顺延提案，新增 **R-7 / R-8** 两条可证伪规则，并新增两条自检门禁（§7d 报告证据矩阵同步 / §7e 规则例外声明）。
+
+**遵循上轮建议**：未重写已覆盖主题（契约演进、隐私、有效性度量、供应链、i18n、多租户、观测、韧性、数据、协议、AI 原生、五阶段与四层模型），以 **Enhance 为主、New 为辅、Merge 消化顺延提案**；四层模型与五阶段流程**未改语义**（按 `self-evolution.md` §7 只升 MINOR）；每轮至少补一条可证伪规则 → 本轮引入 **R-7 / R-8**。同时修正历史文档漂移：`SKILL.md` 曾写「四条可证伪规则」而实际已有六条、`README.md` 速查曾写 `R-1~R-4`、`quality-gates.md` §8 曾写「六条」；并把各模板内硬编码的 `技能版本：v1.3.0` 统一改成 `v<X>` 占位，从根上消除逐轮漂移。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/accessibility-testing.md`、`references/cross-platform-testing.md`、`assets/accessibility-matrix-template.md`、`assets/device-matrix-template.md` |
+| **Enhance** | `SKILL.md`（version 1.4.0、description 触发词、v1.4 增量、v1.4 叠加项、阶段 1/3/4、R-7/R-8 规则行、参考索引、漂移修正）、`README.md`（徽章 24→26 / 13→15 / 43→47、问题表 5 行、结构树、速查 5 行、设计要点、版本史、漂移修正）、`references/dissect.md`（§8 两条新路由、§6 两个解剖面、产出格式两行）、`references/quality-gates.md`（§3 R-7/R-8 两行、§8 核对扩为八条 + 两条新核对）、`assets/report-template.md`（证据矩阵 R-7/R-8 + 两份模板挂接）、`references/tools.md`（5 行专项工具 + 两条使用纪律）、`references/frontend-testing.md`（§3 分工与误引提醒）、`references/self-evolution.md`（§3/§5 新门禁与负向测试要求）、`scripts/selfcheck.py`（§5 字段、§7d、§7e） |
+| **Merge** | 三个顺延提案全部结案：ROI **合并**进 `references/test-effectiveness-testing.md` §5A（不另起文件）与 `assets/test-effectiveness-template.md`；移动端/桌面端与无障碍落地为两份专项手册；`memory/global-lessons.md` 新增 4 组共 22 条 v1.4 教训，提案区改为「已吸收（v1.4）」并留理由。另：可复现构建并入 `references/supply-chain-testing.md` §2A、影子流量并入 `references/contract-evolution-testing.md` §3A，均不新增文件 |
+| **Match** | 2 份新手册均在 `dissect.md` §8 与 `SKILL.md` v1.4 叠加项有触发条件；R-7/R-8 在 `SKILL.md` 定义表、`quality-gates.md` §3/§8、`report-template.md` 证据矩阵三处口径一致。以上由 `selfcheck.py` **代码强制**（§7b 路由闭环、§7c 规则双向同步、§7d 报告矩阵同步、§7e 例外声明） |
+| **Existing** | 五阶段模型、四层能力模型、记忆树 <100 行纪律、双视角、"工具缺失不中止"降级原则、六门禁 12 分、缺陷八字段、R-1~R-6 规则、权限裁决 —— 全部保留，未改语义；`SKILL.md` 的 todo 示例逐字保留 |
+
+### 蒸馏来源（本轮实查，均可核查）
+
+| 来源 | URL / 位置 | 关键结论 |
+|---|---|---|
+| W3C/WAI《What's New in WCAG 2.2》 | https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/ | 相较 2.1 **新增 9 条成功标准**（2.4.11/2.4.12/2.4.13、2.5.7/2.5.8、3.2.6、3.3.7/3.3.8/3.3.9 及各自 A/AA/AAA 级别）；**4.1.1 Parsing is obsolete and removed from WCAG 2.2**；WCAG 2.2 于 **2023-10-05** 成为 W3C Recommendation |
+| WCAG 2.2 Recommendation | https://www.w3.org/TR/WCAG22/ | 2.4.11 Focus Not Obscured (Minimum) AA；2.5.8 Target Size (Minimum) AA = **24×24 CSS px**，例外 Spacing / Equivalent / Inline / User Agent Control / Essential；3.3.8 Accessible Authentication (Minimum) AA 禁止 cognitive function test，除非 Alternative / Mechanism / Object Recognition / Personal Content |
+| Deque `axe-core` README | https://github.com/dequelabs/axe-core | 「find on **average 57%** of WCAG issues automatically」；结果含 `incomplete`，需人工复核；官方示例对 `results.violations` 判失败 |
+| DWP Accessibility Manual | https://accessibility-manual.dwp.gov.uk/ | 测试须覆盖至少一个常用 screen reader；JAWS/NVDA 配 Windows + Firefox/Chromium、VoiceOver 在 macOS 上仅 Safari fully supported、Narrator 用 Win+Ctrl+Enter；结果标 **passed / failed / not checked / not present** 并保存证据 |
+| Playwright 官方文档 | https://playwright.dev/docs/emulation · https://playwright.dev/docs/aria-snapshots | Emulation 可覆写 userAgent / viewport / hasTouch / locale / timezoneId / geolocation / permissions / colorScheme / reducedMotion / forcedColors / contrast / offline 等；`devices[...]` 只是描述符预设；`toMatchAriaSnapshot` 断言 **accessibility tree 的 YAML 快照**，支持 partial matching 与 `/children: equal` |
+| LambdaTest Learning Hub（移动设备矩阵） | https://www.lambdatest.com/learning-hub/ | 设备矩阵应来自 install-base analytics 并覆盖约 **80% installs**；补 low-RAM Android、foldable/tablet、vendor skin、oldest supported OS；emulator 适合快速布局/流程反馈，battery/thermal/sensors/biometrics/real network 须真机；矩阵季度复审 |
+| GitHub `naodeng/awesome-qa-skills` | https://github.com/naodeng/awesome-qa-skills | 存在 `accessibility-testing` / `mobile-testing` / `cross-browser-testing` / `visual-regression-testing` / `automation-roi-analysis` / `test-maintenance-cost-analysis` / `regression-optimization` / `ci-test-optimization` 等 canonical names，佐证本轮主题与顺延提案方向 |
+| Reproducible Builds 官方定义 | https://reproducible-builds.org/docs/definition/ | 相同 **source code / build environment / build instructions** 应能由任何一方重建 **bit-by-bit identical** 产物；以逐位比较或密码学 hash 验证 |
+| 影子流量工程模式（线索层） | Istio `mirror` / Envoy shadow / Diffy 类响应 diff 工具的公开资料 | 只作为「只读镜像 + 响应规范化比对」的模式输入；未逐条核验具体产品参数，手册不臆造命令 |
+
+**口径诚实标注**：① 9 条新增 SC 的编号与级别来自 W3C 官方 What's New 页面（本轮复核），三条 AA 的判据为精简转述，落地验收以 WCAG 2.2 原文为准；② 57% 是 `axe-core` README 的**自述平均值**，非本技能实测，不能当覆盖率承诺；③ DWP 组合是「至少一个常用 screen reader」的最低口径，不构成全部合规覆盖；④ 设备矩阵 80% 覆盖与季度复审是**工程选型建议**而非标准强制，报告须写数据源与时间窗；⑤ 影子流量只作模式输入，不绑定产品、不臆造参数，无镜像能力时明确标 `BLOCKED`；⑥ `SOURCE_DATE_EPOCH` / `diffoscope` 只作可复现构建的排查线索，不把「设了环境变量」当成「已可复现」；⑦ 本轮未把 2G 网络写成任何来源的原文要求，网络档位一律要求自写数值与载体。
+
+### 主要改动
+
+1. **无障碍可达性深度实测**（`accessibility-testing.md` + 证据模板）：WCAG 2.2 增量 9 条与 4.1.1 移除、2.4.11/2.5.8/3.3.8 精确口径与三处易错提醒（44×44 属 AAA、验证码属认知测试、Parsing 已移除）、axe 自动化边界与 `incomplete`、键盘路径逐步记录、DWP 读屏组合与四类结果标注、`toMatchAriaSnapshot` 断言纪律、A-1~A-12 测试卡
+2. **R-7 无障碍可达性**：声称合规须附目标版本级别 + violations/incomplete 原文与人工结论 + 完整键盘路径 + 至少一组读屏组合逐项标注 + 2.5.8/3.3.8 实测；明确「axe 0 violations ≠ WCAG 合规」「键盘通 ≠ 读屏懂」「有 aria-label ≠ 点得中」，无 UI 项目写「不适用：无图形交互界面」
+3. **跨端与设备形态真实性**（`cross-platform-testing.md` + 证据模板）：install-base 设备矩阵与约 80% 覆盖、`real`/`emulator`/`simulator`/`browser-emulation` 四类载体分野、Playwright Emulation 清单与 `devices` 预设、端侧特有面（生命周期/中断/权限/旋转折叠/深链/生物识别/软键盘）、网络档位数值口径、X-1~X-12 测试卡
+4. **R-8 跨端与设备形态真实性**：声称跨端/真机须附矩阵来源与覆盖占比 + 载体逐项标注 + 多内核实测 + 长尾条目结论 + 端侧面与网络档位输出 + ≥1 组 real device 记录；明确「三档断点 ≠ 移动端可用」「Mobile Safari 仿真绿 ≠ iOS 真机」「桌面 Chrome ≠ WebKit/Gecko」，纯后端写「不适用：无终端形态差异」
+5. **测试经济性 / ROI（Merge，落地顺延提案）**：`test-effectiveness-testing.md` §5A 三类成本 × 三类收益、ROI/回收周期口径、E-11~E-14 度量卡、四条反模式；模板加对应字段；**不另起新文件**，与有效性指标联动防止「删用例换速度」
+6. **两份既有手册 Enhance**：`supply-chain-testing.md` §2A 可复现构建（三类输入固定、RB-1~RB-5、`diffoscope` 线索、R-3 证据不放宽）；`contract-evolution-testing.md` §3A 影子流量（只读镜像、无写副作用、脱敏采样、S-1~S-5、不单独构成 R-5 通过）
+7. **证据闭环两条新门禁**：`selfcheck.py` §7d 逐条比对 `report-template.md` 证据矩阵与 SKILL.md 规则集（缺行/多编号即 FAIL）；§7e 逐条检查规则表行的「不适用时禁止冒充声明」（须含「不得」，行数与规则集一致）。`self-evolution.md` §3/§5 同步写明并要求**每轮做负向测试**
+8. **经验治理与漂移修正**：`global-lessons.md` 新增无障碍 7 条 / 跨端 7 条 / ROI 4 条 / 可复现构建与影子流量 4 条共 22 条；三个顺延提案结案为「已吸收（v1.4）」；修正「四条规则」「R-1~R-4」「六条」三处历史漂移，把 4 处模板内硬编码版本统一为 `v<X>` 占位
+
+### 回归检查
+
+- [x] 五阶段模型闭环未变，`SKILL.md` 的 todo 示例（4 条 MRE、含越权 S1）逐字保留
+- [x] 四层能力模型语义未变（v1.4 内容以「横向叠加项」呈现，不构成 MAJOR）
+- [x] 记忆树 <100 行纪律保留；`assets/tree-template.md` 未改，仍 <100 行
+- [x] 「工具缺失不中止」降级原则保留，两份新手册各有 L0 零依赖路径（静态语义/视口线索 + 人工键盘/单台真机走查）
+- [x] 运行时不擅自改本体的安全约束保留；权限裁决原文未改
+- [x] 原有文件引用路径未失效（由 `selfcheck.py` 断链检查验证）
+- [x] 新增 2 份手册不产生孤儿文档（由 `selfcheck.py` §7b 路由闭环验证）
+- [x] R-1~R-8 在 `SKILL.md`、`quality-gates.md` §3/§8 口径一致（由 `selfcheck.py` §7c 双向同步验证）
+- [x] 报告证据矩阵八行与规则集一致（由 `selfcheck.py` §7d 验证）；八条规则均含禁止冒充声明（由 §7e 验证）
+- [x] 六门禁 12 分、缺陷八字段、Flaky 治理、变异测试等关键字段仍在（由 `selfcheck.py` 字段检查验证）
+- [x] 报告模板新增两行未破坏原有 PASS/FAIL 与 Go/No-Go 结构
+- [x] 已做负向测试：在临时副本中分别破坏报告矩阵与规则例外声明，确认 §7d / §7e 均返回 FAIL=1（详见下方自检结果）
+
+### 自检结果
+
+`python scripts/selfcheck.py` → **PASS / WARN 0 / FAIL 0 → GREEN**（退出码 0）；全局安装版复跑结果一致；源与全局安装 `diff -r` 完全一致（47 文件）。负向测试在项目外的临时副本执行，未改动源目录。
+
+---
+
 ## [v1.3.0] — 2026-11-11 · 每日升级 #4
 
 **主题**：从「边界正确性」扩展到「演进与合规正确性」——补齐 API 契约演进兼容性、隐私与数据生命周期、测试有效性度量三块深水区，并落地提案区的「证据矩阵接进报告」。

@@ -67,7 +67,7 @@ curl -s -X POST http://127.0.0.1:3000/api/order -H "Content-Type: application/js
 **头部元信息**追加技能版本与能力层，便于升级后判断旧记录是否仍适用：
 
 ```
-> 更新：<YYYY-MM-DD> ｜ 运行次数：<N> ｜ 技能版本：v1.0.0 ｜ 能力层路由：API+安全+性能
+> 更新：<YYYY-MM-DD> ｜ 运行次数：<N> ｜ 技能版本：v<X> ｜ 能力层路由：API+安全+性能
 ```
 
 **已知问题**表增加严重度与回归标记（与 `quality-gates.md` §2 对齐）：

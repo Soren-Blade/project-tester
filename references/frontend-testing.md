@@ -54,7 +54,9 @@ await page.route('**/api/orders', async r => { await new Promise(x => setTimeout
 
 降级：无浏览器自动化时，至少静态核对 `prefers-reduced-motion` 分支、`useEffect` cleanup 返回值与 `lazy`/`dynamic` 导入，并注明「未做运行时渲染验证」——**静态核对不得冒充运行时结论**。
 
-## 3. 可访问性实测（WCAG 2.2 口径）
+## 3. 可访问性实测（WCAG 2.2 最小清单）
+
+> **v1.4 分工**：本节是「快速最小动作清单」。凡要声称「符合 WCAG 2.2 AA / 支持读屏 / 可键盘操作 / 无障碍已验收」，必须转 `references/accessibility-testing.md`（R-7）+ `assets/accessibility-matrix-template.md` 做深度实测：**axe 0 violations ≠ WCAG 合规**（axe 自述平均仅自动发现约 57% 问题），`incomplete` 必须逐条人工复核；2.4.11 / 2.5.8 / 3.3.8 是 WCAG 2.2 相对 2.1 的新增项，2.5.8 门槛为 24×24 CSS px（44×44 属 AAA 的 2.5.5，别误引）。跨端/真机维度另见 `references/cross-platform-testing.md`（R-8）。
 
 | 维度 | 最小测试动作 |
 |---|---|

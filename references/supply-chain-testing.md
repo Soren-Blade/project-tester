@@ -1,6 +1,6 @@
 # 软件供应链与制品完整性测试（阶段 3 · 横向叠加）
 
-> 蒸馏自 OWASP Top 10:2025 A03、OWASP Software Supply Chain Security / Dependency Graph & SBOM / Vulnerable Dependency Management Cheat Sheets、SLSA v1.0 spec（levels / provenance / verifying-artifacts）、NTIA SBOM 最小要素、以及 `anchore/syft`、`anchore/grype`、`google/osv-scanner`、`sigstore/cosign`、`slsa-framework/slsa-verifier`、npm `ci` 官方文档。来源 URL 见 `CHANGELOG.md` v1.2.0。
+> 蒸馏自 OWASP Top 10:2025 A03、OWASP Software Supply Chain Security / Dependency Graph & SBOM / Vulnerable Dependency Management Cheat Sheets、SLSA v1.0 spec（levels / provenance / verifying-artifacts）、NTIA SBOM 最小要素、以及 `anchore/syft`、`anchore/grype`、`google/osv-scanner`、`sigstore/cosign`、`slsa-framework/slsa-verifier`、npm `ci` 官方文档；v1.4 追加 Reproducible Builds 官方定义（§2A 可复现构建）。来源 URL 见 `CHANGELOG.md` v1.2.0 / v1.4.0。
 > 定位：前面所有手册测的是**运行时行为**；本手册测的是**「我拿到的这个制品，是不是我以为的那个」**。依赖清单、构建产物、签名与来源证明都属于交付链，跑通功能不代表交付可信。
 
 ## 0. 适用边界与分工（先别把它塞进安全测试）
@@ -39,6 +39,39 @@
 | D-8 | 补丁有效性：漏洞复现用例在未打补丁版本失败、在打补丁版本通过 | 两种结果都留日志；「A test that passes in both cases proves nothing about the patch.」 | 只跑应用测试，不跑依赖自身测试 |
 | D-9 | 上游可用性：是否仍在维护、是否有安全公告流程 | 有记录；停维护且有已知漏洞 → 写迁移/虚拟补丁方案 | 「没报错」当「没问题」 |
 | D-10 | 安装脚本审查：`preinstall`/`postinstall`/`setup.py` 是否有网络外联 | 无异常外联；必要时 `--ignore-scripts` 复测 | Shai-Hulud 类 npm 蠕虫正是借 postinstall 传播（OWASP A03:2025 场景 3） |
+
+## 2A. 可复现构建实测（v1.4 增强，落地顺延提案）
+
+> 蒸馏自 Reproducible Builds 官方定义：给定相同的 **source code / build environment / build instructions**，任何一方都应能重建出 **bit-by-bit identical** 的产物；验证方式是逐位比较或密码学 hash 一致。D-3 此前只写了「两次构建比对 digest」，本节把三类输入与差异归因补齐。
+
+**三要素必须同时固定**（缺一就不能写「可复现」）：
+
+| 要素 | 要记录什么 | 常见漂移源 |
+|---|---|---|
+| source code | commit SHA、子模块/依赖解析结果、有无未提交改动 | 浮动版本、未锁依赖 |
+| build environment | 编译器/运行时版本、OS/架构、locale、时区、环境变量、构建路径 | 不同镜像、绝对路径被写进产物 |
+| build instructions | 完整构建命令、脚本版本、并行度、构建参数 | 随机排序、并发产物顺序 |
+
+```bash
+# 同 commit、同环境、同指令，两次干净构建并比对
+git rev-parse HEAD > /tmp/build-inputs.txt
+sha256sum dist/* > /tmp/digest-a.txt
+# 清理产物后按完全相同的命令重建
+sha256sum dist/* > /tmp/digest-b.txt
+diff -u /tmp/digest-a.txt /tmp/digest-b.txt && echo "PASS: bit-identical" || echo "FAIL: 不可复现"
+# 逐位差异定位（工具可选，命令以官方文档为准）
+diffoscope dist/a.tar.gz dist/b.tar.gz | head -80
+```
+
+| # | 检查 | 判据 |
+|---|---|---|
+| RB-1 | 两次干净构建 digest 一致 | 逐位相同或 sha256 全部一致；不一致必须列出具体原因 |
+| RB-2 | 三类输入已固定并留档 | commit / 环境指纹 / 完整命令都有原文 |
+| RB-3 | 时间戳确定性 | 产物含构建时间时，核对是否统一（如 `SOURCE_DATE_EPOCH` 一类机制）；未统一则写明 |
+| RB-4 | 路径与顺序确定性 | 绝对路径、文件遍历顺序、并行构建产物顺序不影响结果 |
+| RB-5 | 差异可解释 | 每个不一致都能归因到具体输入；归因不了写「待确认」 |
+
+> 口径诚实：`SOURCE_DATE_EPOCH`、`diffoscope` 等是可复现构建生态中常用的机制/工具线索，本手册只作检查方向，**不臆造具体参数，也不把「设置了环境变量」当成「已可复现」**；以两次 digest 的实际比对结果与各工具官方文档为准。R-3 的证据要求不因本节放宽——digest 不一致却写「可复现构建」按 R-3 作废结论。
 
 ## 3. SBOM 测试卡
 

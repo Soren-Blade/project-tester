@@ -72,6 +72,11 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **签名与 provenance 验证**（v1.2） | `cosign verify $IMAGE --certificate-identity=$ID --certificate-oidc-issuer=$ISSUER`；`slsa-verifier verify-artifact <artifact> --provenance-path <p> --source-uri github.com/<org>/<repo>` | 只留 digest 与静态审查，结论标 `BLOCKED`，**不得**写「已验证供应链安全」 | `supply-chain-testing.md` §4/§8 |
 | **伪本地化 / locale 矩阵**（v1.2） | 脚本生成加长带变音伪串；浏览器切 `lang`/`dir`；`new Intl.Collator('tr-TR')` 对比排序 | `git grep` 查硬编码串、拼接、`toLocaleString('en-US')`、裸 `sort()` / `toUpperCase()`；注明「未做渲染验证」 | `i18n-localization-testing.md` §2/§7 |
 | **双租户否定路径**（v1.2） | 构造 T1/T2 + 相同 ID 夹具；`curl` 换 `X-Tenant-ID`/token；`psql -tAc "SELECT rolsuper, rolbypassrls FROM pg_roles WHERE rolname=current_user"`；同一 pooled connection 连跑两租户 | `git grep` 查 context 传播、cache key、prefix 授权、`SET LOCAL`，注明「未做双租户实测」 | `multi-tenancy-testing.md` §1/§10 |
+| **无障碍自动化扫描**（v1.4） | `npx @axe-core/cli <url> --exit`、`npx lighthouse --only-categories=accessibility --output=json`；结果必须同时记 `violations` 与 `incomplete` | curl 验 HTML 语义（`label for`/`alt`/`lang`）+ 人工键盘走查；注明「未做自动化扫描」 | `accessibility-testing.md` §2/§6 |
+| **读屏与键盘路径**（v1.4） | NVDA/JAWS + Firefox·Chromium（Windows）、VoiceOver + Safari（macOS）、Narrator（Win+Ctrl+Enter）；Playwright `toMatchAriaSnapshot` 断言 a11y tree | 人工 Tab/Shift+Tab/Enter/Esc 逐步记 `activeElement` 与焦点遮挡，结果标 passed/failed/not checked/not present | `accessibility-testing.md` §3 |
+| **跨端仿真**（v1.4） | Playwright `devices['iPhone 13']` / `devices['Pixel 7']`；`test.use({ locale, timezoneId, colorScheme, reducedMotion, permissions })`；`context.setOffline(true)` | 手工改浏览器窗口 + DevTools 节流，注明「浏览器仿真，非真机」 | `cross-platform-testing.md` §3/§5 |
+| **真机与设备云**（v1.4） | 真机 / device cloud 覆盖 battery、thermal、sensors、biometrics、real network；`adb` / `xcrun simctl` 辅助 | 手边 1 台真机手工走查（前台→后台→回前台、旋转、飞行模式→恢复、深链冷启动），**只能写「单台真机手工走查」** | `cross-platform-testing.md` §2/§8 |
+| **测试经济性 / ROI 取证**（v1.4） | CI 时长与并发数、runner 成本、quarantine 名单、发布回滚记录、工单系统缺陷来源 | `git log` 统计变更频率 + 手工估时，注明「成本为估计值，非实测账单」 | `test-effectiveness-testing.md` §5A |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -96,3 +101,5 @@ done
 6. **工具是可选加速器，不是前置依赖**：任何专项工具缺失，都必须能用 `curl` + shell 断言 + 静态审查走完五阶段，并在报告注明降级原因
 7. 装新依赖前先确认是否污染被测项目；优先用 `npx`/`uvx` 临时执行，或把探针放 `.test-memory/tmp/`
 8. 每个工具输出都要留原始片段作证据；**工具说"通过"不等于断言有效**（见 `quality-gates.md` §5）
+9. **自动化 a11y ≠ 人工读屏**：`axe-core` 自述平均仅自动发现约 57% 的 WCAG 问题，且 `incomplete` 需人工复核；扫描绿只能写「本次自动化扫描未发现 violations」，不能写「符合 WCAG 2.2 AA」（`accessibility-testing.md` §2/§5）
+10. **仿真 ≠ 真机**：`devices['iPhone 13']`、emulator、simulator 一律标注载体，不得写成「真机验证」；battery/thermal/sensors/biometrics/real network 只能在 real device 上验（`cross-platform-testing.md` §2/§7）

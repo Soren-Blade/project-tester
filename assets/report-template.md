@@ -27,8 +27,10 @@
 | R-4 租户隔离 | PASS / 待确认 / 不适用 | <双租户否定路径 or 不适用> |
 | R-5 契约演进 | PASS / 待确认 / 不适用 | <oasdiff 退出码+can-i-deploy or 未做验证> |
 | R-6 隐私与数据生命周期 | PASS / 待确认 / 不适用 | <PII 分类+删除权+日志脱敏 or 未做验证> |
+| R-7 无障碍可达性 | PASS / 待确认 / 不适用 | <WCAG 2.2 级别+violations/incomplete+键盘路径+读屏组合 or 未做无障碍实测> |
+| R-8 跨端与设备形态真实性 | PASS / 待确认 / 不适用 | <设备矩阵来源+载体标注+端侧面+真机证据 or 未做跨端验证> |
 
-> 详细证据填各专项模板：`supply-chain-evidence-template.md` / `i18n-matrix-template.md` / `tenant-isolation-matrix-template.md` / `contract-evolution-matrix-template.md` / `privacy-matrix-template.md` / `test-effectiveness-template.md`。任一条声称通过却无证据 → 该结论作废降为「待确认」。
+> 详细证据填各专项模板：`supply-chain-evidence-template.md` / `i18n-matrix-template.md` / `tenant-isolation-matrix-template.md` / `contract-evolution-matrix-template.md` / `privacy-matrix-template.md` / `test-effectiveness-template.md` / `accessibility-matrix-template.md` / `device-matrix-template.md`。八行每行都必须填结论或「不适用 / 待确认」声明（由 `scripts/selfcheck.py` §7d 强制），任一条声称通过却无证据 → 该结论作废降为「待确认」。
 
 ## 缺陷清单（按严重度排序）
 

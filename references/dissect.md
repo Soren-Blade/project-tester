@@ -88,6 +88,8 @@
 | **交付链设施**（v1.2） | `package-lock.json` / `poetry.lock` / `go.sum`、`Dockerfile`、release workflow、`dist/` 与产物、SBOM 文件、签名/attestation 配置 | 决定能否叠加 `references/supply-chain-testing.md`；**无构建产物的纯源码脚本标「不适用」**，不写「供应链安全」 |
 | **locale 面**（v1.2） | 资源文件（`locales/`、`i18n/`、`messages.*`）、`Intl`/`toLocaleString` 调用、`lang`/`dir` 属性、时区与货币格式化 | 决定代表 locale 清单与 `references/i18n-localization-testing.md` 的六维矩阵范围 |
 | **租户边界**（v1.2） | `tenant_id`/`org_id`/`workspace_id` 从哪来、共享 DB/cache/queue/storage 清单、隔离策略声明（Separate DBs / Schemas / RLS / Hybrid）、platform admin 与跨租户 service identity | 决定 `references/multi-tenancy-testing.md` 的夹具与否定路径清单；**单租户标「不适用：无租户边界」** |
+| **无障碍面**（v1.4） | 交互控件清单、认证方式（有无验证码/转录）、焦点样式与 ARIA、`aria-live`/`aria-describedby`、图标按钮可访问名、目标尺寸、是否已声明 WCAG 2.2 AA 与读屏支持 | 决定 `references/accessibility-testing.md` 的键盘路径与读屏组合范围；**无 UI 的 CLI/库标「不适用：无图形交互界面」** |
+| **设备形态面**（v1.4） | 声明支持的 OS / 浏览器内核 / 屏幕形态（折叠屏、平板、小屏）、是否可得 install-base analytics、有无真机或设备云、CI 里是否已有 `devices`/emulation 配置 | 决定 `references/cross-platform-testing.md` 的矩阵来源与 `real`/`emulator` 载体划分；**纯后端 API/CLI 标「不适用：无终端形态差异」** |
 
 ## 7. 攻击面、观测面与依赖拓扑（v1.0 新增，v1.1 / v1.2 扩充）
 
@@ -127,7 +129,9 @@
 | **多租户 / SaaS / 共享 DB·cache·queue·storage / platform admin**（v1.2） | `references/multi-tenancy-testing.md` + `assets/tenant-isolation-matrix-template.md` | 双租户相同 ID 夹具、分层否定路径、连接复用与双租户备份恢复（R-4）；单租户标「不适用」 |
 | **有 OpenAPI/GraphQL/proto 规范且多客户端/多版本在跑**（v1.3） | `references/contract-evolution-testing.md` + `assets/contract-evolution-matrix-template.md` | `oasdiff breaking --fail-on=ERR` 退出码 + 输出行、Pact 消费者契约与 `can-i-deploy` 闸门、容忍读取验证（R-5）；无对外契约的单体工具标「不适用」 |
 | **处理个人数据 / PII / 用户生成内容、有隐私政策或合规要求**（v1.3） | `references/privacy-compliance-testing.md` + `assets/privacy-matrix-template.md` | 字段级 PII 分类 + 读接口响应白名单比对、批量分配、删除权端到端验证、日志脱敏核查（R-6）；不处理 PII 的纯技术工具标「不适用」 |
-| **有 CI / 测试套件 / 发布流程，需量化测试有效性**（v1.3） | `references/test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` | DORA 四指标（CFR/MTTR）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率；结论支撑 Go/No-Go；无自动化测试标「无测试度量基础」 |
+| **有 CI / 测试套件 / 发布流程，需量化测试有效性或成本收益**（v1.3 / v1.4） | `references/test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` | DORA 四指标（CFR/MTTR）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率、§5A 测试经济性/ROI；结论支撑 Go/No-Go；无自动化测试标「无测试度量基础」 |
+| **有 UI / 交互 / 表单 / 认证，或声称 WCAG 2.2 AA / 支持读屏**（v1.4） | `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md` | 版本与级别口径、axe violations + `incomplete` 人工复核、完整键盘路径、至少一组读屏组合逐项标注、2.4.11/2.5.8/3.3.8 实测（R-7）；无 UI 的 CLI/库标「不适用：无图形交互界面」 |
+| **有移动端 / 桌面端 / 多浏览器用户，或声称移动端可用 / 真机验过**（v1.4） | `references/cross-platform-testing.md` + `assets/device-matrix-template.md` | 设备矩阵来源与覆盖占比、`real`/`emulator`/`browser-emulation` 载体标注、多内核与长尾条目、端侧特有面与网络档位、发布门禁真机证据（R-8）；纯后端 API/CLI 标「不适用：无终端形态差异」 |
 
 路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 
@@ -148,6 +152,8 @@
 交付链（v1.2）：lockfile___ 产物/镜像___ SBOM/签名___ CI 可绕过?___（无则写"不适用：无构建产物"）
 locale 面（v1.2）：支持 locale___ 资源文件___ RTL___ 格式化调用___（单 locale 写"最小检查"）
 租户边界（v1.2）：标识来源___ 隔离策略___ 共享资源___ platform admin___（单租户写"不适用"）
-能力层路由：___（对应手册 ___；v1.1/v1.2 叠加项 ___，不适用原因 ___）
+无障碍面（v1.4）：交互控件___ 认证方式(有无认知测试)___ 焦点/ARIA___ 目标尺寸___ 声明级别___（无 UI 写"不适用"）
+设备形态面（v1.4）：支持OS/内核___ 屏幕形态___ install-base 数据可得?___ 真机/设备云___（纯后端写"不适用"）
+能力层路由：___（对应手册 ___；v1.1/v1.2/v1.3/v1.4 叠加项 ___，不适用原因 ___）
 风险初判：___（如"无任何输入校验""秘密硬编码""无链路埋点""下游调用无 timeout""客户端 tenant_id 直取""浮动依赖版本"）
 ```
