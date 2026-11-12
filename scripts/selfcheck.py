@@ -8,7 +8,8 @@
 
 检查项：frontmatter / 版本一致 / 本地引用完整性 / 占位资源 URL /
 关键字段 / 模板行数 / 索引覆盖 / **路由闭环（孤儿文档）** / **可证伪规则同步** /
-**报告证据矩阵同步（§7d）** / **规则例外声明（§7e）** / global-lessons 格式。
+**报告证据矩阵同步（§7d）** / **规则例外声明（§7e）** /
+**脚本可证伪性静态门禁（§7f，v1.5）** / global-lessons 格式。
 """
 from __future__ import annotations
 
@@ -127,6 +128,8 @@ checks = {
     "assets/test-effectiveness-template.md": ["DORA", "flaky", "变异得分", "ROI", "建设成本"],
     "assets/accessibility-matrix-template.md": ["R-7", "WCAG 2.2", "incomplete", "读屏"],
     "assets/device-matrix-template.md": ["R-8", "real", "设备矩阵", "网络档位"],
+    "assets/evidence-chain-template.md": ["R-9", "sha256", "控制项", "不适用", "不得"],
+    "references/evidence-chain-audit.md": ["R-9", "PROV", "OSCAL", "in-toto", "不适用"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -197,8 +200,9 @@ elif orphan_qg:
 else:
     ok(f"可证伪规则双向同步：{', '.join(rules)} 共 {len(rules)} 条，SKILL.md 与 quality-gates.md 集合一致")
 
-# 7d) 报告证据矩阵同步：报告模板的证据矩阵段必须覆盖 SKILL.md 定义的全部规则，
-#     且不得出现未定义编号。防止「新增 R-N 却忘了在报告里留证据槽位」。
+# 7d) 报告证据矩阵同步：证据矩阵**表格行**必须逐条覆盖 SKILL.md 定义的全部规则。
+#     v1.5 负向测试发现：只统计整段里的 R-N 会被说明文字中的编号蒙混（删掉 R-9 表格行
+#     仍判 PASS），因此改为只认 `| R-N ` 开头的表格行；说明段另查「未定义编号」。
 report_tpl = read(ROOT / "assets/report-template.md")
 matrix_marker = "## 证据矩阵"
 if matrix_marker in report_tpl:
@@ -206,15 +210,19 @@ if matrix_marker in report_tpl:
 else:
     matrix_section = ""
     fail("assets/report-template.md 缺少「## 证据矩阵」段，无法校验规则覆盖")
-matrix_rules = sorted(set(re.findall(r"R-\d+", matrix_section)))
+row_re = re.compile(r"^\|\s*(R-\d+)\s")
+matrix_rules = sorted({m.group(1) for ln in matrix_section.splitlines()
+                       for m in [row_re.match(ln)] if m})
 missing_matrix = [r for r in rules if r not in matrix_rules]
 extra_matrix = [r for r in matrix_rules if r not in rules]
+stray = [r for r in sorted(set(re.findall(r"R-\d+", matrix_section))) if r not in rules]
 if missing_matrix:
-    fail("报告证据矩阵缺少规则行: " + ", ".join(missing_matrix))
-elif extra_matrix:
-    fail("报告证据矩阵出现 SKILL.md 未定义的规则: " + ", ".join(extra_matrix))
+    fail("报告证据矩阵缺少规则表格行: " + ", ".join(missing_matrix))
+elif extra_matrix or stray:
+    fail("报告证据矩阵/说明段出现 SKILL.md 未定义的规则: "
+         + ", ".join(sorted(set(extra_matrix + stray))))
 else:
-    ok(f"报告证据矩阵同步：{', '.join(matrix_rules)} 共 {len(matrix_rules)} 条，与 SKILL.md 规则集一致")
+    ok(f"报告证据矩阵同步：{', '.join(matrix_rules)} 共 {len(matrix_rules)} 条表格行，与 SKILL.md 规则集一致")
 
 # 7e) 规则例外声明：每条规则定义行都必须写清「不适用时不得冒充通过」的降级写法。
 #     只加一句「要有证据」而不写禁止冒充声明，规则仍不可证伪。
@@ -227,6 +235,32 @@ else:
         fail("规则缺少「不适用时的禁止冒充声明」（须含『不得』）: " + ", ".join(bad_rows))
     else:
         ok(f"规则例外声明齐备：{len(rule_rows)} 条规则均写清禁止冒充的降级写法")
+
+# 7f) 脚本可证伪性静态门禁（v1.5）：新增可执行脚本必须自带 --self-test 与诚实边界声明。
+#     「加了个脚本」只证明静态记录；能检出自己造的假缺陷、且明确写出不越界声明，
+#     才允许作为交付证据。运行时另须人工执行两个 --self-test 并确认退出码 0。
+SCRIPT_GATES = {
+    "scripts/evidence-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap",
+        "dangling_reference", "unresolvable_anchor", "stale_evidence",
+        "pass_without_proof", "unclassified_conclusion", "不证明",
+    ],
+    "scripts/device-matrix.py": [
+        "--self-test", "SELFTEST GREEN", "CRUX_CAVEAT", "数据源未登记",
+        "不联网", "不代填",
+    ],
+}
+for rel, needles in SCRIPT_GATES.items():
+    sp = ROOT / rel
+    if not sp.is_file():
+        fail(f"{rel} 缺失：脚本可证伪性门禁无法校验")
+        continue
+    stext = read(sp)
+    absent = [n for n in needles if n not in stext]
+    if absent:
+        fail(f"{rel} 缺少可证伪性 / 诚实边界关键字段: {', '.join(absent)}")
+    else:
+        ok(f"{rel} 自带 --self-test 与诚实边界声明（§7f）")
 
 # 8) global-lessons 格式（软约束）
 gl = read(ROOT / "memory/global-lessons.md")

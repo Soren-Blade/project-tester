@@ -77,6 +77,10 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **跨端仿真**（v1.4） | Playwright `devices['iPhone 13']` / `devices['Pixel 7']`；`test.use({ locale, timezoneId, colorScheme, reducedMotion, permissions })`；`context.setOffline(true)` | 手工改浏览器窗口 + DevTools 节流，注明「浏览器仿真，非真机」 | `cross-platform-testing.md` §3/§5 |
 | **真机与设备云**（v1.4） | 真机 / device cloud 覆盖 battery、thermal、sensors、biometrics、real network；`adb` / `xcrun simctl` 辅助 | 手边 1 台真机手工走查（前台→后台→回前台、旋转、飞行模式→恢复、深链冷启动），**只能写「单台真机手工走查」** | `cross-platform-testing.md` §2/§8 |
 | **测试经济性 / ROI 取证**（v1.4） | CI 时长与并发数、runner 成本、quarantine 名单、发布回滚记录、工单系统缺陷来源 | `git log` 统计变更频率 + 手工估时，注明「成本为估计值，非实测账单」 | `test-effectiveness-testing.md` §5A |
+| **证据链自动对账**（v1.5） | `python scripts/evidence-audit.py audit --manifest <json> --root . --format markdown --output <md>`；CI 门禁加 `--fail-on-gap --format json`；`python scripts/evidence-audit.py --self-test` 验门禁可证伪 | 按 `evidence-chain-audit.md` §8 用 `git rev-parse HEAD` + `grep -n` + `sha256sum` 手工重建链，标 `BLOCKED`、结论降为「待确认」，**不得**写「可审计」 | `evidence-chain-audit.md` §4/§8 |
+| **install-base 设备矩阵草稿**（v1.5） | `python scripts/device-matrix.py build --input <csv\|json> --source "<数据源>" --window "<时间窗>" --min-coverage 0.8 --format markdown` | 无本地导出时人工填 `assets/device-matrix-template.md` 并写「数据源未登记 / 时间窗未登记」；**不得**把占比草稿写成真机证据 | `cross-platform-testing.md` §6A |
+| **视觉回归基线**（v1.5） | Playwright `toHaveScreenshot()` + `snapshotPathTemplate`；`npx playwright test --update-snapshots`；`maxDiffPixels` / `maxDiffPixelRatio` / `threshold` / `mask` / `stylePath` | 三档断点人工截图比对；注明「未做像素级基线比对」；基线更新须留旧/新 hash + 理由 + 批准人 | `cross-platform-testing.md` §6A |
+| **AI 生成用例有效性**（v1.5） | 变异测试（`npx stryker run` / `mutmut run`）+ 故意改坏 ≥1 处核心逻辑验假通过率 | 人工逐条审断言强度（`ai-native-testing.md` §3），注明「未做变异实测」，不写「有效性已验证」 | `test-effectiveness-testing.md` §5B |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -89,6 +93,9 @@ command -v schemathesis || command -v uvx || echo "schemathesis MISSING -> 手�
 for c in syft grype osv-scanner cosign slsa-verifier trivy; do
   command -v "$c" >/dev/null || echo "$c MISSING -> 走 sha256sum / git grep 静态降级，结论标 BLOCKED"
 done
+# v1.5 两个零依赖脚本：先证明门禁本身可证伪，再用于交付
+python scripts/evidence-audit.py --self-test || echo "evidence-audit SELFTEST FAIL -> 走 §8 人工链，结论标 BLOCKED"
+python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL -> 退回人工填模板，注明数据源口径"
 ```
 
 ## 工具使用纪律
@@ -103,3 +110,5 @@ done
 8. 每个工具输出都要留原始片段作证据；**工具说"通过"不等于断言有效**（见 `quality-gates.md` §5）
 9. **自动化 a11y ≠ 人工读屏**：`axe-core` 自述平均仅自动发现约 57% 的 WCAG 问题，且 `incomplete` 需人工复核；扫描绿只能写「本次自动化扫描未发现 violations」，不能写「符合 WCAG 2.2 AA」（`accessibility-testing.md` §2/§5）
 10. **仿真 ≠ 真机**：`devices['iPhone 13']`、emulator、simulator 一律标注载体，不得写成「真机验证」；battery/thermal/sensors/biometrics/real network 只能在 real device 上验（`cross-platform-testing.md` §2/§7）
+11. **对账 GREEN ≠ 合规通过**：`scripts/evidence-audit.py` 只证明「结论 → 证据 → 原始输出」可解析；`--update-snapshots` 与 `--output` 是受控变更，基线/导出件更新都要留旧/新 hash 与理由；一次性探索无留档要求写「不适用」（`evidence-chain-audit.md` §4/§7）
+12. **占比草稿 ≠ 安装量真相**：`scripts/device-matrix.py` 只吃本地导出、不联网、不代填载体，缺 `--source` / `--window` 时不能作为 R-8 矩阵来源证据；CrUX 只覆盖符合条件的真实 Chrome 用户且 form factor 仅三值，不能推出机型/OS 版本/非 Chrome 内核分布（`cross-platform-testing.md` §6A）

@@ -55,6 +55,8 @@ npx playwright init-agents --loop=vscode   # 生成 .github/ 下的 agent 定义
 4. 计划里的场景是否覆盖 P0 与至少 1 个无效等价类？
 5. 生成用例是否自带 setup/teardown、不依赖执行顺序？
 
+> **量化口径（v1.5）**：本节清单管「单条用例能不能要」；入库率 / 断言强度合格率 / 变异杀伤贡献 / 假通过率 / 审查成本管「这一批用例值不值」，见 `references/test-effectiveness-testing.md` §5B（E-15~E-18）。审查记录（提示词、diff、判定、批准人）须登记进 `scripts/evidence-audit.py` 的 manifest，否则 R-9 判证据链缺口；两处不重复抄写本清单。
+
 ## 4. Testing for AI：把 AI 系统当被测对象
 
 **根本差异**：传统测试假设"同样输入 → 同样输出"，AI 系统天然非确定。因此**不能只靠单点期望值断言**，改用不变量 / 蜕变关系 / 评测集 / rubric。

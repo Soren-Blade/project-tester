@@ -5,6 +5,70 @@
 
 ---
 
+## [v1.5.0] — 2026-11-12 · 每日升级 #6
+
+**主题**：从「结论正确」扩展到「**结论可复核 · 声称可对账**」——把上一轮剩下的两个顺延提案全部结案：合规性声明与证据链自动对账、设备矩阵与真实安装量数据源采集脚本；新增 **R-9 证据链可追溯与可复核性** 与两个**零依赖、自带可证伪自检**的 Python 脚本，并把视觉回归基线治理、AI 生成用例有效性度量 **Merge** 进已有手册（不新增强化手册、不膨胀目录）。注：与 #5 同日（2026-11-12）执行，按自动化轮次仍记为 #6。
+
+**遵循上轮建议**：未重写已覆盖主题（无障碍、跨端、测试经济性、供应链、隐私、契约演进、i18n、多租户、观测、韧性、数据、协议、AI 原生、五阶段与四层模型），以 **Enhance / Merge / New 混合、Merge 为主**；四层模型与五阶段流程**未改语义**（按 `self-evolution.md` §7 只升 MINOR）；每轮至少一条可证伪规则 → 本轮引入 **R-9**；本轮做了**负向测试**（临时副本破坏一处，确认 `selfcheck.py` 确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/evidence-chain-audit.md`、`assets/evidence-chain-template.md`、`scripts/evidence-audit.py`、`scripts/device-matrix.py` |
+| **Enhance** | `SKILL.md`（version 1.5.0、description 触发词、v1.5 增量与横向叠加项、阶段 1 证据链面 / 阶段 3 三项专项 / 证据纪律 / 阶段 4 自检、九条规则与 R-9 定义行、参考索引）、`README.md`（徽章 26→27 / 15→16 / 47→51、问题表 3 行、结构树、速查 3 行、设计要点、升级流程、版本史、`R-1~R-8`→`R-1~R-9` 漂移修正）、`references/dissect.md`（§6 证据链面、§8 两条新路由、产出格式一行）、`references/quality-gates.md`（§3 R-9 行、§8 九条 / 九行 / 两条新核对）、`assets/report-template.md`（证据矩阵 R-9 + 第九份模板挂接 + 八行→九行）、`references/tools.md`（4 行专项工具 + 2 条纪律 + 可用性探测两条自检）、`references/self-evolution.md`（§3 ⑥ 与 §5 表格的 §7f / 脚本回归）、`scripts/selfcheck.py`（§5 字段、新增 §7f、**§7d 由「整段统计编号」加固为「逐条核对表格行」**）、`references/ai-native-testing.md`（§3 交叉引用 §5B，不重复抄写） |
+| **Merge** | 两个顺延提案结案：合规声明对账落地为新手册 + 模板 + 脚本（因需独立 manifest 规范，另起文件）；设备矩阵数据源脚本落地为 `scripts/device-matrix.py` + `cross-platform-testing.md` §6A（**不另起手册**）。视觉回归基线治理并入 `cross-platform-testing.md` §6A、AI 生成用例有效性并入 `test-effectiveness-testing.md` §5B，均不新增文件；`memory/global-lessons.md` 提案区改为「已吸收（v1.5）」并新增 2 组共 13 条 v1.5 教训、2 条新提案 |
+| **Match** | 新手册在 `dissect.md` §8 与 `SKILL.md` v1.5 叠加项均有触发条件；R-9 在 `SKILL.md` 定义表、`quality-gates.md` §3/§8、`report-template.md` 证据矩阵、`selfcheck.py` §7c/§7d/§7e 四处口径一致；两个新脚本由 §7f 静态门禁约束。全部由 `selfcheck.py` **代码强制** |
+| **Existing** | 五阶段模型、四层能力模型、记忆树 <100 行纪律、双视角、"工具缺失不中止"降级原则、六门禁 12 分、缺陷八字段、R-1~R-8 规则、权限裁决 —— 全部保留，未改语义；`SKILL.md` 的 todo 示例逐字保留 |
+
+### 蒸馏来源（本轮实查，均可核查）
+
+| 来源 | URL / 位置 | 关键结论 |
+|---|---|---|
+| W3C PROV-DM（Recommendation 2013-04-30） | https://www.w3.org/TR/prov-dm/ | `Entity` / `Activity` / `Agent` 三类对象与 `wasGeneratedBy` / `used` / `wasDerivedFrom` / `wasAttributedTo` / `wasAssociatedWith` 等关系；目标是 provenance 在异构系统间 **interchange**，并支持对 quality / reliability / trustworthiness 形成判断 |
+| NIST OSCAL 模型分层 | https://pages.nist.gov/OSCAL/concepts/layer/ · https://pages.nist.gov/OSCAL/ | Control / Implementation / Assessment 三层；模型精确名 `catalog` `profile` `mapping` `component-definition` `system-security-plan` `assessment-plan` `assessment-results` `plan-of-action-and-milestones`；官方原文「The OSCAL models provide native traceability from the assessment layer to the catalog layer」；`assessment-results` 含评估执行时间、scope、evidence 与 findings |
+| NIST SP 800-218 SSDF v1.1 | https://csrc.nist.gov/pubs/sp/800/218/final · https://csrc.nist.gov/Projects/ssdf | 2022-02；PO / PS / PW / RV 四组；每条实践由 Practice / Task / Notional Implementation Example / Reference 四要素定义；与 PS.3.2（collecting and sharing provenance data）、PW.1.2 相关；官方明确「not to create a checklist to follow」 |
+| in-toto 官方 README | https://github.com/in-toto/in-toto | `layout` 由 project owner 创建，列 `steps` 顺序与授权 `functionaries`；`material and product rules`（`CREATE`/`DELETE`/`MODIFY`/`ALLOW`/`DISALLOW`/`REQUIRE`/`MATCH`）；`link` file 记录 step name / command / materials / products 并签名，「provide the required evidence to establish a continuous chain」；`in-toto-verify` 校验签名、过期、授权与规则；未显式作为 artifacts 传入的文件不会被记录 |
+| GitHub Docs · artifact attestations | https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations | `actions/attest@v4` 的 `subject-path` / `subject-name` + `subject-digest` / `sbom-path`；`gh attestation verify <artifact> -R ORG/REPO`、`--predicate-type https://spdx.dev/Document/v2.3`、`--format json --jq '.[].verificationResult.statement.predicate'` |
+| Playwright · Visual comparisons / `toHaveScreenshot()` | https://playwright.dev/docs/test-snapshots | 像素比对会因 OS / 浏览器 / 平台渲染差异产生不同结果，应与生成基线相同的环境运行；`--update-snapshots`、`snapshotPathTemplate`、`maxDiffPixels` / `maxDiffPixelRatio` / `threshold`、`mask` / `stylePath`、`animations` / `caret` / `scale` / `omitBackground` |
+| Chrome UX Report（CrUX）官方文档 | https://developer.chrome.com/docs/crux/ · https://developer.chrome.com/docs/crux/methodology | 符合条件的真实 Chrome 用户 field data；origin/page 需公开可发现且访问量足够；form factor 仅 `phone` / `tablet` / `desktop`（UA 推断）；country 维度在 CrUX APIs 中不可用、ECT 维度已移除；不覆盖机型 / OS 版本 / 非 Chrome 内核 |
+| GitHub `naodeng/awesome-qa-skills` | https://github.com/naodeng/awesome-qa-skills | `requirement-traceability-analysis` / `test-report-review` / `skill-change-verification` / `visual-regression-testing` / `ai-generated-test-review` / `test-effectiveness-analysis` 等 canonical names，佐证本轮主题与 Merge 方向 |
+
+**口径诚实标注**：① PROV-DM 页面**没有**把 `traceability` 定义成独立术语，本手册只借其对象与关系做建模语言，不宣称实现完整 PROV 合规；② OSCAL 官网「from months to minutes」是**宣传口径**，非本技能实测承诺；③ SSDF 的 Notional Implementation Example 明确非必需，且官方声明不是 checklist，故手册禁止「抄清单即合规」；④ in-toto README **未**给出 `threshold` 定义、**未**使用 `expected materials/products` 短语，手册不臆造字段；⑤ GitHub artifact attestations 是**产品级能力**非通用标准，离线/气隙验证流程不同，手册不套用在线命令；⑥ Playwright 阈值参数只列名称与用途，**不给默认数值**，避免把某个数字写成官方要求；⑦ CrUX 局限按官方文档逐条写明，脚本固定输出该声明；⑧ **未采用**任何「AI 提效 X%」类二手数据，`test-effectiveness-testing.md` §5B 只给可自测的度量口径；⑨ 设备矩阵脚本**不臆造 analytics API 字段或鉴权**，只接受本地导出；⑩ GitHub Docs 栏目 URL 为文档入口，具体子页路径以官方站点为准，手册中的命令按官方原文转述。
+
+### 主要改动
+
+1. **证据链可追溯与合规声明对账**（新手册 + 模板 + 脚本 + R-9）：PROV 三级引用链、OSCAL 三层与 SSDF 四组的「逐控制项挂证据」纪律、in-toto 连续链与 GitHub attestations 的真实命令、manifest 最小字段与 7 类检出码、EA-1~EA-12 测试卡、L0 人工降级路径；`scripts/evidence-audit.py` 只用标准库、不联网、不修改被测项目，自动补算证据 `sha256` 并抽出锚点原文，`--self-test` 可检出悬空引用 / 过期证据 / 不可解析锚点 / PASS 无证据 / 无控制项缺口声明 / 未分类结论
+2. **R-9 证据链可追溯与可复核性**：声称「可复核 / 证据链完整 / 已通过审计」须附三级引用链 + hash/commit 绑定 + 自动对账缺口 + 控制项映射与未映射声明 + 导出件自身 hash；一次性探索、无留档要求写「不适用：无留档要求」，**不得**写「可审计 / 通过审计」；部分证据写「存在 N 处缺口，降为待确认」。**对账 GREEN ≠ 合规通过 ≠ 软件安全 ≠ 发布批准**
+3. **设备矩阵真实安装量数据源**（落地顺延提案）：`scripts/device-matrix.py` 接受本地 CSV/JSON 导出，算占比 / 累计 / 80% 截断点 / 长尾补充位，固定输出数据源、时间窗与 CrUX 局限；空数据或合计 0 直接报错；**不代填** `real` / `emulator` 载体、不写「真机已验证」；`--self-test` 用 50/30/15/5 验算
+4. **视觉回归基线治理**（`cross-platform-testing.md` §6A）：基线环境指纹、`--update-snapshots` 留旧/新 hash + 理由 + 批准人、`snapshotPathTemplate` 分平台、`maxDiffPixels`/`threshold`/`mask` 变更需批准、基线计入证据链；X-13~X-16 测试卡
+5. **AI 生成用例有效性度量**（`test-effectiveness-testing.md` §5B）：入库率 / 断言强度合格率 / 变异杀伤贡献 / **假通过率** / 审查人时 / 逃逸拦截贡献，E-15~E-18；分母是「入库用例」而非「生成条数」；`ai-native-testing.md` §3 只加交叉引用，不二次抄写弱断言清单
+6. **门禁升级**：`selfcheck.py` 新增 **§7f 脚本可证伪性静态门禁**——两个脚本必须自带 `--self-test`、`SELFTEST GREEN`、检出码与「不联网 / 不代填 / 不证明」诚实边界声明，缺字段即 FAIL；`self-evolution.md` §3 ⑥ 把两个 `--self-test` 列为升级固定动作
+7. **漂移修正**：`SKILL.md` 规则数「八条→九条」、`quality-gates.md` §8「八条/八行→九条/九行」、`report-template.md`「八行→九行」、README 与索引中 `R-1~R-8` 统一改为 `R-1~R-9`
+8. **§7d 门禁加固（负向测试实证驱动）**：旧实现只在证据矩阵**整段**里统计 `R-N` 编号，说明文字中出现的编号即可蒙混——删掉 R-9 表格行仍判 GREEN。现改为只认 `| R-N ` 开头的**表格行**逐条比对，说明段另查「未定义编号」。这恰好是本轮 R-9「结论可复核」要防的失效模式：**看起来有证据槽位，实际没有**
+
+### 自检、回归与负向测试
+
+| 项 | 结果 |
+|---|---|
+| `python scripts/selfcheck.py` | **PASS 32 / WARN 0 / FAIL 0**（frontmatter、断链、版本一致、占位 URL、模板/手册字段、tree 模板行数、27 份手册索引、19 份专项路由闭环、R-1~R-9 双向同步、报告矩阵九行、九条例外声明、§7f 两个脚本门禁、global-lessons 格式） |
+| `python scripts/evidence-audit.py --self-test` | `SELFTEST GREEN`，exit 0 |
+| `python scripts/device-matrix.py --self-test` | `SELFTEST GREEN`，exit 0 |
+| `python -m py_compile scripts/*.py` | `COMPILE_OK` |
+| 负向测试 | 临时副本两处破坏均 `PASS 31 / FAIL 1`、exit 1；其中 NEG-2 首次误判 GREEN 并促成 §7d 加固（详见下方记录） |
+| 回归检查 | 五阶段与四层模型未改语义；todo 示例逐字保留；记忆树 <100 行纪律保留；新手册有 §8 路由；R-9 已落 `quality-gates.md` / `report-template.md` / 规则例外声明三处；旧示例仍成立 |
+
+**负向测试记录**（临时副本中执行，源文件未改动，副本已清理）：
+
+- **NEG-1**：把 `scripts/evidence-audit.py` 的 `SELFTEST GREEN` 改成 `SELFTEST OK` → `[FAIL] scripts/evidence-audit.py 缺少可证伪性 / 诚实边界关键字段: SELFTEST GREEN`，`PASS 31 / FAIL 1`，exit 1（§7f 确实生效）。
+- **NEG-2**：删除 `assets/report-template.md` 证据矩阵的 `| R-9 ... |` 表格行 → **首次仍判 GREEN**，暴露 §7d 的真实缺陷：旧实现统计整段里的 `R-N`，说明文字里的 R-9 足以蒙混。随即把 §7d 改为只认表格行并重跑 → `[FAIL] 报告证据矩阵缺少规则表格行: R-9`，`PASS 31 / FAIL 1`，exit 1。
+- **首次尝试的假 GREEN**：Git Bash 的 `mktemp -d` 返回 Windows 路径，拼进 Python 字符串字面量触发 `\U` unicodeescape 错误，导致副本**根本没被破坏**却打印了 GREEN。改为经 `sys.argv` 传路径后重做，才得到上面的真实结果。**「负向测试打印 GREEN」本身也可能是假象**，这与本轮 R-9 的主题一致，故如实留档。
+- 主目录加固后自检仍为 `PASS 32 / WARN 0 / FAIL 0`；`python -m py_compile scripts/*.py` → `COMPILE_OK`。
+
+**下轮建议**：① 别再重写已覆盖的大块，继续以 Enhance / Merge 为主；② 两个新提案（manifest ↔ OSCAL `assessment-results` 互转、跨语言变异杀伤自动跑数）先确认真实消费需求再动，避免造无人使用的转换层；③ 每轮仍至少一条可证伪规则、且必须做负向测试；④ 关注 `selfcheck.py` 检查项变多后的执行时长（当前仍是纯本地静态检查，无子进程）。
+
+---
+
 ## [v1.4.0] — 2026-11-12 · 每日升级 #5
 
 **主题**：从「系统正确」扩展到「**人人可用 · 处处可用 · 值得测**」——补齐无障碍可达性深度实测、跨端与设备形态真实性、测试经济性/ROI 三块深水区，落地三个顺延提案，新增 **R-7 / R-8** 两条可证伪规则，并新增两条自检门禁（§7d 报告证据矩阵同步 / §7e 规则例外声明）。

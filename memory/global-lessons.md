@@ -189,6 +189,26 @@
 - [安全] 影子流量只做只读镜像比对，不得影响真实用户或引入写副作用 — 应用：PII/token 先脱敏，写明采样率与时间窗
 - [手法] 契约绿但影子 diff 出现非预期项 = 契约覆盖有缺口 — 应用：回看 Pact 交互清单，别把影子流量当 R-5 的替代品
 
+## 证据链与合规声明类（v1.5 蒸馏）
+
+- [流程] 结论 ≠ 证据文件 ≠ 原始输出；报告写「链路完整」却指不到日志那一行，等于不可复核 — 应用：每条结论登记路径 + 可解析锚点 + `sha256` + 采集 commit（W3C PROV-DM，R-9）
+- [合规] SSDF 明确「not to create a checklist to follow」；抄一份控制项清单不能写「合规通过」 — 应用：逐控制项挂「评估活动 / 证据锚点 / finding / 缺口声明」（NIST SP 800-218 v1.1）
+- [流程] 对账 GREEN 只证明链可解析，不证明软件安全、合规通过或发布批准 — 应用：固定区分静态记录 / 评测准备度 / 运行时质量 / 发布批准四类结论
+- [手法] 过期证据比没有证据更危险：采集于旧 commit 的日志会让报告看起来完整 — 应用：PASS 结论必须绑 `subject_commit`，否则判 `stale_evidence` 降为待确认
+- [手法] in-toto 的 link file 只记录显式登记为 artifacts 的文件，没登记的原始输出等于不存在 — 应用：证据清单显式登记，不靠事后翻目录补
+- [安全] 视觉基线被 `--update-snapshots` 悄悄覆盖等同于证据被替换 — 应用：每次更新留旧/新 hash + 理由 + 批准人（Playwright Visual comparisons）
+- [流程] 一次性探索、无留档要求 → 只写「未做证据链对账 / 不适用」，不得写「可审计 / 证据链完整」 — 应用：R-9 例外场景统一降级写法
+- [流程] 门禁只统计「段落里出现的编号」会被说明文字蒙混；负向测试打印 GREEN 也可能是副本根本没被破坏 — 应用：门禁只认结构化行（表格行 / 代码块），负向测试先确认破坏确实生效再下结论（v1.5 §7d 加固实证）
+
+## 设备矩阵数据源与 AI 用例有效性类（v1.5 蒸馏）
+
+- [手法] CrUX 是符合条件的真实 Chrome 用户 field data，form factor 仅 `phone`/`tablet`/`desktop`，country 不在 CrUX APIs、ECT 已移除 — 应用：不能据此推机型 / OS 版本 / 非 Chrome 内核分布，也不能当全量人群
+- [流程] 设备矩阵草稿必须由本地导出算占比并写数据源与时间窗 — 应用：缺 `--source` / `--window` 就写「未登记」，该草稿不能作为 R-8 矩阵来源证据
+- [安全] 采集脚本绝不代填 `real` / `emulator` 载体或写「真机已验证」 — 应用：载体列与实测结论一律人工填（`scripts/device-matrix.py`）
+- [指标] AI 生成用例的分母是「入库用例」而非「生成条数」 — 应用：报入库率 / 断言强度合格率 / 变异杀伤贡献 / 假通过率，别只报「生成 200 条」
+- [手法] 故意改坏核心逻辑后 AI 生成用例仍全绿 = 假通过 — 应用：E-17 实测，与 `ai-native-testing.md` §3 的自愈陷阱同源
+- [流程] AI 改过的断言与视觉基线更新都要人工 diff 并留痕 — 应用：审查记录进 `scripts/evidence-audit.py` 的 manifest，否则 R-9 判缺口
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -201,5 +221,7 @@
 - [技能改进] ✅ **已吸收（v1.4）**：测试成本 / ROI 度量 → **合并**进 `references/test-effectiveness-testing.md` §5A（不另起文件），模板加三类成本/三类收益与 E-11~E-14；理由：与有效性度量是同一把尺的两面，另起文件会膨胀目录
 - [技能改进] ✅ **已吸收（v1.4）**：移动端与桌面端专项 → 落地为 `references/cross-platform-testing.md` + `assets/device-matrix-template.md`，以 R-8 固定「仿真 ≠ 真机」；理由：本轮实查 Playwright Emulation 官方能力与 install-base 设备矩阵口径，不再靠臆造平台特有断言
 - [技能改进] ✅ **已吸收（v1.4）**：无障碍自动化实测的边界 → 落地为 `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md`，以 R-7 固定「axe 0 violations ≠ 合规」；来源 W3C WCAG 2.2 / Deque axe-core / DWP / Playwright
-- [技能改进] 待后续轮次：把「合规性声明」（如 SOC2 / 等保）与证据链自动对账 → 目前 R-3/R-6 已覆盖制品与隐私两类，泛化前需更多权威映射来源，避免造空泛清单
-- [技能改进] 待后续轮次：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 依赖具体 analytics 平台，先保留人工填口径的模板，不臆造 API
+- [技能改进] ✅ **已吸收（v1.5）**：把「合规性声明」（SOC2 / 等保 / SSDF）与证据链自动对账 → 落地为 `references/evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`，新增 **R-9**；理由：本轮实查 W3C PROV-DM / NIST OSCAL / NIST SP 800-218 v1.1 / in-toto / GitHub artifact attestations，权威映射来源已足，不再造空泛清单，且明确「对账 GREEN ≠ 合规通过」
+- [技能改进] ✅ **已吸收（v1.5）**：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 落地为 `scripts/device-matrix.py` + `references/cross-platform-testing.md` §6A；理由：**不臆造 analytics API**，只接受本地 CSV/JSON 导出，算占比/累计/80% 截断点并固定输出 CrUX 口径局限；载体与实测结论仍人工填，不冒充真机证据
+- [技能改进] 待后续轮次：把 `scripts/evidence-audit.py` 的 manifest 与 CI artifacts / OSCAL `assessment-results` 做格式互转 → 需先确认目标组织实际采用 OSCAL 模型，否则易造无人消费的转换层
+- [技能改进] 待后续轮次：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → 依赖具体变异工具输出格式，先保留 §5B 的人工度量口径，不硬编码某一家 JSON schema

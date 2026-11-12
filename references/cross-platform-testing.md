@@ -111,6 +111,52 @@ await page.context().setOffline(true);   // 离线态：错误提示 / 缓存 / 
 | X-11 | 网络档位（离线/高延迟/切换/省电） | 每档有参数、载体、观察结果 | 只写「弱网测过」 |
 | X-12 | 发布门禁前的真机组 | 至少 1 组 real device 覆盖 battery/thermal/real network 观察 | 全靠仿真就宣布可发布 |
 
+## 6A. 视觉回归基线治理与 install-base 数据源采集（v1.5 新增）
+
+> 蒸馏自 Playwright 官方文档 Visual comparisons / `toHaveScreenshot()` API、Chrome UX Report（CrUX）官方文档的 form factor 与数据资格口径，以及 GitHub `naodeng/awesome-qa-skills` 的 `visual-regression-testing` 分类。来源 URL 见 `CHANGELOG.md` v1.5.0。
+> **合并进本手册而非另起文件**：视觉基线是「跨端渲染差异」的一个证据面，install-base 数据源是 R-8 矩阵的输入，两者同属设备矩阵治理。
+
+### 6A.1 视觉回归基线：先固定环境，再谈像素差异
+
+Playwright 的 `toHaveScreenshot()` 做像素比对；官方明确提示**不同 OS / 浏览器 / 平台会因字体渲染与抗锯齿等产生差异**，因此基线必须在与生成基线相同的环境里运行，否则红色 diff 不是 bug 而是环境噪声。
+
+| 治理动作 | 最小判据 | 常见造假 |
+|---|---|---|
+| 基线环境指纹 | 记录 OS / 浏览器内核版本 / viewport / `deviceScaleFactor` / 字体集 / 时区 / locale，写进 `assets/evidence-chain-template.md` 的 subject 指纹 | 只写「本机跑过」 |
+| 生成与更新 | `npx playwright test --update-snapshots` 生成基线；**每次更新写理由**（文案变更 / 设计改版 / 环境升级）并留 diff 前后截图路径 | 一键 `--update-snapshots` 把红变绿就当修好了 |
+| 路径与命名 | `snapshotPathTemplate` 按平台/项目分目录，避免多内核共用一份基线 | Chromium 的基线拿去验 WebKit |
+| 差异阈值 | `maxDiffPixels` / `maxDiffPixelRatio` / `threshold` 写明数值与理由；调大阈值必须人工批准 | 悄悄放宽阈值让用例变绿 |
+| 稳定化 | `mask` 遮挡动态区域（时间戳/广告/头像）、`stylePath` 注入样式、`animations: 'disabled'`、`caret: 'hide'`、`scale` 口径统一 | 把整块内容 mask 掉，等于没测 |
+| 基线留痕 | 基线文件计入证据链：`sha256` + 采集 commit + 生成命令原文（`references/evidence-chain-audit.md` §4） | 基线被事后替换且无版本 |
+
+**纪律**：`--update-snapshots` 是**受控的基线变更**，不是测试修复手段。与 `references/ai-native-testing.md` §3 的「自愈陷阱」同源：让测试变绿 ≠ 功能变好。基线更新后须在 `assets/evidence-chain-template.md` 留「旧 hash → 新 hash + 理由 + 批准人」，否则 R-9 判证据链缺口。
+
+### 6A.2 install-base 数据源：用本地导出算矩阵，不臆造 API
+
+`scripts/device-matrix.py` 只接受**本地 CSV / JSON 导出**（CrUX BigQuery 导出、自有埋点报表、应用商店安装量报表）：不联网、不调用任何 analytics API——各家字段与鉴权不同，臆造参数只会产出假证据。
+
+```bash
+python scripts/device-matrix.py build --input exports/install-base.csv \
+  --source "CrUX BigQuery 导出 2026-10" --window "2026-10-01 ~ 2026-10-31" \
+  --min-coverage 0.8 --format markdown --output .test-memory/device-matrix-draft.md
+python scripts/device-matrix.py --self-test
+```
+
+输入列（大小写不敏感，允许别名）：`device` / `os` / `os_version` / `browser` / `engine` / `form_factor` / `installs`（`installs` 也可用 `sessions` / `users` / `count` / `install_base`）。脚本输出占比、累计占比、达到阈值（默认 80%）的**截断点**、长尾补充位与口径声明；空数据或合计为 0 时直接报错，不生成空矩阵。
+
+**CrUX 口径诚实声明（写进报告，不能省）**：CrUX 是真实 Chrome 用户的 field data，origin/page 需符合资格条件（可公开发现且访问量足够）才有数据；form factor 仅 `phone` / `tablet` / `desktop` 三值（由 UA 推断）；**country 维度在 CrUX APIs 中不可用，ECT 维度已移除**；不能据此推出机型、OS 版本或非 Chrome 内核（WebKit/Gecko）的分布，也不能当作全量人群。
+
+**脚本绝不代填**：`real` / `emulator` / `simulator` / `browser-emulation` 载体列与实测结论一律留空待人工填；缺 `--source` / `--window` 时显式写「数据源未登记 / 时间窗未登记」，此类草稿**不能作为 R-8 的矩阵来源证据**。
+
+### 6A.3 补充测试卡（X-13 ~ X-16）
+
+| # | 测试动作 | 通过判据 | 常见失败 |
+|---|---|---|---|
+| X-13 | 视觉基线记录环境指纹与生成命令 | OS/内核版本/viewport/字体/`snapshotPathTemplate` 齐全 | 换台机器基线全红且说不清原因 |
+| X-14 | 基线更新留「旧 hash → 新 hash + 理由 + 批准人」 | 每次 `--update-snapshots` 都有对应记录 | 直接覆盖基线文件 |
+| X-15 | 阈值与 mask 变更有人批准 | `threshold` / `maxDiffPixels` / `mask` 数值与理由可查 | 放大阈值把真实回归藏掉 |
+| X-16 | 矩阵草稿注明数据源与时间窗，载体由人工填 | 无「数据源未登记」，无脚本代填的 `real` | 把占比草稿写成「真机验证通过」 |
+
 ## 7. R-8 跨端与设备形态真实性（可证伪规则，见 SKILL.md）
 
 | 声称 | 必须附的证据 | 不适用时的写法 |

@@ -2,9 +2,10 @@
 
 > 一个会**自我进化**的测试 Skill：解剖任意项目 → 按风险生成测试需求 → 双视角深测 → 记忆树接力 → 每日蒸馏升级。不绑定语言、框架或 agent。
 
-![version](https://img.shields.io/badge/version-v1.4.0-1677ff)
-![references](https://img.shields.io/badge/reference_files-26-2ea44f)
-![assets](https://img.shields.io/badge/templates-15-e60023)
+![version](https://img.shields.io/badge/version-v1.5.0-1677ff)
+![references](https://img.shields.io/badge/reference_files-27-2ea44f)
+![assets](https://img.shields.io/badge/templates-16-e60023)
+![scripts](https://img.shields.io/badge/scripts-3-6f42c1)
 ![updated](https://img.shields.io/badge/updated-2026-11-12-6e7781)
 
 ---
@@ -37,20 +38,23 @@
 | **测试越堆越多，说不清值不值** | `test-effectiveness-testing.md` §5A：建设/运行/维护成本、反馈时间收益、逃逸避免成本、选测/并行/缓存收益，与有效性指标合并成 ROI 口径 |
 | **同一 commit 两次构建产物不一样** | `supply-chain-testing.md` §2A 可复现构建：固定 build inputs/environment/instructions、逐位或 hash 比对、时间戳与随机排序口径；R-3 证据增强 |
 | **契约测试过了，线上真实流量行为仍不一致** | `contract-evolution-testing.md` §3A 影子流量：只读镜像比对响应与派生状态、脱敏与采样口径，不产生写副作用 |
+| **报告结论看着全，却没人能按证据重放；说「合规」却挂不上控制项** | `evidence-chain-audit.md`：PROV 三级引用链、OSCAL/SSDF 控制项映射、`scripts/evidence-audit.py` 自动对账（悬空引用 / 过期证据 / 锚点失效 / PASS 无证据 / 未分类结论）；**R-9 不认「报告写全了 / 证据文件都在 / 对账 GREEN」** |
+| **设备矩阵靠拍脑袋列机型 / 视觉基线被 `--update-snapshots` 悄悄换掉** | `cross-platform-testing.md` §6A + `scripts/device-matrix.py`：本地 install-base 导出算占比 / 累计 / 80% 截断点，固定输出 CrUX 口径局限；基线更新留旧/新 hash + 理由 + 批准人，载体列人工填 |
+| **AI 一口气生成 200 条用例，其实没杀伤力** | `test-effectiveness-testing.md` §5B：入库率 / 断言强度合格率 / 变异杀伤贡献 / **假通过率**（故意改坏代码应转红）/ 审查人时，E-15~E-18；审查 diff 登记进 manifest |
 | 工具装不齐就测不下去 | `tools.md` 全表带降级路径，零依赖也能走完五阶段 |
 | 升级无记录、越更越乱 | `self-evolution.md` 十步门禁 + `CHANGELOG.md` + `scripts/selfcheck.py` 自检（路由闭环、规则同步、报告矩阵、例外声明） |
 
 ---
 
-## 文件结构（47 个文件）
+## 文件结构（51 个文件）
 
 ```
 project-tester/
-├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-8 + 参考索引
+├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-9 + 参考索引
 ├── README.md                         # 本文件
 ├── CHANGELOG.md                      # 每日升级记录（来源 / 改动 / 自检）
 ├── .gitignore
-├── references/                       # 26 份手册（渐进披露，按需读）
+├── references/                       # 27 份手册（渐进披露，按需读）
 │   ├── dissect.md                    # 解剖：栈指纹 / 入口 / 测试设施 / 攻击面 / 观测面 / 交付链 / locale / 租户 / a11y / 设备形态 / 路由
 │   ├── tools.md                      # 工具总表 / 专项工具 / 可用性探测 / 降级纪律
 │   ├── personas.md                   # 7 日常 + 8 刁钻画像 / 判 bug 标准 / 手册映射
@@ -60,7 +64,7 @@ project-tester/
 │   ├── performance-testing.md        # 五种负载 / p95 口径 / k6 模板 / 性能预算 / 瓶颈定位
 │   ├── frontend-testing.md           # 五态矩阵 / WCAG 2.2 最小清单 / CWV / 错误映射 / a11y 与跨端联动
 │   ├── fullstack-integration.md      # 测试金字塔 / 隔离与工厂 / 集成边界 / 六门禁 12 分
-│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-8 交付核对
+│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-9 交付核对
 │   ├── ai-native-testing.md          # 四层能力模型 / AI for QA vs Testing for AI / 评测集
 │   ├── observability-testing.md      # 三大信号 / Trace 驱动 / W3C Trace Context / SLO 与错误预算 / R-1
 │   ├── chaos-resilience.md           # 稳态假设 / 故障注入矩阵 / 三级工具阶梯 / 恢复判据 / R-2
@@ -71,15 +75,16 @@ project-tester/
 │   ├── multi-tenancy-testing.md      # 双租户夹具 / TC·IDOR·DB·CACHE·QUEUE·FILE·BACKUP·ADMIN 否定路径 / R-4
 │   ├── contract-evolution-testing.md # oasdiff / Pact / can-i-deploy / 影子流量 / Zalando·SemVer / R-5
 │   ├── privacy-compliance-testing.md # PII 分类与最小化 / API3 / GDPR Art5·17 / 日志 PII / R-6
-│   ├── test-effectiveness-testing.md # DORA 四指标 / 逃逸率 / flaky / 变异得分 / §5A 测试经济性·ROI
+│   ├── test-effectiveness-testing.md # DORA 四指标 / 逃逸率 / flaky / 变异得分 / §5A 测试经济性·ROI / §5B AI 生成用例有效性
 │   ├── accessibility-testing.md     # WCAG 2.2 增量 9 条 / 2.4.11·2.5.8·3.3.8 / axe 边界与 incomplete / 键盘路径·读屏组合 / R-7
-│   ├── cross-platform-testing.md    # 设备矩阵与 80% 覆盖 / 载体分野 / Playwright Emulation / 端侧特有面·网络档位 / R-8
+│   ├── cross-platform-testing.md    # 设备矩阵与 80% 覆盖 / 载体分野 / Playwright Emulation / 端侧特有面·网络档位 / §6A 视觉基线治理与 install-base 导出 / R-8
 │   ├── memory-tree.md                # 记忆树规范 / runs 格式 / 省 token 三律
 │   ├── evolution.md                  # 运行时进化回路 / 四问 / 三层记忆
-│   └── self-evolution.md             # 每日升级十步协议 / 权限裁决 / 版本与蒸馏门槛
-├── assets/                           # 15 份模板
+│   ├── self-evolution.md             # 每日升级十步协议 / 权限裁决 / 版本与蒸馏门槛
+│   └── evidence-chain-audit.md       # PROV 三级引用链 / OSCAL·SSDF 合规声明对账 / in-toto 与 GitHub attestations / manifest 与自动对账 / EA-1~EA-12 / R-9
+├── assets/                           # 16 份模板
 │   ├── tree-template.md              # 项目记忆树初始化
-│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-8 证据矩阵）
+│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-9 证据矩阵）
 │   ├── bug-report-template.md        # 缺陷报告八字段 + MRE
 │   ├── test-plan-template.md         # 测试计划 / 六维矩阵
 │   ├── release-gate-template.md      # 六门禁 12 分发布验收
@@ -92,11 +97,14 @@ project-tester/
 │   ├── privacy-matrix-template.md    # PII 分类 / 响应白名单 / 删除权 / 日志脱敏 / R-6
 │   ├── test-effectiveness-template.md # DORA 四指标 / 逃逸率 / flaky / 变异得分 / ROI 成本·收益
 │   ├── accessibility-matrix-template.md # WCAG 2.2 版本口径 / violations·incomplete / 键盘路径 / 读屏组合 / R-7
-│   └── device-matrix-template.md     # 矩阵来源·覆盖占比 / 载体标注 / 端侧特有面 / 网络档位 / 真机证据 / R-8
+│   ├── device-matrix-template.md     # 矩阵来源·覆盖占比 / 载体标注 / 端侧特有面 / 网络档位 / 真机证据 / R-8
+│   └── evidence-chain-template.md    # 三级引用链（R-1~R-9）/ 控制项映射 / 缺口清单 / 锚点原文 / 审计导出留痕 / R-9 结论
 ├── memory/
 │   └── global-lessons.md             # 跨项目经验（开局即读，自我进化载体）
-└── scripts/
-    └── selfcheck.py                  # 升级自检：frontmatter / 断链 / 版本 / 占位 URL / 模板字段 / 路由闭环 / 规则同步 / 报告矩阵 / 例外声明
+└── scripts/                          # 3 个零依赖 Python 脚本（标准库，无外部包）
+    ├── evidence-audit.py             # 证据链自动对账：audit --manifest / --fail-on-gap / --format / --output / --self-test
+    ├── device-matrix.py              # install-base 本地导出汇总：build --input/--source/--window/--min-coverage / --self-test
+    └── selfcheck.py                  # 升级自检：frontmatter / 断链 / 版本 / 占位 URL / 模板字段 / 路由闭环 / 规则同步 / 报告矩阵 / 例外声明 / §7f 脚本门禁
 ```
 
 ## 知识资产速查
@@ -124,9 +132,12 @@ project-tester/
 | 算测试成本 / ROI / 自动化投入值不值 | `test-effectiveness-testing.md` §5A + `assets/test-effectiveness-template.md` |
 | 验无障碍 / WCAG 2.2 AA / 读屏与键盘路径 | `accessibility-testing.md` + `assets/accessibility-matrix-template.md`（R-7） |
 | 验移动端 / 真机 / 设备矩阵 / 跨浏览器 | `cross-platform-testing.md` + `assets/device-matrix-template.md`（R-8） |
+| 让测试结论可被别人复核 / 对账合规声明 | `evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`（R-9） |
+| 按真实安装量定设备矩阵 / 治理视觉快照基线 | `cross-platform-testing.md` §6A + `scripts/device-matrix.py` |
+| 判断 AI 生成的一堆用例有没有杀伤力 | `test-effectiveness-testing.md` §5B + `ai-native-testing.md` §3 |
 | 不知道该测哪些点 | `test-design.md` + `test-plan-template.md` |
 | 写缺陷报告 | `bug-report-template.md` + `quality-gates.md` §2 |
-| 判断测试是否可信 | `quality-gates.md` §5 + SKILL.md 的 R-1~R-8 可证伪规则 |
+| 判断测试是否可信 | `quality-gates.md` §5 + SKILL.md 的 R-1~R-9 可证伪规则 |
 | 升级本技能 | `self-evolution.md` + `CHANGELOG.md` |
 
 ## 设计要点
@@ -134,10 +145,11 @@ project-tester/
 - **通用性**：不绑定语言/框架/agent，只用通用能力（文件读写、shell、按需浏览器）；工具缺失自动降级，不中止
 - **省 token**：被测项目根下 `.test-memory/tree.md`（<100 行）是接力地图，细节沉到 `runs/`；读一份树 = 跳过一次完整解剖
 - **证据优先**：每个失败结论必须有 MRE + 实际输出；指标写清分子/分母；报告强制给出 `PASS/FAIL` 与 `Go/No-Go`
-- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，均不新增层级
+- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，v1.5 叠加证据链对账/视觉基线与 install-base 数据源/AI 用例有效性，均不新增层级
 - **路由闭环**：每份专项手册必须同时出现在 `dissect.md` §8 路由表与 `SKILL.md` 叠加项，由 `scripts/selfcheck.py` 逐份核对，缺一即 FAIL（不再只是文字约定）
-- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）**八条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"
-- **证据闭环（v1.4）**：`selfcheck.py` 新增两条代码门禁——`§7d` 强制 `report-template.md` 证据矩阵覆盖全部 R 规则，`§7e` 强制每条规则的「不适用时的写法」含明确禁止冒充声明；新增规则却忘了留证据槽位或写清降级路径，自检直接 FAIL
+- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）、R-9（证据链可追溯与可复核性）**九条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"、**R-9 不认"报告写全了 / 证据文件都在 / 对账 GREEN"**
+- **证据闭环（v1.4 / v1.5）**：`selfcheck.py` 的代码门禁——`§7d` **逐条核对** `report-template.md` 证据矩阵的 `| R-N |` 表格行（v1.5 负向测试实证加固：旧版只统计整段编号，说明文字里的编号可蒙混），`§7e` 强制每条规则写清禁止冒充声明，**`§7f`（v1.5）强制可执行脚本自带 `--self-test` 与诚实边界声明**；新增规则却忘了留证据槽位、写清降级路径，或新增脚本只会打 PASS，自检直接 FAIL
+- **可执行且诚实（v1.5）**：`scripts/evidence-audit.py`（本地确定性证据链对账）与 `scripts/device-matrix.py`（本地 install-base 导出汇总）只用 Python 标准库、不联网、不修改被测项目；前者固定输出「对账通过只证明证据链可解析，不证明合规或软件安全」，后者不代填 `real` 载体、不写「真机已验证」，缺数据源就显式标注不可作为 R-8 证据
 - **自我进化**：项目教训 → `.test-memory/lessons.md`；通用教训 → `memory/global-lessons.md`；每日升级 → `CHANGELOG.md` + 版本号
 - **权限裁决**：**测项目时不自治**（运行时只提 `[技能改进]` 提案），**升级技能时授权自治**（用户明确授权的每日任务，走十步门禁）
 
@@ -159,7 +171,8 @@ diff -r "/d/My Skills/project-tester" "$HOME/.agents/skills/project-tester" --ex
 ```
 ① 读 automation memory + CHANGELOG → ② 联网查权威资料并记来源 → ③ 深度蒸馏成可执行规则
 → ④ 治理分类（Existing/Enhance/Merge/Match/New）→ ⑤ 只改本文件夹
-→ ⑥ python scripts/selfcheck.py（FAIL=0 才继续：断链 / 版本 / 路由闭环 / 规则同步 / 报告矩阵 / 例外声明）+ 回归检查
+→ ⑥ python scripts/selfcheck.py（FAIL=0 才继续：断链 / 版本 / 路由闭环 / 规则同步 / 报告矩阵 / 例外声明 / §7f 脚本门禁）
+   + 两个 scripts 的 --self-test 退出码为 0 + 回归检查 + 负向测试（临时副本破坏一处，确认确实 FAIL）
 → ⑦ 升版本 + 写 CHANGELOG → ⑧ 同步全局安装 + diff 校验
 → ⑨ git commit（`feat(vN): 每日升级 #M <主题>`）+ push → ⑩ 回写执行记忆
 ```
@@ -174,6 +187,7 @@ cd "D:/My Skills/project-tester" && python scripts/selfcheck.py
 
 | 版本 | 日期 | 主题 |
 |---|---|---|
+| v1.5.0 | 2026-11-12 | 每日升级 #6：从「结论正确」扩展到「**结论可复核 · 声称可对账**」——证据链可追溯与合规声明对账（PROV / OSCAL / SSDF v1.1 / in-toto / GitHub attestations）、设备矩阵真实安装量数据源采集、视觉回归基线治理、AI 生成用例有效性度量；新增 **R-9**、`references/evidence-chain-audit.md`、`assets/evidence-chain-template.md` 与两个带 `--self-test` 的零依赖脚本；落地两个顺延提案（Merge 为主，不新增强化手册）；`selfcheck.py` 新增 §7f 脚本可证伪性门禁（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.4.0 | 2026-11-12 | 每日升级 #5：从「系统正确」扩展到「人人可用 · 处处可用 · 值得测」——无障碍可达性深度实测（WCAG 2.2 / 键盘 / 读屏）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机）、测试经济性 ROI；新增 R-7/R-8；落地三个顺延提案；新增 `selfcheck.py` §7d/§7e 两条门禁；修正「四条规则 / R-1~R-4」历史漂移（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.3.0 | 2026-11-11 | 每日升级 #4：从「边界正确性」扩展到「演进与合规正确性」——API 契约演进兼容性（oasdiff/Pact/SemVer）、隐私与数据生命周期（PII/GDPR/日志）、测试有效性度量（DORA/flaky/变异得分）；新增 R-5/R-6；把证据矩阵接进 `report-template.md`（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.2.0 | 2026-11-11 | 每日升级 #3：从「系统行为」扩展到「交付链与边界正确性」——软件供应链/制品完整性、i18n 与本地化、多租户隔离；吸收 i18n 提案，新增 R-3/R-4；把「孤儿文档门禁」真正落进 `selfcheck.py` 并补齐 `performance-testing.md` 路由（[详见 CHANGELOG](CHANGELOG.md)） |

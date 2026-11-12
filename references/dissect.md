@@ -90,6 +90,7 @@
 | **租户边界**（v1.2） | `tenant_id`/`org_id`/`workspace_id` 从哪来、共享 DB/cache/queue/storage 清单、隔离策略声明（Separate DBs / Schemas / RLS / Hybrid）、platform admin 与跨租户 service identity | 决定 `references/multi-tenancy-testing.md` 的夹具与否定路径清单；**单租户标「不适用：无租户边界」** |
 | **无障碍面**（v1.4） | 交互控件清单、认证方式（有无验证码/转录）、焦点样式与 ARIA、`aria-live`/`aria-describedby`、图标按钮可访问名、目标尺寸、是否已声明 WCAG 2.2 AA 与读屏支持 | 决定 `references/accessibility-testing.md` 的键盘路径与读屏组合范围；**无 UI 的 CLI/库标「不适用：无图形交互界面」** |
 | **设备形态面**（v1.4） | 声明支持的 OS / 浏览器内核 / 屏幕形态（折叠屏、平板、小屏）、是否可得 install-base analytics、有无真机或设备云、CI 里是否已有 `devices`/emulation 配置 | 决定 `references/cross-platform-testing.md` 的矩阵来源与 `real`/`emulator` 载体划分；**纯后端 API/CLI 标「不适用：无终端形态差异」** |
+| **证据链面**（v1.5） | 有无留档要求与合规声明清单（SOC2 / 等保 / SSDF / GDPR）、原始输出落点（`runs/` / CI artifacts / 日志）、能否取到 commit / 环境指纹 / 时间窗、是否有视觉快照基线与 install-base 本地导出、报告结论是否可指到文件行 | 决定能否叠加 `references/evidence-chain-audit.md`（R-9）与 `scripts/evidence-audit.py`；**一次性探索、无留档要求标「不适用：无留档要求」**，不写「可审计」 |
 
 ## 7. 攻击面、观测面与依赖拓扑（v1.0 新增，v1.1 / v1.2 扩充）
 
@@ -132,6 +133,8 @@
 | **有 CI / 测试套件 / 发布流程，需量化测试有效性或成本收益**（v1.3 / v1.4） | `references/test-effectiveness-testing.md` + `assets/test-effectiveness-template.md` | DORA 四指标（CFR/MTTR）、缺陷逃逸率、flaky 配额与 quarantine、变异得分对照覆盖率、§5A 测试经济性/ROI；结论支撑 Go/No-Go；无自动化测试标「无测试度量基础」 |
 | **有 UI / 交互 / 表单 / 认证，或声称 WCAG 2.2 AA / 支持读屏**（v1.4） | `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md` | 版本与级别口径、axe violations + `incomplete` 人工复核、完整键盘路径、至少一组读屏组合逐项标注、2.4.11/2.5.8/3.3.8 实测（R-7）；无 UI 的 CLI/库标「不适用：无图形交互界面」 |
 | **有移动端 / 桌面端 / 多浏览器用户，或声称移动端可用 / 真机验过**（v1.4） | `references/cross-platform-testing.md` + `assets/device-matrix-template.md` | 设备矩阵来源与覆盖占比、`real`/`emulator`/`browser-emulation` 载体标注、多内核与长尾条目、端侧特有面与网络档位、发布门禁真机证据（R-8）；纯后端 API/CLI 标「不适用：无终端形态差异」 |
+| **有测试报告 / 发布验收 / CI 门禁需结论可复核，或声称「符合 SOC2 / 等保 / SSDF」「已通过审计」「证据链完整」**（v1.5） | `references/evidence-chain-audit.md` + `assets/evidence-chain-template.md` | 三级引用链（结论→证据文件→原始输出）逐条可解析、证据 `sha256` + `subject.commit`/环境/时间窗、`scripts/evidence-audit.py` 自动对账与缺口清单、合规声明→控制项→证据映射与未映射声明、审计导出件自身 hash（R-9）；一次性探索、无留档要求标「不适用：无留档要求」 |
+| **有视觉快照基线 / install-base 导出数据，或要按真实安装量定设备矩阵**（v1.5） | `references/cross-platform-testing.md` §6A + `scripts/device-matrix.py` + `assets/device-matrix-template.md` | 基线环境指纹与 `--update-snapshots` 留痕、`maxDiffPixels`/`mask`/`threshold` 变更批准；本地 CSV/JSON 导出的占比/累计/80% 截断点与 CrUX 口径声明，载体列人工填（R-8 增强，不新增规则） |
 
 路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 
@@ -154,6 +157,7 @@ locale 面（v1.2）：支持 locale___ 资源文件___ RTL___ 格式化调用__
 租户边界（v1.2）：标识来源___ 隔离策略___ 共享资源___ platform admin___（单租户写"不适用"）
 无障碍面（v1.4）：交互控件___ 认证方式(有无认知测试)___ 焦点/ARIA___ 目标尺寸___ 声明级别___（无 UI 写"不适用"）
 设备形态面（v1.4）：支持OS/内核___ 屏幕形态___ install-base 数据可得?___ 真机/设备云___（纯后端写"不适用"）
-能力层路由：___（对应手册 ___；v1.1/v1.2/v1.3/v1.4 叠加项 ___，不适用原因 ___）
+证据链面（v1.5）：留档要求___ 合规声明清单___ 原始输出落点___ commit/环境/时间窗可得?___ 视觉基线___ install-base 本地导出___（无留档要求写"不适用"）
+能力层路由：___（对应手册 ___；v1.1/v1.2/v1.3/v1.4/v1.5 叠加项 ___，不适用原因 ___）
 风险初判：___（如"无任何输入校验""秘密硬编码""无链路埋点""下游调用无 timeout""客户端 tenant_id 直取""浮动依赖版本"）
 ```
