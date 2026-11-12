@@ -81,6 +81,8 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **install-base 设备矩阵草稿**（v1.5） | `python scripts/device-matrix.py build --input <csv\|json> --source "<数据源>" --window "<时间窗>" --min-coverage 0.8 --format markdown` | 无本地导出时人工填 `assets/device-matrix-template.md` 并写「数据源未登记 / 时间窗未登记」；**不得**把占比草稿写成真机证据 | `cross-platform-testing.md` §6A |
 | **视觉回归基线**（v1.5） | Playwright `toHaveScreenshot()` + `snapshotPathTemplate`；`npx playwright test --update-snapshots`；`maxDiffPixels` / `maxDiffPixelRatio` / `threshold` / `mask` / `stylePath` | 三档断点人工截图比对；注明「未做像素级基线比对」；基线更新须留旧/新 hash + 理由 + 批准人 | `cross-platform-testing.md` §6A |
 | **AI 生成用例有效性**（v1.5） | 变异测试（`npx stryker run` / `mutmut run`）+ 故意改坏 ≥1 处核心逻辑验假通过率 | 人工逐条审断言强度（`ai-native-testing.md` §3），注明「未做变异实测」，不写「有效性已验证」 | `test-effectiveness-testing.md` §5B |
+| **特性开关 / 配置 / 灰度**（v1.6） | 列开关清单 + 逐 flag 翻 off/on 实测；模拟配置缺失/中心不可达验默认态回退；非目标群体否定用例；env/文件/远程三处 `grep` 比对；kill-switch 真关实测；灰度曝光比例采样 | 静态审开关名/默认值/目标属性来源 + 手写「关态核心链路」用例，注明「未做开关动态实测」，不写「开关安全」 | `feature-flag-testing.md` §2/§3 |
+| **证据链 OSCAL 导出**（v1.6） | `python scripts/evidence-audit.py audit --manifest <json> --format oscal --output <json>`；仅在有 OSCAL 消费方时启用 | 无消费方时退回 `--format markdown`；不得因「有了 OSCAL 文件」写成「已通过合规评估」（`evidence-chain-audit.md` §10） | `evidence-chain-audit.md` §10 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -112,3 +114,5 @@ python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL
 10. **仿真 ≠ 真机**：`devices['iPhone 13']`、emulator、simulator 一律标注载体，不得写成「真机验证」；battery/thermal/sensors/biometrics/real network 只能在 real device 上验（`cross-platform-testing.md` §2/§7）
 11. **对账 GREEN ≠ 合规通过**：`scripts/evidence-audit.py` 只证明「结论 → 证据 → 原始输出」可解析；`--update-snapshots` 与 `--output` 是受控变更，基线/导出件更新都要留旧/新 hash 与理由；一次性探索无留档要求写「不适用」（`evidence-chain-audit.md` §4/§7）
 12. **占比草稿 ≠ 安装量真相**：`scripts/device-matrix.py` 只吃本地导出、不联网、不代填载体，缺 `--source` / `--window` 时不能作为 R-8 矩阵来源证据；CrUX 只覆盖符合条件的真实 Chrome 用户且 form factor 仅三值，不能推出机型/OS 版本/非 Chrome 内核分布（`cross-platform-testing.md` §6A）
+13. **开态测过 ≠ 关态也安全 / 配置三处没比对 ≠ 开关可控**：特性开关必须两个状态都跑常规测试（FF-12），缺失态/配置不可达必须验回退路径；env/文件/远程三处配置不一致而声称「配置正确」一律降级为「待确认」（`feature-flag-testing.md` §2/§4）
+14. **OSCAL 导出 ≠ 合规裁决**：`scripts/evidence-audit.py --format oscal` 只做证据链的可机读编码，manifest 里的 `待确认`/`缺口` 到 OSCAL 里仍是 `partial`/`gap`，不得因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（`evidence-chain-audit.md` §10）

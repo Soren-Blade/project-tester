@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""证据链自动对账 / 审计导出（project-tester v1.5.0）
+"""证据链自动对账 / 审计导出（project-tester v1.6.0）
 
 把测试报告里的「声称 / 规则结论」与证据文件、原始输出锚点、被测对象
 commit 绑定起来，做**本地确定性**对账，并导出可交付的审计表。
@@ -37,7 +37,7 @@ manifest 格式（字段全为可选，缺什么就报什么）：
 
 用法：
   python scripts/evidence-audit.py audit --manifest <path> [--root <dir>]
-        [--format json|markdown] [--output <file>] [--fail-on-gap]
+        [--format json|markdown|oscal] [--output <file>] [--fail-on-gap]
   python scripts/evidence-audit.py --self-test
 """
 from __future__ import annotations
@@ -246,6 +246,89 @@ def to_markdown(result: dict) -> str:
     return "\n".join(out) + "\n"
 
 
+def to_oscal(result: dict) -> str:
+    """把对账结果压成 OSCAL assessment-results JSON。
+
+    字段映射见 `references/evidence-chain-audit.md` §10：conclusion → OSCAL `finding`、
+    证据锚点 → `relevant-evidence`、评估活动 → `observation`。只做字段搬运，不裁决合规——
+    `待确认` / 缺口 在 OSCAL 里仍是 `partial` / `gap`，不得翻成 `implemented`。
+    """
+    import datetime as _dt
+    subj = result.get("subject", {})
+    now = _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    state_map = {
+        "PASS": "implemented", "通过": "implemented",
+        "FAIL": "no-expectation", "不适用": "not-applicable",
+        "待确认": "partial", "BLOCKED": "planned",
+    }
+
+    findings = []
+    observations = []
+    for r in result["claims"]:
+        base = r["status"].split("/")[0].strip().upper()
+        state = state_map.get(base, "partial")
+        # 证据链缺口 / 作废 → 强制降级为 partial，禁止越界成 implemented
+        if "作废" in r["verdict"] or r["verdict"].startswith("证据链缺口"):
+            state = "partial"
+        findings.append({
+            "uuid": f"finding-{r['id']}",
+            "title": f"{r['id']}: {r['statement']}",
+            "description": f"status={r['status']}; verdict={r['verdict']}",
+            "implementation-status": {"state": state},
+            "relevant-evidence": [{
+                "title": r["evidence"] or "(no evidence)",
+                "description": f"anchor={r['anchor']}; sha256={(r['sha256'] or 'N/A')[:16]}; {r['anchor_excerpt']}",
+                "href": r["evidence"] or "",
+                "media-type": "text/plain",
+            }],
+            "location": [{"uuid": f"loc-{r['id']}",
+                          "related-observation": [f"obs-{r['id']}"]}],
+        })
+        observations.append({
+            "uuid": f"obs-{r['id']}",
+            "title": f"assessment activity for {r['id']}",
+            "description": f"conclusion_class={r['conclusion_class'] or '未标注'}; "
+                           f"subject_commit={r['subject_commit'] or '未绑定'}",
+            "methods": [
+                {"uuid": f"method-{r['id']}", "title": r["conclusion_class"] or "未标注"},
+                {"uuid": "method-gap", "title": "evidence-chain-gap-check"},
+            ],
+            "relevant-evidence": [{
+                "title": r["evidence"] or "(no evidence)",
+                "href": r["evidence"] or "",
+                "media-type": "text/plain",
+            }] if r["evidence"] else [],
+            "collected": now,
+        })
+
+    window = str(subj.get("window") or " ")
+    oscal = {
+        "assessment-results": {
+            "uuid": f"assessment-{subj.get('commit', 'unknown')}",
+            "metadata": {
+                "title": f"project-tester evidence-chain export: {subj.get('name', '(未填)')}",
+                "published": now,
+                "last-modified": now,
+                "version": "1.6.0",
+                "oscal-version": "1.0.0",
+            },
+            "results": [{
+                "uuid": "result-1",
+                "title": "evidence-chain traceability assessment",
+                "description": f"subject={subj.get('name', '')} commit={subj.get('commit', '')} "
+                               f"env={subj.get('environment', '')} window={subj.get('window', '')}",
+                "start": window.split("~")[0].strip(),
+                "end": window.split("~")[-1].strip(),
+                "findings": findings,
+                "observations": observations,
+            }],
+        },
+        "_disclaimer": "本导出件只证明证据链可机读编码，不证明合规通过或软件安全"
+                       "（project-tester R-9 / evidence-chain-audit.md §10）",
+    }
+    return json.dumps(oscal, ensure_ascii=False, indent=2)
+
+
 def self_test() -> int:
     """可证伪性自检：5 种缺陷必须全部被检出，漏检即 exit 1。"""
     cases: list[tuple[str, str, str]] = []  # (name, 期望 code, 说明)
@@ -323,7 +406,35 @@ def self_test() -> int:
             print(f"[SELFTEST FAIL] {f}")
         print("结论：SELFTEST BLOCKED —— 证据链对账门禁不可信，禁止用于交付。")
         return 1
-    print("[SELFTEST PASS] 干净链无 BLOCK；悬空引用 / 过期证据 / 不可解析锚点 / PASS 无证据 / 无控制项缺口声明 / 未分类结论 均被检出")
+
+    # EA-13：OSCAL 导出对等性 —— manifest 的每个 claim 都能在 oscal findings 找到，且不越界
+    with tempfile.TemporaryDirectory() as tmp:
+        d = Path(tmp) / "oscal"
+        d.mkdir()
+        p = make(d)  # 干净 PASS 链
+        res = audit_manifest(p)
+        try:
+            osc = json.loads(to_oscal(res))
+        except Exception as exc:  # noqa: BLE001
+            failures.append(f"oscal: 导出不是合法 JSON: {exc}")
+        else:
+            findings = osc["assessment-results"]["results"][0]["findings"]
+            if len(findings) != len(res["claims"]):
+                failures.append(f"oscal: findings 数 {len(findings)} != claims 数 {len(res['claims'])}")
+            for r, f in zip(res["claims"], findings):
+                if r["status"].upper() == "PASS":
+                    continue
+                if f.get("implementation-status", {}).get("state") == "implemented":
+                    failures.append(f"oscal: 非 PASS 结论 {r['id']} 被翻成 implemented（越界）")
+            if "assessment-results" not in osc or "_disclaimer" not in osc:
+                failures.append("oscal: 缺少 assessment-results 根或诚实声明")
+
+    if failures:
+        for f in failures:
+            print(f"[SELFTEST FAIL] {f}")
+        print("结论：SELFTEST BLOCKED —— 证据链对账门禁不可信，禁止用于交付。")
+        return 1
+    print("[SELFTEST PASS] 干净链无 BLOCK；悬空引用 / 过期证据 / 不可解析锚点 / PASS 无证据 / 无控制项缺口声明 / 未分类结论 均被检出；OSCAL 导出对等且不越界")
     print("结论：SELFTEST GREEN —— 证据链对账门禁可证伪。")
     return 0
 
@@ -335,7 +446,7 @@ def main() -> int:
     a = sub.add_parser("audit", help="对账一个 manifest")
     a.add_argument("--manifest", required=True)
     a.add_argument("--root", default=None, help="相对证据路径的解析根目录（默认 manifest 所在目录）")
-    a.add_argument("--format", choices=("json", "markdown"), default="markdown")
+    a.add_argument("--format", choices=("json", "markdown", "oscal"), default="markdown")
     a.add_argument("--output", default=None, help="显式给出才写文件；默认只打印到 stdout")
     a.add_argument("--fail-on-gap", action="store_true", help="存在 BLOCK 级缺口时退出码 1")
     args = ap.parse_args()
@@ -349,7 +460,12 @@ def main() -> int:
     manifest = Path(args.manifest)
     root = Path(args.root) if args.root else None
     result = audit_manifest(manifest, root)
-    text = json.dumps(result, ensure_ascii=False, indent=2) if args.format == "json" else to_markdown(result)
+    if args.format == "oscal":
+        text = to_oscal(result)
+    elif args.format == "json":
+        text = json.dumps(result, ensure_ascii=False, indent=2)
+    else:
+        text = to_markdown(result)
     if args.output:
         Path(args.output).write_text(text, encoding="utf-8")
         print(f"已写入审计导出：{args.output}")

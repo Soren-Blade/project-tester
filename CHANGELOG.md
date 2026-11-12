@@ -5,6 +5,57 @@
 
 ---
 
+## [v1.6.0] — 2026-11-12 · 每日升级 #7
+
+**主题**：从「结论可复核」扩展到「**动态正确 · 配置可信 · 开关可控 · 合规可机读**」——同一份代码在开关 / 配置 / 灰度的动态下是否仍正确、是否仍安全；并把 R-9 证据链做成可机读导出。新增 **R-10 特性开关 / 配置 / 灰度正确性** 与两份文件，落地一个 v1.5 顺延提案（`evidence-audit.py --format oscal` → OSCAL `assessment-results`）。注：与 #5/#6 同日（2026-11-12）执行，按自动化轮次记为 #7。
+
+**遵循上轮建议**：未重写已覆盖主题（无障碍、跨端、测试经济性、供应链、隐私、契约演进、i18n、多租户、观测、韧性、数据、协议、AI 原生、证据链、五阶段与四层模型），以 **Enhance / Merge / New 混合、New + Merge 为主**；四层模型与五阶段流程**未改语义**（按 `self-evolution.md` §7 只升 MINOR）；每轮至少一条可证伪规则 → 本轮引入 **R-10**；本轮做了**负向测试**（临时副本破坏 R-10 一处，确认 `selfcheck.py` §7c/§7d 确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/feature-flag-testing.md`、`assets/flag-rollout-matrix-template.md` |
+| **Merge** | v1.5 顺延提案「manifest ↔ OSCAL `assessment-results` 互转」落地为 `scripts/evidence-audit.py --format oscal` + `references/evidence-chain-audit.md` §10（**不另起文件**）；明确「只搬字段不裁决合规」，EA-13 纳入 `--self-test` 对等性校验 |
+| **Enhance** | `SKILL.md`（version 1.6.0、description 触发词、v1.6 增量与横向叠加项、阶段 1 配置/开关面 / 阶段 3 专项维度 / 九条→十条规则与 R-10 定义行 / 参考索引 / 报告矩阵十行）、`README.md`（徽章 27→28 / 16→17 / 51→53、问题表 1 行、结构树、速查 2 行、设计要点 R-1~R-9→R-1~R-10 与 OSCAL 段、版本史）、`references/dissect.md`（§6 配置/开关面、§8 两条新路由、产出格式一行）、`references/quality-gates.md`（§3 R-10 行、§8 十条 / 十行 / 两条新核对）、`assets/report-template.md`（证据矩阵 R-10 + 第十份模板挂接 + 九行→十行）、`references/evidence-chain-audit.md`（§6 EA-1~EA-12→EA-13、§10 manifest→OSCAL 映射段）、`references/tools.md`（2 行专项工具 + 2 条纪律 + 可读性）、`references/self-evolution.md`（§3 ⑥ 与 §5 表格）、`scripts/selfcheck.py`（§5 两个新文件字段、`references/feature-flag-testing.md` 与 `assets/flag-rollout-matrix-template.md` 关键字段）、`memory/global-lessons.md`（新蒸馏 6 条、提案区改「已吸收（v1.6）」） |
+| **Match** | 新手册在 `dissect.md` §8 与 `SKILL.md` v1.6 叠加项均有触发条件；R-10 在 `SKILL.md` 定义表、`quality-gates.md` §3/§8、`report-template.md` 证据矩阵、`selfcheck.py` §7c/§7d/§7e 四处口径一致；OSCAL 导出由 §7f 静态门禁 + EA-13 运行时自测约束。全部由 `selfcheck.py` **代码强制** |
+| **Existing** | 五阶段模型、四层能力模型、记忆树 <100 行纪律、双视角、"工具缺失不中止"降级原则、六门禁 12 分、缺陷八字段、R-1~R-9 规则、权限裁决 —— 全部保留，未改语义 |
+
+### 蒸馏来源（本轮实查，均可核查）
+
+| 来源 | URL / 位置 | 关键结论 |
+|---|---|---|
+| Martin Fowler《Feature Toggles》 | https://martinfowler.com/articles/feature-toggles.html | 四类 toggle：Release / Experiment / Ops / Permissioning；明确「toggle 应有计划删除日期」；开关两态都要测 |
+| Open Practice Library《Feature Toggles》 | https://openpracticelibrary.com/practice/feature-toggles/ | 避免长期存活的 toggle；两个状态都要测；与持续交付结合 |
+| Harness / Rollout.io kill-switch 实践 | https://www.harness.io/harness-devops-academy/feature-flags · https://rollout.io/blog/how-to-disable-code-the-developers-production-kill-switch/ | 部署时功能处于休眠态、上线后再翻开关；kill-switch 是生产止血机制 |
+| SEC 对 Knight Capital 2012-08-01 事件调查报告 | https://www.sec.gov/litigation/admin/2013/34-70694.pdf | 遗留/废弃路径被重新启用 + 缺乏对应控制，约 45 分钟损失约 4.6 亿美元；用于说明「开关默认态与废弃开关」风险，不臆造其内部结构 |
+| Google SRE · progressive / canary rollout | https://sre.google/sre-book/ | 灰度曝光的「actual exposure 须可测量」，能与计划比例对照 |
+| NIST OSCAL 模型分层 | https://pages.nist.gov/OSCAL/concepts/layer/ | Control / Implementation / Assessment 三层；`assessment-results` 含 scope、evidence 与 findings；native traceability to catalog layer |
+| GitHub `naodeng/awesome-qa-skills` | https://github.com/naodeng/awesome-qa-skills | `requirement-traceability-analysis` / `test-report-review` / `skill-change-verification` 等 canonical names，佐证本轮主题与 OSCAL 导出方向 |
+
+### 口径诚实（逐条核验，不臆造）
+
+- Knight Capital 案例在公开报道中被广泛归结为「遗留功能开关/代码路径被重新启用 + 缺乏对应控制」，本手册把它作为**反面教材**引用，**只写「说明开关默认态/废弃开关风险」，不对其内部实现/具体 flag 名称下结论**。
+- OSCAL `assessment-results` 子页（reference 路径）本轮经 WebFetch 返回 **404**（JS 渲染不可抓，与 v1.5 体验一致）；字段名（`metadata` / `result` / `finding` / `observation` / `relevant-evidence` / `implementation-status.state` / `location.related-observation`）依据 OSCAL Assessment Layer **模型规范描述**，已在 `evidence-chain-audit.md` §10.2 写明「落地以目标组织实际采用的 OSCAL 版本校验」，不臆造对方不需要的字段（如未确认消费方时不凭空加 `import-applicant`）。
+- `to_oscal` 只做字段搬运：`待确认` / 缺口 在 OSCAL 里仍是 `partial` / `gap`，**不得**因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」；导出件固定带 `_disclaimer`。
+- R-10 的「开态测过 ≠ 关态也安全」「配置三处没比对 ≠ 开关可控」「说 5% 没实测 ≠ 灰度可控」均为**禁止冒充声明**，缺证据一律降级为「待确认」。
+
+### 自检结果与门禁负向测试
+
+- `scripts/selfcheck.py`：**PASS 34 / WARN 0 / FAIL 0 / GREEN**（源，含 §7c 规则双向同步、§7d 证据矩阵十行、§7e 例外声明、§7f 脚本门禁）；两个新文件关键字段齐备、路由闭环、索引覆盖均通过。
+- `scripts/evidence-audit.py --self-test` 与 `scripts/device-matrix.py --self-test` 退出码均 0；`to_oscal` 新增 EA-13 对等性校验（claim 数与 findings 数一致、非 PASS 不被翻成 `implemented`）。
+- 门禁负向测试（项目外临时副本）：删 `SKILL.md` 的 R-10 定义行 → §7c 判 `quality-gates.md 出现 SKILL.md 未定义的规则: R-10` FAIL、§7d 判 `报告证据矩阵缺少规则表格行: R-10` FAIL、§7e 判 `规则缺少禁止冒充声明: R-10` FAIL；删 `report-template.md` 的 `| R-10 ` 表格行 → §7d 单独 FAIL；干净副本退出码 0。证明 R-10 门禁可证伪而非文字声明。
+- `py_compile` 校验三个脚本均 OK。
+
+### 提交与同步 / 治理
+
+- 文件 51 → 53（references 27→28、assets 16→17、scripts 不变）。
+- 全局安装：`cp -r` 覆盖同步（`--exclude=.git/.workbuddy-ai/__pycache__/*.pyc/.test-memory`），全局版 `version: 1.6.0`，2 个新文件齐全，`diff -r` 零差异；全局目录复跑 selfcheck 同样 GREEN。
+- `memory/global-lessons.md` 新增 6 条 v1.6 蒸馏（feature flag / config drift / kill-switch / OSCAL 边界），提案区「manifest ↔ OSCAL 互转」结案为「已吸收（v1.6）」，另一 v1.5 顺延提案（AI 用例变异杀伤跨语言自动跑数）保留为「待后续轮次」。
+- 提交 `feat(v1.6.0): 每日升级 #7 <主题>`，push 到 `origin/main`（先常规 push，失败按 memory.md「环境事实」的 Git Data API 路径）。
+
+---
+
 ## [v1.5.0] — 2026-11-12 · 每日升级 #6
 
 **主题**：从「结论正确」扩展到「**结论可复核 · 声称可对账**」——把上一轮剩下的两个顺延提案全部结案：合规性声明与证据链自动对账、设备矩阵与真实安装量数据源采集脚本；新增 **R-9 证据链可追溯与可复核性** 与两个**零依赖、自带可证伪自检**的 Python 脚本，并把视觉回归基线治理、AI 生成用例有效性度量 **Merge** 进已有手册（不新增强化手册、不膨胀目录）。注：与 #5 同日（2026-11-12）执行，按自动化轮次仍记为 #6。

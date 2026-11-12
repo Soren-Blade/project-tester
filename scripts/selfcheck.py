@@ -130,6 +130,8 @@ checks = {
     "assets/device-matrix-template.md": ["R-8", "real", "设备矩阵", "网络档位"],
     "assets/evidence-chain-template.md": ["R-9", "sha256", "控制项", "不适用", "不得"],
     "references/evidence-chain-audit.md": ["R-9", "PROV", "OSCAL", "in-toto", "不适用"],
+    "references/feature-flag-testing.md": ["R-10", "kill-switch", "灰度", "不适用", "不得"],
+    "assets/flag-rollout-matrix-template.md": ["R-10", "开关", "灰度", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }

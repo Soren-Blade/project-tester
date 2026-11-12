@@ -2,9 +2,9 @@
 
 > 一个会**自我进化**的测试 Skill：解剖任意项目 → 按风险生成测试需求 → 双视角深测 → 记忆树接力 → 每日蒸馏升级。不绑定语言、框架或 agent。
 
-![version](https://img.shields.io/badge/version-v1.5.0-1677ff)
-![references](https://img.shields.io/badge/reference_files-27-2ea44f)
-![assets](https://img.shields.io/badge/templates-16-e60023)
+![version](https://img.shields.io/badge/version-v1.6.0-1677ff)
+![references](https://img.shields.io/badge/reference_files-28-2ea44f)
+![assets](https://img.shields.io/badge/templates-17-e60023)
 ![scripts](https://img.shields.io/badge/scripts-3-6f42c1)
 ![updated](https://img.shields.io/badge/updated-2026-11-12-6e7781)
 
@@ -41,21 +41,22 @@
 | **报告结论看着全，却没人能按证据重放；说「合规」却挂不上控制项** | `evidence-chain-audit.md`：PROV 三级引用链、OSCAL/SSDF 控制项映射、`scripts/evidence-audit.py` 自动对账（悬空引用 / 过期证据 / 锚点失效 / PASS 无证据 / 未分类结论）；**R-9 不认「报告写全了 / 证据文件都在 / 对账 GREEN」** |
 | **设备矩阵靠拍脑袋列机型 / 视觉基线被 `--update-snapshots` 悄悄换掉** | `cross-platform-testing.md` §6A + `scripts/device-matrix.py`：本地 install-base 导出算占比 / 累计 / 80% 截断点，固定输出 CrUX 口径局限；基线更新留旧/新 hash + 理由 + 批准人，载体列人工填 |
 | **AI 一口气生成 200 条用例，其实没杀伤力** | `test-effectiveness-testing.md` §5B：入库率 / 断言强度合格率 / 变异杀伤贡献 / **假通过率**（故意改坏代码应转红）/ 审查人时，E-15~E-18；审查 diff 登记进 manifest |
+| **功能对，但开关关掉系统就崩 / 灰度说 5% 实际全开 / 配置三处不一致 / 废弃开关没删干净** | `feature-flag-testing.md`：开关 off 态与缺失态回退安全路径、目标群体否定用例、env/文件/远程三处配置比对、kill-switch 真关实测、灰度比例实测；**R-10 不认「开态测过」、不认「配置三处没比对」、不认「说 5% 没实测」** |
 | 工具装不齐就测不下去 | `tools.md` 全表带降级路径，零依赖也能走完五阶段 |
 | 升级无记录、越更越乱 | `self-evolution.md` 十步门禁 + `CHANGELOG.md` + `scripts/selfcheck.py` 自检（路由闭环、规则同步、报告矩阵、例外声明） |
 
 ---
 
-## 文件结构（51 个文件）
+## 文件结构（53 个文件）
 
 ```
 project-tester/
-├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-9 + 参考索引
+├── SKILL.md                          # 主流程：五阶段 + 能力层路由 + R-1~R-10 + 参考索引
 ├── README.md                         # 本文件
 ├── CHANGELOG.md                      # 每日升级记录（来源 / 改动 / 自检）
 ├── .gitignore
-├── references/                       # 27 份手册（渐进披露，按需读）
-│   ├── dissect.md                    # 解剖：栈指纹 / 入口 / 测试设施 / 攻击面 / 观测面 / 交付链 / locale / 租户 / a11y / 设备形态 / 路由
+├── references/                       # 28 份手册（渐进披露，按需读）
+│   ├── dissect.md                    # 解剖：栈指纹 / 入口 / 测试设施 / 攻击面 / 观测面 / 交付链 / locale / 租户 / a11y / 设备形态 / 开关 / 路由
 │   ├── tools.md                      # 工具总表 / 专项工具 / 可用性探测 / 降级纪律
 │   ├── personas.md                   # 7 日常 + 8 刁钻画像 / 判 bug 标准 / 手册映射
 │   ├── test-design.md                # 测试设计九式 / 六维矩阵 v2 / 风险分 / 覆盖与退出标准
@@ -64,7 +65,7 @@ project-tester/
 │   ├── performance-testing.md        # 五种负载 / p95 口径 / k6 模板 / 性能预算 / 瓶颈定位
 │   ├── frontend-testing.md           # 五态矩阵 / WCAG 2.2 最小清单 / CWV / 错误映射 / a11y 与跨端联动
 │   ├── fullstack-integration.md      # 测试金字塔 / 隔离与工厂 / 集成边界 / 六门禁 12 分
-│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-9 交付核对
+│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-10 交付核对
 │   ├── ai-native-testing.md          # 四层能力模型 / AI for QA vs Testing for AI / 评测集
 │   ├── observability-testing.md      # 三大信号 / Trace 驱动 / W3C Trace Context / SLO 与错误预算 / R-1
 │   ├── chaos-resilience.md           # 稳态假设 / 故障注入矩阵 / 三级工具阶梯 / 恢复判据 / R-2
@@ -81,10 +82,11 @@ project-tester/
 │   ├── memory-tree.md                # 记忆树规范 / runs 格式 / 省 token 三律
 │   ├── evolution.md                  # 运行时进化回路 / 四问 / 三层记忆
 │   ├── self-evolution.md             # 每日升级十步协议 / 权限裁决 / 版本与蒸馏门槛
-│   └── evidence-chain-audit.md       # PROV 三级引用链 / OSCAL·SSDF 合规声明对账 / in-toto 与 GitHub attestations / manifest 与自动对账 / EA-1~EA-12 / R-9
-├── assets/                           # 16 份模板
+│   ├── feature-flag-testing.md       # 开关默认态/缺失态安全 / 目标群体隔离 / env/文件/远程配置漂移 / kill-switch 真关实测 / 灰度比例实测 / FF-1~FF-12 / R-10
+│   └── evidence-chain-audit.md       # PROV 三级引用链 / OSCAL·SSDF 合规声明对账 / in-toto 与 GitHub attestations / manifest 与自动对账 / §10 manifest→OSCAL / EA-1~EA-13 / R-9
+├── assets/                           # 17 份模板
 │   ├── tree-template.md              # 项目记忆树初始化
-│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-9 证据矩阵）
+│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-10 证据矩阵）
 │   ├── bug-report-template.md        # 缺陷报告八字段 + MRE
 │   ├── test-plan-template.md         # 测试计划 / 六维矩阵
 │   ├── release-gate-template.md      # 六门禁 12 分发布验收
@@ -98,11 +100,12 @@ project-tester/
 │   ├── test-effectiveness-template.md # DORA 四指标 / 逃逸率 / flaky / 变异得分 / ROI 成本·收益
 │   ├── accessibility-matrix-template.md # WCAG 2.2 版本口径 / violations·incomplete / 键盘路径 / 读屏组合 / R-7
 │   ├── device-matrix-template.md     # 矩阵来源·覆盖占比 / 载体标注 / 端侧特有面 / 网络档位 / 真机证据 / R-8
-│   └── evidence-chain-template.md    # 三级引用链（R-1~R-9）/ 控制项映射 / 缺口清单 / 锚点原文 / 审计导出留痕 / R-9 结论
+│   ├── evidence-chain-template.md    # 三级引用链（R-1~R-10）/ 控制项映射 / 缺口清单 / 锚点原文 / 审计导出留痕 / R-9 结论
+│   └── flag-rollout-matrix-template.md # 开关/配置/灰度验证矩阵：四类必测面 / 目标群体否定用例 / 三处配置比对 / kill-switch 实测 / 灰度比例 / R-10 结论
 ├── memory/
 │   └── global-lessons.md             # 跨项目经验（开局即读，自我进化载体）
 └── scripts/                          # 3 个零依赖 Python 脚本（标准库，无外部包）
-    ├── evidence-audit.py             # 证据链自动对账：audit --manifest / --fail-on-gap / --format / --output / --self-test
+    ├── evidence-audit.py             # 证据链自动对账：audit --manifest / --fail-on-gap / --format json|markdown|oscal / --output / --self-test
     ├── device-matrix.py              # install-base 本地导出汇总：build --input/--source/--window/--min-coverage / --self-test
     └── selfcheck.py                  # 升级自检：frontmatter / 断链 / 版本 / 占位 URL / 模板字段 / 路由闭环 / 规则同步 / 报告矩阵 / 例外声明 / §7f 脚本门禁
 ```
@@ -137,7 +140,9 @@ project-tester/
 | 判断 AI 生成的一堆用例有没有杀伤力 | `test-effectiveness-testing.md` §5B + `ai-native-testing.md` §3 |
 | 不知道该测哪些点 | `test-design.md` + `test-plan-template.md` |
 | 写缺陷报告 | `bug-report-template.md` + `quality-gates.md` §2 |
-| 判断测试是否可信 | `quality-gates.md` §5 + SKILL.md 的 R-1~R-9 可证伪规则 |
+| 判断测试是否可信 | `quality-gates.md` §5 + SKILL.md 的 R-1~R-10 可证伪规则 |
+| 验特性开关 / 配置漂移 / 灰度放量 / kill-switch 能止血 | `feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md`（R-10） |
+| 把证据链导出成 OSCAL assessment-results 喂给 GRC/审计工具 | `evidence-chain-audit.md` §10 + `scripts/evidence-audit.py --format oscal` |
 | 升级本技能 | `self-evolution.md` + `CHANGELOG.md` |
 
 ## 设计要点
@@ -145,11 +150,12 @@ project-tester/
 - **通用性**：不绑定语言/框架/agent，只用通用能力（文件读写、shell、按需浏览器）；工具缺失自动降级，不中止
 - **省 token**：被测项目根下 `.test-memory/tree.md`（<100 行）是接力地图，细节沉到 `runs/`；读一份树 = 跳过一次完整解剖
 - **证据优先**：每个失败结论必须有 MRE + 实际输出；指标写清分子/分母；报告强制给出 `PASS/FAIL` 与 `Go/No-Go`
-- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，v1.5 叠加证据链对账/视觉基线与 install-base 数据源/AI 用例有效性，均不新增层级
+- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，v1.5 叠加证据链对账/视觉基线与 install-base 数据源/AI 用例有效性，v1.6 叠加特性开关/配置/灰度正确性与证据链 OSCAL `assessment-results` 导出，均不新增层级
 - **路由闭环**：每份专项手册必须同时出现在 `dissect.md` §8 路由表与 `SKILL.md` 叠加项，由 `scripts/selfcheck.py` 逐份核对，缺一即 FAIL（不再只是文字约定）
-- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）、R-9（证据链可追溯与可复核性）**九条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"、**R-9 不认"报告写全了 / 证据文件都在 / 对账 GREEN"**
+- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）、R-9（证据链可追溯与可复核性）、R-10（特性开关 / 配置 / 灰度正确性）**十条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"、R-9 不认"报告写全了 / 证据文件都在 / 对账 GREEN"、**R-10 不认"开态测过 / 配置三处没比对 / 说 5% 没实测"**
 - **证据闭环（v1.4 / v1.5）**：`selfcheck.py` 的代码门禁——`§7d` **逐条核对** `report-template.md` 证据矩阵的 `| R-N |` 表格行（v1.5 负向测试实证加固：旧版只统计整段编号，说明文字里的编号可蒙混），`§7e` 强制每条规则写清禁止冒充声明，**`§7f`（v1.5）强制可执行脚本自带 `--self-test` 与诚实边界声明**；新增规则却忘了留证据槽位、写清降级路径，或新增脚本只会打 PASS，自检直接 FAIL
 - **可执行且诚实（v1.5）**：`scripts/evidence-audit.py`（本地确定性证据链对账）与 `scripts/device-matrix.py`（本地 install-base 导出汇总）只用 Python 标准库、不联网、不修改被测项目；前者固定输出「对账通过只证明证据链可解析，不证明合规或软件安全」，后者不代填 `real` 载体、不写「真机已验证」，缺数据源就显式标注不可作为 R-8 证据
+- **证据可机读（v1.6）**：`scripts/evidence-audit.py` 新增 `--format oscal`，把 manifest 的「结论→证据→锚点」链按 `references/evidence-chain-audit.md` §10 字段映射导出为 OSCAL `assessment-results` JSON，让 R-9 证据链能直接喂给 GRC/审计工具；只做字段搬运，不裁决合规——`待确认`/缺口在 OSCAL 里仍是 `partial`/`gap`，**不得**因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（EA-13 已纳入 `--self-test` 对等性校验）
 - **自我进化**：项目教训 → `.test-memory/lessons.md`；通用教训 → `memory/global-lessons.md`；每日升级 → `CHANGELOG.md` + 版本号
 - **权限裁决**：**测项目时不自治**（运行时只提 `[技能改进]` 提案），**升级技能时授权自治**（用户明确授权的每日任务，走十步门禁）
 
@@ -187,6 +193,7 @@ cd "D:/My Skills/project-tester" && python scripts/selfcheck.py
 
 | 版本 | 日期 | 主题 |
 |---|---|---|
+| v1.6.0 | 2026-11-12 | 每日升级 #7：从「结论可复核」扩展到「**动态正确 · 配置可信 · 开关可控 · 合规可机读**」——特性开关/配置/灰度正确性（Knight Capital 废弃开关反例、默认态/缺失态安全、目标群体隔离、env/文件/远程配置漂移、kill-switch 真关实测、灰度比例实测）；新增 **R-10**、`references/feature-flag-testing.md`、`assets/flag-rollout-matrix-template.md`；落地一个 v1.5 顺延提案：把 `scripts/evidence-audit.py` 的 manifest 增加 `--format oscal` 导出 OSCAL `assessment-results` JSON（`evidence-chain-audit.md` §10 字段映射），让 R-9 证据链可机读；EA-13 纳入 `--self-test` 对等性校验（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.5.0 | 2026-11-12 | 每日升级 #6：从「结论正确」扩展到「**结论可复核 · 声称可对账**」——证据链可追溯与合规声明对账（PROV / OSCAL / SSDF v1.1 / in-toto / GitHub attestations）、设备矩阵真实安装量数据源采集、视觉回归基线治理、AI 生成用例有效性度量；新增 **R-9**、`references/evidence-chain-audit.md`、`assets/evidence-chain-template.md` 与两个带 `--self-test` 的零依赖脚本；落地两个顺延提案（Merge 为主，不新增强化手册）；`selfcheck.py` 新增 §7f 脚本可证伪性门禁（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.4.0 | 2026-11-12 | 每日升级 #5：从「系统正确」扩展到「人人可用 · 处处可用 · 值得测」——无障碍可达性深度实测（WCAG 2.2 / 键盘 / 读屏）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机）、测试经济性 ROI；新增 R-7/R-8；落地三个顺延提案；新增 `selfcheck.py` §7d/§7e 两条门禁；修正「四条规则 / R-1~R-4」历史漂移（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.3.0 | 2026-11-11 | 每日升级 #4：从「边界正确性」扩展到「演进与合规正确性」——API 契约演进兼容性（oasdiff/Pact/SemVer）、隐私与数据生命周期（PII/GDPR/日志）、测试有效性度量（DORA/flaky/变异得分）；新增 R-5/R-6；把证据矩阵接进 `report-template.md`（[详见 CHANGELOG](CHANGELOG.md)） |

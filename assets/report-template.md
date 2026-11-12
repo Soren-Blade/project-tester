@@ -30,8 +30,9 @@
 | R-7 无障碍可达性 | PASS / 待确认 / 不适用 | <WCAG 2.2 级别+violations/incomplete+键盘路径+读屏组合 or 未做无障碍实测> |
 | R-8 跨端与设备形态真实性 | PASS / 待确认 / 不适用 | <设备矩阵来源+载体标注+端侧面+真机证据 or 未做跨端验证> |
 | R-9 证据链可追溯与可复核性 | PASS / 待确认 / 不适用 | <三级引用链可解析+sha256/commit 绑定+自动对账缺口+控制项映射 or 未做证据链对账 / 不适用：无留档要求> |
+| R-10 特性开关 / 配置 / 灰度正确性 | PASS / 待确认 / 不适用 | <开关off/缺失态回退+目标群体否定用例+三处配置比对+kill-switch实测+灰度比例 or 未做开关/配置/灰度验证 / 不适用：无开关与配置维度> |
 
-> 详细证据填各专项模板：`supply-chain-evidence-template.md` / `i18n-matrix-template.md` / `tenant-isolation-matrix-template.md` / `contract-evolution-matrix-template.md` / `privacy-matrix-template.md` / `test-effectiveness-template.md` / `accessibility-matrix-template.md` / `device-matrix-template.md` / **`evidence-chain-template.md`（R-9 三级引用链、控制项映射、锚点原文与审计导出留痕）**。九行每行都必须填结论或「不适用 / 待确认」声明（由 `scripts/selfcheck.py` §7d 强制），任一条声称通过却无证据 → 该结论作废降为「待确认」。**R-9 的「对账 GREEN」只证明证据链可解析，不得写成「已通过审计 / 合规通过 / 软件安全」**（`references/evidence-chain-audit.md` §4）。
+> 详细证据填各专项模板：`supply-chain-evidence-template.md` / `i18n-matrix-template.md` / `tenant-isolation-matrix-template.md` / `contract-evolution-matrix-template.md` / `privacy-matrix-template.md` / `test-effectiveness-template.md` / `accessibility-matrix-template.md` / `device-matrix-template.md` / `evidence-chain-template.md`（R-9 三级引用链、控制项映射、锚点原文与审计导出留痕）/ **`flag-rollout-matrix-template.md`（R-10 四类必测面、目标群体否定用例、三处配置比对、kill-switch 实测、灰度比例）**。十行每行都必须填结论或「不适用 / 待确认」声明（由 `scripts/selfcheck.py` §7d 强制），任一条声称通过却无证据 → 该结论作废降为「待确认」。**R-9 的「对账 GREEN」只证明证据链可解析，不得写成「已通过审计 / 合规通过 / 软件安全」**（`references/evidence-chain-audit.md` §4）；**R-10 的「开态测过」不得写成「关态也安全 / 灰度可控」**（`references/feature-flag-testing.md` §4）。
 
 ## 缺陷清单（按严重度排序）
 

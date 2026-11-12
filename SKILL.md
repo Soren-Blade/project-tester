@@ -1,10 +1,10 @@
 ---
 name: project-tester
-version: 1.5.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）。
+version: 1.6.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）。
 ---
 
-# 通用项目测试 (project-tester) · v1.5.0
+# 通用项目测试 (project-tester) · v1.6.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
@@ -17,6 +17,8 @@ v1.3 增量：**从「边界正确性」扩展到「演进与合规正确性」*
 v1.4 增量：**从「系统正确」扩展到「人人可用 · 处处可用 · 值得测」**——「辅助功能用户能不能走完流程」「换台真机、换个内核、换种网络还成立吗」「这堆测试的成本配得上收益吗」。新增 R-7（无障碍可达性）/ R-8（跨端与设备形态真实性）两条可证伪规则，把三个顺延提案（ROI 度量、移动端与桌面端专项、无障碍自动化实测）落地；同时修正此前「四条规则 / R-1~R-4」等文档漂移。四层模型与五阶段语义未变，故仍按 MINOR 升级。
 
 v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对账」**——「这个结论别人能不能按锚点重放」「报告里写『合规』到底挂了哪些控制项与证据」「设备矩阵是真实安装量算出来的还是拍脑袋列的」「视觉基线是不是被悄悄换过」「AI 生成的一堆用例到底有没有杀伤力」。新增 **R-9（证据链可追溯与可复核性）** 与 `references/evidence-chain-audit.md` / `assets/evidence-chain-template.md`，落地两个顺延提案（合规性声明与证据链自动对账、设备矩阵真实安装量数据源采集脚本）；新增两个零依赖可执行脚本 `scripts/evidence-audit.py` / `scripts/device-matrix.py`，均带 `--self-test` 可证伪自检与「不联网 / 不代填 / 不冒充」的诚实边界；视觉回归基线治理并入 `cross-platform-testing.md` §6A、AI 生成用例有效性度量并入 `test-effectiveness-testing.md` §5B，均 **Merge 不新增手册**。四层模型与五阶段语义未变，仍按 MINOR 升级。
+
+v1.6 增量：**从「结论可复核」扩展到「动态正确 · 配置可信 · 开关可控 · 合规可机读」**——「功能对」之上再加一层：开关的**默认态/缺失态是否回到安全路径**、目标群体是否真的隔离、env/文件/远程配置三处是否漂移、kill-switch 真关后是否回到安全态、灰度比例是否真的可控。新增 **R-10（特性开关 / 配置 / 灰度正确性）** 与 `references/feature-flag-testing.md` / `assets/flag-rollout-matrix-template.md`，以 Knight Capital 2012「废弃开关被重新点亮」反例打底，落地一个 v1.5 顺延提案：把 `scripts/evidence-audit.py` 的 manifest 增加 `--format oscal` 导出 OSCAL `assessment-results` JSON（manifest 字段 → OSCAL 模型字段的映射见 `references/evidence-chain-audit.md` §10），让 R-9 的证据链能直接喂给 GRC / 审计工具，不造无人消费的转换层。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -80,6 +82,13 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 | 有视觉快照基线 / install-base 导出数据，或要按真实安装量定设备矩阵 | `references/cross-platform-testing.md` §6A + `scripts/device-matrix.py` + `assets/device-matrix-template.md` | 基线环境指纹、`--update-snapshots` 留「旧 hash→新 hash+理由+批准人」、`maxDiffPixels`/`mask`/`threshold` 变更批准；本地 CSV/JSON 导出的占比/累计/80% 截断点与 CrUX 口径声明，载体列人工填（R-8 增强，不新增规则） |
 | 用了 AI 生成测试用例，要判断这批用例有没有杀伤力 | `references/test-effectiveness-testing.md` §5B + `references/ai-native-testing.md` §3 | 入库率、断言强度合格率、变异杀伤贡献、假通过率（故意改坏代码应转红）、审查人时；E-15~E-18 度量卡；审查 diff 登记进 manifest，否则 R-9 判缺口 |
 
+**v1.6 横向叠加项**（同样不新增层级；四层模型与五阶段语义未变）：
+
+| 触发条件 | 叠加手册 | 必做动作 |
+|---|---|---|
+| 用了特性开关 / kill-switch / 远程配置 / 实验开关 / A-B，或声称「开关关掉系统还安全 / kill-switch 能止血 / 灰度可控」 | `references/feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md` | 开关 off 态与缺失态回退到安全路径、目标群体否定用例、env/文件/远程三处配置比对、kill-switch 真关实测、灰度比例实测；**R-10**。无任何开关与配置化的纯离线脚本写「不适用：无开关与配置维度」 |
+| 要把 R-9 证据链喂给 GRC / 审计工具，或声明「证据可机读导出」 | `references/evidence-chain-audit.md` §10 + `scripts/evidence-audit.py --format oscal` | manifest 经 `--format oscal` 导出 OSCAL `assessment-results` JSON（结论→OSCAL `finding`、证据锚点→`relevant-evidence`、原始输出→`observation`），字段映射见 §10；**不**把导出件写成「已通过 OSCAL 合规评估」 |
+
 > **对账边界**：`scripts/evidence-audit.py` 的对账 GREEN 只证明「结论 → 证据 → 原始输出」这条链**可解析**，**不证明**软件安全、合规通过、运行时质量或发布批准；`scripts/device-matrix.py` 的占比草稿**不是**真机证据。两者都不得越界写成「已通过审计 / 已验证真机」。
 
 **先分清 "AI for QA"（用 AI 提效，横向）与 "Testing for AI"（测 AI 系统本身，L4）**——这是最容易混淆的一处。工具总表与降级见 `references/tools.md`。
@@ -111,7 +120,8 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 2. **功能清单**：README 宣称的功能 + 代码实际暴露的功能，**两者的差异本身就是测试点**（文档过时？功能没实现？）
 3. **优先级**：风险分 = 影响 × 概率 × 暴露面（见 `test-design.md` §4），P0 核心 / P1 主要 / P2 边缘
 4. **测试设施、攻击面、观测面与依赖拓扑**：框架、规范文件、CI、E2E；认证位置、对象 ID、配置/密钥、影子端点；日志/埋点/健康检查、外部依赖清单与故障域；**交付链**（lockfile / 镜像 / 产物 / 签名 / SBOM）、**locale 面**（资源文件 / 格式化调用 / `dir`/`lang`）、**租户边界**（tenant 标识来源 / 共享资源清单 / 隔离策略声明）、**无障碍面**（交互控件 / 认证方式 / 焦点与 ARIA / 目标尺寸 / 读屏支持声明）、**设备形态面**（支持的 OS / 浏览器内核 / 屏幕形态 / 安装量分布数据是否可得）、**证据链面**（v1.5：有无留档要求、合规声明清单、原始输出落在哪、能否拿到 commit / 环境指纹 / 时间窗、有无视觉快照基线与 install-base 导出）——见 `dissect.md` §6~7
-5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 叠加项）
+**配置/开关面**（v1.6：有无特性开关 / kill-switch / 远程配置 / 实验开关 / A-B；开关默认态与缺失态是否回退到安全路径；目标群体属性来源；env / 文件 / 远程配置三处优先级声明；灰度比例与「一键停」能力）——见 `dissect.md` §6~7 与 `references/feature-flag-testing.md`
+5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 叠加项）
 
 原则：解剖够用即止——能支撑测试计划就停，不做无死角的代码审读。大型项目只解剖本次范围内的模块。
 
@@ -153,6 +163,7 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 - **跨端与设备形态真实性**（v1.4）→ 设备矩阵来源与载体标注、仿真 vs 真机边界、端侧特有面、网络档位 → `cross-platform-testing.md` + `assets/device-matrix-template.md`
 - **证据链与合规声明对账**（v1.5）→ 三级引用链可解析 + `sha256`/commit 绑定 + 自动对账缺口 + 控制项映射 → `evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`
 - **视觉基线与真实安装量 / AI 用例有效性**（v1.5）→ 基线更新留痕与阈值批准、本地导出算 80% 截断点、假通过率与变异杀伤贡献 → `cross-platform-testing.md` §6A + `scripts/device-matrix.py` + `test-effectiveness-testing.md` §5B
+- **特性开关 / 配置 / 灰度正确性**（v1.6）→ 开关 off 态与缺失态回退、目标群体否定用例、三处配置漂移比对、kill-switch 真关实测、灰度比例实测 → `references/feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -173,7 +184,7 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 
 **安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。**多租户测试须构造自己的合成租户与数据，禁止拿真实客户数据做越权验证**（`multi-tenancy-testing.md` §1）。**影子流量只做只读比对，不得对真实用户产生写副作用**。
 
-**九条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9）——规则的价值在于写清「什么时候不适用」：
+**十条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10）——规则的价值在于写清「什么时候不适用」：
 
 | 规则 | 结论必须附的证据 | 不适用时的写法 |
 |---|---|---|
@@ -186,8 +197,9 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 | **R-7 无障碍可达性** | 声称"符合 WCAG 2.2 AA / 支持读屏 / 可键盘操作 / 无障碍已验收"，须附 ① 目标版本与级别；② `axe-core` 或等价扫描的 violations **+ incomplete 原文**且 incomplete 逐条人工结论；③ 至少一条 P0 流程的完整键盘路径记录（逐步焦点、可见性、2.4.11 遮挡判定）；④ 至少一组读屏 + 浏览器 + OS 组合的逐项 passed/failed/not checked/not present 标注；⑤ 2.5.8 目标尺寸与 3.3.8 认证认知负担实测结论 | 纯 CLI / 无 UI 的库 / 批处理脚本、无图形交互界面 → 只写「不适用：无图形交互界面，未做无障碍实测」，**不得**写「无障碍合规 / 符合 WCAG」；无读屏环境只写「未做读屏实测」，结论降为「待确认」 |
 | **R-8 跨端与设备形态真实性** | 声称"移动端可用 / 兼容主流浏览器 / 已适配折叠屏 / 跨端已验证 / 真机验过"，须附 ① 设备矩阵来源（install-base analytics 数据源 + 时间窗）与覆盖占比；② `real`/`emulator`/`simulator`/`browser-emulation` 逐项载体标注；③ 不同浏览器内核实测；④ 长尾条目（低配/最老受支持 OS/厂商皮肤/折叠屏平板）逐条结论或显式未覆盖；⑤ 生命周期、中断、权限、旋转、深链、网络档位的实际输出；⑥ 声称真机须有 ≥1 组 real device 记录 | 纯后端 API / CLI / 无 UI 的库 → 只写「不适用：无终端形态差异，未做跨端验证」，**不得**写「跨端已验证」；只有仿真时写「仅完成仿真验证，未做真机验证」并降为「待确认」，**不得**写「真机验过 / 全平台兼容」 |
 | **R-9 证据链可追溯与可复核性** | 声称"测试结论可复核 / 证据链完整 / 已通过审计 / 合规声明有证据支撑"，须附 ① 每条结论 → 证据文件 → 原始输出的三级引用链且锚点可解析（行号存在或片段命中）；② 证据 `sha256` + 被测对象 commit / 环境指纹 / 时间窗绑定（无 `stale_evidence`）；③ `scripts/evidence-audit.py` 自动对账结果含覆盖缺口、悬空引用、过期证据与四类结论区分；④ 合规声明 → 控制项 → 证据的映射表与未映射项声明；⑤ 审计导出件自身 hash 与生成时间 | 一次性探索测试、无留档要求的临时验证 → 只写「未做证据链对账 / 不适用：无留档要求」，**不得**写「可审计 / 证据链完整 / 通过审计」；只有部分证据时写「证据链存在 N 处缺口，结论降级为待确认」，**不得**写「证据齐全」，**不得**把对账 GREEN 冒充「合规通过」 |
+| **R-10 特性开关 / 配置 / 灰度正确性** | 声称"开关关掉系统还安全 / kill-switch 能止血 / 灰度可控 / 配置正确 / 目标群体隔离"或"开关两态都测过"，须附 ① 开关 off 态与**缺失态**（配置不可达）都回退到声明的安全路径、且无残留新副作用的实测；② 目标群体命中变体的同时，非目标群体的否定用例（不得泄露）；③ env / 文件 / 远程配置三处的比对与优先级声明，或明确写「无外部化配置」；④ kill-switch 真关后回到安全态的实测；⑤ 灰度比例实测采样（计划 vs 实际）与「一键停」能力 | 纯静态、无任何开关 / 配置化 / 灰度放量的离线脚本 → 只写「不适用：无开关与配置维度」，**不得**写「开关安全 / 灰度可控」；只有部分证据时写「证据链存在 N 处缺口，R-10 降级为待确认」，**不得**写「开关可控 / 灰度安全」，**不得**把「开态测过」冒充「关态也安全」 |
 
-详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准。
+详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准。
 
 ## 阶段 4：记忆与进化（本技能的灵魂）
 
@@ -195,7 +207,7 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 2. **更新 tree.md**：模块叶节点状态、严重度与回归用例、新增模块、已知问题表、"下次待办"三类（回归/待测/阻塞）
 3. **沉淀教训**：项目级 → `.test-memory/lessons.md`；跨项目 → 本技能 `memory/global-lessons.md`
 4. **进化检查四问**（`references/evolution.md` §1）：踩了什么坑、什么手法有效、证据够不够、流程哪里不足 → 通用项写 global-lessons.md，`[技能改进]` 提案进提案区
-5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-9 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**九行**都填了结论或「不适用 / 待确认」声明；用了两个 v1.5 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
+5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-10 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十行**都填了结论或「不适用 / 待确认」声明；用了 v1.5/v1.6 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
 
 最后用 `assets/report-template.md` 输出测试报告，**必须给出明确的 `PASS/FAIL` 与 `Go/No-Go`**，禁止"基本可以"。发布验收用 `assets/release-gate-template.md` 打 12 分。
 
@@ -238,7 +250,7 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 | `references/performance-testing.md` | 五种负载、p95 口径、k6 模板、性能预算、瓶颈定位 |
 | `references/frontend-testing.md` | 五态矩阵、WCAG 2.2 最小清单、Core Web Vitals、错误映射、动效运行时纪律 |
 | `references/fullstack-integration.md` | 测试金字塔、隔离与工厂、集成边界、六门禁 12 分 Go/No-Go |
-| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-9 Go/No-Go |
+| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-10 Go/No-Go |
 | `references/ai-native-testing.md` | 四层能力模型、AI for QA vs Testing for AI、AI 生成测试审查、AI 系统评测 |
 | `references/observability-testing.md` | 三大信号、Trace 驱动测试、W3C Trace Context、SLI/SLO/错误预算、R-1 可证伪规则 |
 | `references/chaos-resilience.md` | 稳态假设、故障注入矩阵、三级工具阶梯、恢复判据、R-2 可证伪规则 |
@@ -252,12 +264,13 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 | `references/test-effectiveness-testing.md` | DORA 四指标、缺陷逃逸率、flaky 配额、变异得分、§5A 测试经济性/ROI、§5B AI 生成用例有效性（入库率/假通过率/变异杀伤/E-15~E-18）、度量纪律 |
 | `references/accessibility-testing.md` | WCAG 2.2 新增 9 条与 2.4.11/2.5.8/3.3.8 精确口径、axe 自动化边界与 incomplete、键盘路径与读屏组合、ARIA 快照、R-7 |
 | `references/cross-platform-testing.md` | install-base 设备矩阵与 80% 覆盖、real/emulator/browser-emulation 载体分野、Playwright Emulation、端侧特有面与网络档位、§6A 视觉回归基线治理与本地 install-base 导出汇总、R-8 |
-| `references/evidence-chain-audit.md` | PROV 三级引用链、OSCAL/SSDF 合规声明对账、in-toto 与 GitHub artifact attestations、manifest 字段与自动对账、EA-1~EA-12、R-9 |
+| `references/evidence-chain-audit.md` | PROV 三级引用链、OSCAL/SSDF 合规声明对账、in-toto 与 GitHub artifact attestations、manifest 字段与自动对账、EA-1~EA-13、R-9、**§10 manifest ↔ OSCAL `assessment-results` 字段映射** |
+| `references/feature-flag-testing.md` | 开关默认态/缺失态安全、目标群体隔离、env/文件/远程配置漂移、kill-switch 真关实测、灰度比例实测、FF-1~FF-12、R-10 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
 | `assets/tree-template.md` | 记忆树初始化模板 |
-| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-9 证据矩阵） |
+| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-10 证据矩阵） |
 | `assets/bug-report-template.md` | 缺陷报告八字段 + MRE |
 | `assets/test-plan-template.md` | 测试计划/测试矩阵模板 |
 | `assets/release-gate-template.md` | 六门禁 12 分发布验收模板 |
@@ -271,9 +284,10 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 | `assets/test-effectiveness-template.md` | 测试有效性与经济性：DORA 四指标、逃逸率、flaky、变异得分、ROI 成本/收益 |
 | `assets/accessibility-matrix-template.md` | 无障碍矩阵：WCAG 2.2 版本口径、violations/incomplete、键盘路径、读屏组合、R-7 结论 |
 | `assets/device-matrix-template.md` | 设备矩阵：来源与覆盖占比、载体标注、端侧特有面、网络档位、真机证据、R-8 结论 |
-| `assets/evidence-chain-template.md` | 证据链对账：三级引用链（R-1~R-9）、控制项映射、缺口清单、锚点原文、四类结论、审计导出留痕、R-9 结论 |
+| `assets/evidence-chain-template.md` | 证据链对账：三级引用链（R-1~R-10）、控制项映射、缺口清单、锚点原文、四类结论、审计导出留痕、R-9 结论 |
+| `assets/flag-rollout-matrix-template.md` | 开关/配置/灰度验证矩阵：四类必测面、目标群体否定用例、三处配置比对、kill-switch 实测、灰度比例、R-10 结论与不适用声明 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
-| `scripts/evidence-audit.py` | 本地确定性证据链对账：`audit --manifest` / `--fail-on-gap` / `--format json\|markdown` / `--output`、`--self-test`；检出悬空引用、过期证据、不可解析锚点、PASS 无证据、未分类结论 |
+| `scripts/evidence-audit.py` | 本地确定性证据链对账：`audit --manifest` / `--fail-on-gap` / `--format json\|markdown\|oscal` / `--output`、`--self-test`；检出悬空引用、过期证据、不可解析锚点、PASS 无证据、未分类结论；`--format oscal` 导出 OSCAL `assessment-results` JSON |
 | `scripts/device-matrix.py` | 本地 CSV/JSON install-base 导出汇总：`build --input/--source/--window/--min-coverage --format`、`--self-test`；占比/累计/截断点/CrUX 口径声明，不联网、不代填载体 |
 | `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、索引覆盖、路由闭环与规则同步、**报告证据矩阵表格行同步（§7d 加固）与规则例外声明**、**§7f 脚本可证伪性静态门禁** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |

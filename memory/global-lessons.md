@@ -209,6 +209,15 @@
 - [手法] 故意改坏核心逻辑后 AI 生成用例仍全绿 = 假通过 — 应用：E-17 实测，与 `ai-native-testing.md` §3 的自愈陷阱同源
 - [流程] AI 改过的断言与视觉基线更新都要人工 diff 并留痕 — 应用：审查记录进 `scripts/evidence-audit.py` 的 manifest，否则 R-9 判缺口
 
+## 特性开关 / 配置 / 灰度类（v1.6 蒸馏）
+
+- [手法] 「功能对」≠「开关隔离对」：feature 对目标群可见 ≠ 对非目标群不可见；灰度 5% 须实测采样而非只写计划值 — 应用：非目标群体必须补否定用例，灰度比例实测与计划值并列（feature-flag-testing.md §2/§3，R-10）
+- [安全] 开关默认态/缺失态回退到哪个路径要写成明确假设并验证：配置中心宕机时回退到「开」会把没准备的功能暴露给全员 — 应用：缺省即开是 S1 级缺陷，R-10 要求测 off 态与缺失态（Knight Capital 反例）
+- [安全] 废弃/应休眠的开关是高危资产：本以为没人翻的 flag 在灰度里被重新命中，等于多了一条没人测的代码路径 — 应用：每个还活着的废弃开关都要显式验证当前解析为 off 或已移除（SEC 对 Knight Capital 2012 调查口径）
+- [手法] env / 文件 / 远程配置三处不一致时，代码跑的是「你没注意到的那份配置」且无报错 — 应用：开关/配置维度先声明优先级再比对，非法值须被拒绝而非静默采纳（FF-7/FF-8）
+- [流程] kill-switch 必须经过真关验证：声称「一键关掉」必须附「真关后回到安全态」的证据 — 应用：关态路径从没被执行过的系统，R-10 判缺口而非 PASS（FF-9/FF-12）
+- [合规] OSCAL 导出是「同一份证据的另一种编码」，不是新的评估结论 — 应用：`待确认`/缺口到 OSCAL 里仍是 `partial`/`gap`，不得因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（evidence-chain-audit.md §10）
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -223,5 +232,5 @@
 - [技能改进] ✅ **已吸收（v1.4）**：无障碍自动化实测的边界 → 落地为 `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md`，以 R-7 固定「axe 0 violations ≠ 合规」；来源 W3C WCAG 2.2 / Deque axe-core / DWP / Playwright
 - [技能改进] ✅ **已吸收（v1.5）**：把「合规性声明」（SOC2 / 等保 / SSDF）与证据链自动对账 → 落地为 `references/evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`，新增 **R-9**；理由：本轮实查 W3C PROV-DM / NIST OSCAL / NIST SP 800-218 v1.1 / in-toto / GitHub artifact attestations，权威映射来源已足，不再造空泛清单，且明确「对账 GREEN ≠ 合规通过」
 - [技能改进] ✅ **已吸收（v1.5）**：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 落地为 `scripts/device-matrix.py` + `references/cross-platform-testing.md` §6A；理由：**不臆造 analytics API**，只接受本地 CSV/JSON 导出，算占比/累计/80% 截断点并固定输出 CrUX 口径局限；载体与实测结论仍人工填，不冒充真机证据
-- [技能改进] 待后续轮次：把 `scripts/evidence-audit.py` 的 manifest 与 CI artifacts / OSCAL `assessment-results` 做格式互转 → 需先确认目标组织实际采用 OSCAL 模型，否则易造无人消费的转换层
+- [技能改进] ✅ **已吸收（v1.6）**：把 `scripts/evidence-audit.py` 的 manifest 与 OSCAL `assessment-results` 做格式互转 → 落地为 `evidence-audit.py --format oscal` + `references/evidence-chain-audit.md` §10 字段映射；理由：本轮确认确有 GRC/审计消费场景，且明确「只搬字段不裁决合规」，EA-13 纳入 `--self-test` 对等性校验，不造无人消费的转换层
 - [技能改进] 待后续轮次：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → 依赖具体变异工具输出格式，先保留 §5B 的人工度量口径，不硬编码某一家 JSON schema

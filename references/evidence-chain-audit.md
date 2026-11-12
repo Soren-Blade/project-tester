@@ -196,7 +196,7 @@ python scripts/evidence-audit.py --self-test
 | 运行时质量 | 证据文件里有**本次**真实执行的原始输出 |
 | 发布批准 | 用户/评审者认可（证据链无法代替） |
 
-## 6. 测试卡（EA-1 ~ EA-12）
+## 6. 测试卡（EA-1 ~ EA-13）
 
 | # | 测试动作 | 通过判据 | 常见失败 |
 |---|---|---|---|
@@ -246,3 +246,34 @@ sha256sum .test-memory/runs/*.log               # 证据 hash
 | 全局 Go/No-Go | `references/quality-gates.md` §3（R-9） |
 | 记忆树与 runs 格式 | `references/memory-tree.md` |
 | 工具与降级 | `references/tools.md` |
+
+## 10. manifest ↔ OSCAL `assessment-results` 字段映射（R-9 证据链可机读导出）
+
+> 蒸馏自 NIST OSCAL 的 Assessment Layer 模型（官方三层：`assessment-plan` / `assessment-results` / `plan-of-action-and-milestones`，且明确「native traceability from the assessment layer to the catalog layer」）。`assessment-results` 表示一组评估活动产出的信息，包含 scope、收集的 `evidence` 与 `findings`，并支持 periodic / continuous assessments。
+> 定位：前面 §4 的 manifest 是**人类可核对**的结论→证据→锚点链；本节能把它**自动导出**成 OSCAL `assessment-results` JSON，让 R-9 的证据链直接喂给 GRC / 审计工具，而不必手工重录。一句话分野：**导出件是「同一份证据的另一种编码」，不是新的评估结论**。
+
+### 10.1 字段映射（manifest → OSCAL）
+
+| manifest 字段 | OSCAL `assessment-results` 落点 | 备注 |
+|---|---|---|
+| `subject.name` / `subject.commit` / `environment` / `window` | `metadata.title` + `result.description` + `result.start`/`end`（window 拆两端） | 被测对象指纹写进结果级元信息 |
+| 每条 `claim`（id/statement/status/evidence/anchor/sha256） | 一条 `finding`：`uuid`、`title`（claim.id + statement）、`description`、`implementation-status.state`、若干 `relevant-evidence`（证据文件路径 + `href` + `sha256` 摘要 + anchor 原文） | `state` 由 status 映射：PASS→`implemented`、FAIL→`no-expectation`/问题、`不适用`→`not-applicable`、`待确认`→`partial`、BLOCKED→`planned` |
+| `anchor`（L<n> / text:） | `relevant-evidence.description` 里的锚点原文片段 | 保留可复核锚点 |
+| `control_mapping`（control / claim_ids） | `result.local-definitions` 或直接挂到对应 `finding`，并生成 `observation`（评估活动）记录"哪次测试、时间窗、scope" | OSCAL 用 `observation` 承载评估活动与证据采集，`finding` 通过 `location.related-observation` 关联 |
+| 四类 `conclusion_class` | `observation.methods` / `prop`（区分静态记录 / 评测准备度 / 运行时质量 / 发布批准） | 防止四类结论被混为一谈 |
+| 自动对账的缺口清单（dangling / stale / 不可解析锚点等） | `finding.implementation-status.state=partial` 或追加 `prop`（缺口码），并在 `prop` 显式标 `gap` | 缺口随导出件一起带走，不丢 |
+
+### 10.2 诚实边界（导出件不得越界）
+
+- 导出只做**字段搬运**：manifest 里是 `待确认` / 缺口，导出件也必须是 `partial` / `gap`，**不得**因为「有了 OSCAL 文件」就写成 `implemented` 或「已通过 OSCAL 合规评估」。
+- OSCAL 是**可机读格式**，不是**合规裁决**：审计员 / 评审者仍需按 `catalog` 逐控制项判定。`scripts/evidence-audit.py --format oscal` 的输出固定带一行「本导出件只证明证据链可机读编码，不证明合规通过或软件安全」，与 §4 的对账 GREEN 同一纪律。
+- 字段名依据 OSCAL `assessment-results` 模型（`metadata` / `result` / `finding` / `observation` / `relevant-evidence` / `implementation-status.state`）。本轮未能实时取到该子页（官方 reference 页返回 404，JS 渲染不可抓），以下字段以 OSCAL 模型规范描述为准，**落地以目标组织实际采用的 OSCAL 版本校验**——若对方用 `assessment-plan` + `assessment-results` 分离建模，需额外补 `import-applicant` 与 `local-definitions`，不要臆造对方不需要的字段。
+- 转换只在**确有 OSCAL 消费方**时启用（`scripts/evidence-audit.py --format oscal`）；无消费方时仍用 §4 的 markdown 导出，避免造无人使用的转换层。
+
+### 10.3 测试卡（EA-13）
+
+| # | 测试动作 | 通过判据 |
+|---|---|---|
+| EA-13 | 对同一份 manifest 分别跑 `--format markdown` 与 `--format oscal` | 两者覆盖的 claim 数量一致；`oscal` 导出里每个 `finding` 都能回溯到 manifest 的某条 claim 与证据文件；`待确认`/`缺口` 未被翻成 `implemented` |
+
+> 口径诚实：`--format oscal` 是 v1.6 新增的可选导出；`--self-test` 已覆盖其对等性与不越界检查（见 `scripts/evidence-audit.py`）。
