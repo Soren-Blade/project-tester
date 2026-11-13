@@ -132,6 +132,8 @@ checks = {
     "references/evidence-chain-audit.md": ["R-9", "PROV", "OSCAL", "in-toto", "不适用"],
     "references/feature-flag-testing.md": ["R-10", "kill-switch", "灰度", "不适用", "不得"],
     "assets/flag-rollout-matrix-template.md": ["R-10", "开关", "灰度", "不适用", "不得"],
+    "references/test-data-management.md": ["R-11", "合成数据", "脱敏", "不适用", "不得"],
+    "assets/test-data-matrix-template.md": ["R-11", "合成数据", "脱敏", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -250,6 +252,10 @@ SCRIPT_GATES = {
     "scripts/device-matrix.py": [
         "--self-test", "SELFTEST GREEN", "CRUX_CAVEAT", "数据源未登记",
         "不联网", "不代填",
+    ],
+    "scripts/test-data-gen.py": [
+        "--self-test", "SELFTEST GREEN", "deterministic", "seed", "mask",
+        "不联网", "不代填", "不冒充", "不保证无泄漏",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

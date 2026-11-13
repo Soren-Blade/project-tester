@@ -218,6 +218,15 @@
 - [流程] kill-switch 必须经过真关验证：声称「一键关掉」必须附「真关后回到安全态」的证据 — 应用：关态路径从没被执行过的系统，R-10 判缺口而非 PASS（FF-9/FF-12）
 - [合规] OSCAL 导出是「同一份证据的另一种编码」，不是新的评估结论 — 应用：`待确认`/缺口到 OSCAL 里仍是 `partial`/`gap`，不得因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（evidence-chain-audit.md §10）
 
+## 测试数据管理类（v1.7 蒸馏）
+
+- [流程] 测试用数据必须可信、合规、可复现，否则再多用例也是沙上筑塔 — 应用：解剖阶段先判数据来源（合成/脱敏/子集/生产），R-11 据此定结论（test-data-management.md §1）
+- [手法] 硬编码测试数据 → 用工厂（faker + overrides）；随机库要带固定种子才能复现 — 应用：`faker.seed(42)` / `--seed`，断言"数据可复现"须附同种子两次生成一致性校验（fullstack-dev testing-strategy.md / test-data-gen.py）
+- [安全] 连生产库抽数做测试本身是 S1 反模式，即便"只读副本"里的 PII 仍受 GDPR/个保法约束 — 应用：进测试环境前必须脱敏，且脱敏命令原文 + 退出码留证；直接连生产库即判缺陷（test-data-management.md §5）
+- [安全] 掩码是启发式（保留格式、替换主体），不保证覆盖全部 PII、不保证不可逆 — 应用：用了 `mask` 子命令不写「数据已脱敏」，须附掩码后残留核查 + 人工复核（test-data-management.md §3）
+- [手法] 子集须保引用完整：外键图抽取后悬空外键数必须为 0，否则关联查询会跑出脏数据 — 应用：子集制备后查 `LEFT JOIN ... WHERE fk IS NULL` 计数（test-data-management.md §4）
+- [流程] 前端/媒体测试数据的真实感也要可复现：`--seed` 相同提示词产出相同图/音，视觉回归才能比对 — 应用：生成媒体统一带种子，避免每次基线漂移（frontend-dev minimax --seed）
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -233,4 +242,4 @@
 - [技能改进] ✅ **已吸收（v1.5）**：把「合规性声明」（SOC2 / 等保 / SSDF）与证据链自动对账 → 落地为 `references/evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`，新增 **R-9**；理由：本轮实查 W3C PROV-DM / NIST OSCAL / NIST SP 800-218 v1.1 / in-toto / GitHub artifact attestations，权威映射来源已足，不再造空泛清单，且明确「对账 GREEN ≠ 合规通过」
 - [技能改进] ✅ **已吸收（v1.5）**：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 落地为 `scripts/device-matrix.py` + `references/cross-platform-testing.md` §6A；理由：**不臆造 analytics API**，只接受本地 CSV/JSON 导出，算占比/累计/80% 截断点并固定输出 CrUX 口径局限；载体与实测结论仍人工填，不冒充真机证据
 - [技能改进] ✅ **已吸收（v1.6）**：把 `scripts/evidence-audit.py` 的 manifest 与 OSCAL `assessment-results` 做格式互转 → 落地为 `evidence-audit.py --format oscal` + `references/evidence-chain-audit.md` §10 字段映射；理由：本轮确认确有 GRC/审计消费场景，且明确「只搬字段不裁决合规」，EA-13 纳入 `--self-test` 对等性校验，不造无人消费的转换层
-- [技能改进] 待后续轮次：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → 依赖具体变异工具输出格式，先保留 §5B 的人工度量口径，不硬编码某一家 JSON schema
+- [技能改进] 待后续轮次（v1.7 已打底）：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → TDM 的确定性 `--seed` 现为跨语言变异基准的可复现数据底座；本提案仍保留至具体变异工具输出 schema 确定，不硬编码某一家 JSON schema

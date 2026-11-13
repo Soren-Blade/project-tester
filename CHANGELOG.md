@@ -5,6 +5,48 @@
 
 ---
 
+## [v1.7.0] — 2026-11-13 · 每日升级 #8
+
+**主题**：从「结论可复核」扩展到「**喂给测试的数据本身可信 · 合规 · 可复现**」——测试数据管理（TDM）：合成数据生成、PII 脱敏 / 掩码、确定性种子、数据子集与制备、绝不用生产数据。同一份测试结论若建立在「假数据 / 泄漏的生产 PII / 每次跑都不一样的随机样本」之上，再多用例也只是沙上筑塔。新增 **R-11 测试数据可信与合规** 与三份文件（手册 + 模板 + 零依赖脚本），蒸馏来源含权威 TDM 定义与用户附加技能 `fullstack-dev` / `frontend-dev` 的二次蒸馏。注：与 #1~#7 同属每日升级自动化序列，按轮次记为 #8。
+
+**遵循上轮建议**：未重写已覆盖主题（无障碍、跨端、测试经济性、供应链、隐私、契约演进、i18n、多租户、观测、韧性、数据、协议、AI 原生、证据链、特性开关、五阶段与四层模型），以 **Enhance / New 混合、New 为主**；四层模型与五阶段流程**未改语义**（按 `self-evolution.md` §7 只升 MINOR）；每轮至少一条可证伪规则 → 本轮引入 **R-11**；本轮做了**负向测试**（临时副本破坏 R-11 一处，确认 `selfcheck.py` §7c/§7d/§7e 确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/test-data-management.md`、`assets/test-data-matrix-template.md`、`scripts/test-data-gen.py` |
+| **Enhance** | `SKILL.md`（version 1.7.0、description 触发词、v1.7 增量说明、v1.7 叠加项、阶段1 测试数据面、R-11、参考索引）、`README.md`（徽章 28→29 references / 17→18 assets / 3→4 scripts / 53→56 files、问题表 +1 行、结构树 +3 条、速查 +1 行、设计要点 R-1~R-11 + 分层叠加 v1.7、版本史 +1 行）、`CHANGELOG.md`（本条目）、`references/dissect.md`（§6 测试数据面 + §8 路由行）、`references/quality-gates.md`（§3 R-11 + §8 十一条 + 规则同步）、`assets/report-template.md`（R-11 行 + 十一行矩阵 + 残留核查边界）、`scripts/selfcheck.py`（§5 新文件字段 + §7f 新脚本门禁）、`memory/global-lessons.md`（TDM 教训组） |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- Thoughtworks《Test data management》：TDM 定义——"用真实世界形态的数据测开发中的应用，同时不让真实数据承担风险"，质量是测试数据的最大杠杆 → `references/test-data-management.md` §1/§5
+- K2view《What is Test Data Management (TDM)》《What is Synthetic Data Generation》：TDM 四步（define/provision/maintain/retire）、合成数据 vs 数据脱敏（用假值替换 PII 但结构一致） → §1/§3
+- DATPROF / IRI Test Data Virtualization：masking + subsetting + synthetic generation + automation 的组合能力、子集须保引用完整 → §3/§4
+- 用户附加技能 `fullstack-dev`（其 `testing-strategy.md` 外部技能，不在本仓库）：Test Factories（faker/factory_boy，hardcode→factories）、目录约定 `tests/fixtures/{factories,seeds}`、Anti-Patterns #4（hardcode→factories）/ #9（"Test against production data → Generated test data only"）、`db-schema.md` 迁移须在 production data size 下 < 30s → §2/§4/§5
+- 用户附加技能 `frontend-dev`（其 minimax 指南外部技能）：`--seed` 保证相同提示词可复现产出（图像/音频），对应"确定性种子" → §2
+- 交叉引用（不重复造轮子）：`references/privacy-compliance-testing.md`（R-6 生产 PII 生命周期）、`references/data-integrity-testing.md`（迁移 up/down 与类生产数据量） → §9
+
+### 口径诚实
+
+- 掩码是**启发式规则**（保留格式、替换主体），**不保证**覆盖全部 PII、**不保证**不可逆；用了 `scripts/test-data-gen.py` 的 `mask` **不**等于"数据已脱敏 / 无 PII 泄漏"（§3/§7，模板 §7）
+- `self-test` 只证明脚本自身的确定性/掩码逻辑可用，**不证明**你的数据集无 PII 残留、不证明合规通过
+- 声称"测试数据已脱敏 / 合成数据无 PII 泄漏 / 数据可复现"必须附 §6 五类证据，否则降级为「待确认」；**R-11 不认「用了生成器」、不认「掩码了已知字段」、不认「无种子却说可复现」**
+- 与 R-6 边界：R-6 管"生产系统怎么处理真实 PII"，R-11 管"喂给测试的数据本身是否可信合规"，二者不重叠、不互相替代（§9）
+
+### 自检与门禁
+
+- `scripts/selfcheck.py`：源与全局安装均 **PASS 36 / WARN 0 / FAIL 0 / GREEN**（规则数 10→11，§7c 双向同步、§7d 逐行矩阵、§7e 例外声明、§7f 新脚本门禁全过）
+- `scripts/test-data-gen.py --self-test` 退出码 0；`scripts/evidence-audit.py --self-test` 与 `scripts/device-matrix.py --self-test` 退出码均 0；`py_compile` OK
+- **负向测试**（项目外临时副本）：删 SKILL.md 的 R-11 定义 → §7c FAIL；删 `report-template.md` 的 `| R-11 ... |` 表格行 → §7d FAIL；删 R-11 行的「不得」 → §7e FAIL；三例 exit=1，干净副本 exit 0，证明 §7c/§7d/§7e 可证伪
+- 文件数 53 → 56（references 28→29、assets 17→18、scripts 3→4），`diff -r` 源与全局安装零差异
+
+### 提案处置
+
+- 待后续轮次（v1.7 已打底）：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → TDM 的确定性 `--seed` 现已成为跨语言变异基准的可复现数据底座；本提案仍保留至具体变异工具输出 schema 确定（不硬编码某一家 JSON）
+
+---
+
 ## [v1.6.0] — 2026-11-12 · 每日升级 #7
 
 **主题**：从「结论可复核」扩展到「**动态正确 · 配置可信 · 开关可控 · 合规可机读**」——同一份代码在开关 / 配置 / 灰度的动态下是否仍正确、是否仍安全；并把 R-9 证据链做成可机读导出。新增 **R-10 特性开关 / 配置 / 灰度正确性** 与两份文件，落地一个 v1.5 顺延提案（`evidence-audit.py --format oscal` → OSCAL `assessment-results`）。注：与 #5/#6 同日（2026-11-12）执行，按自动化轮次记为 #7。
