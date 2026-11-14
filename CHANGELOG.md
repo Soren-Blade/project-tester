@@ -5,6 +5,77 @@
 
 ---
 
+## [v1.11.0] — 2026-11-14 · 每日升级 #12
+
+**主题**：从「功能、金额、交付都正确」扩展到「**缓存不串号 · 发布即生效 · 文件不可当代码**」——缓存与内容新鲜度（R-17）与文件上传下载内容边界（R-18）。一个接口全绿、金额也对、webhook 也幂等的系统，仍然会在「A 登录后 B 打开同一 URL 看到 A 的账单」「发了新版但 CDN 还吐旧页面」「把 shell 改名成 `.jpg` 就传上去了」「登出后预签名 URL 还能往桶里写」上成片出错；这类缺陷不是「边界没测」，而是「缓存键与文件边界没有可证伪判据」。新增 **R-17 缓存与内容新鲜度**、**R-18 文件上传下载与内容边界** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 RFC 9111 / 5861 / 8246 / 9211 / 9110 / 6266、Cloudflare Cache Deception Armor、OWASP File Upload Cheat Sheet、OWASP WSTG、S3 presigned 官方文档、sharp 构造器文档与 ImageTragick。按每日升级序列记为 #12。
+
+**遵循上轮建议**：未重写已覆盖的 16 个主题与五阶段、四层模型、路由闭环，以 **New 为主 + Enhance 为辅**；四层模型与五阶段流程**未改语义**，只升 MINOR。上轮遗留的「AUTH/S/F 三张卡做成可执行 adapter」「税务辖区舍入矩阵」继续**待评估**；「AI 变异杀伤跨语言自动跑数」仍受变异工具 JSON schema 未定阻塞，顺延；「`money-audit.py` 自动拉渠道对账单」维持**已驳回**（违反零依赖/不联网边界）。每轮至少一条可证伪规则 → 本轮引入 **R-17 / R-18**，并做了**三例负向测试**（临时副本分别删 R-17 手册「不得」、删报告矩阵 R-18 行、删 SKILL.md R-17 行里的「不得」声明，确认 `selfcheck.py` 对应检查确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/cache-freshness-testing.md`、`assets/cache-freshness-matrix-template.md`、`scripts/cache-audit.py` | 新增 R-17 能力：四层缓存分层与策略来源、`Cache-Control` 指令语义、`Vary` 与缓存键、ETag/304/Range、C-01~C-08 共享缓存安全用例、缓存欺骗、个性化与多租户、失效与发布、CA-01~CA-08 / CA-10~CA-16 审计 |
+| New | `references/file-upload-download-testing.md`、`assets/upload-security-matrix-template.md`、`scripts/upload-audit.py` | 新增 R-18 能力：三道闸（扩展名 / 魔数与 Content-Type / 解码重编码）、U-01~U-09 绕过矩阵、落盘与执行权限、presigned bearer 语义、下载 IDOR 与 `Content-Disposition`、SVG 与压缩炸弹、UA-01~UA-08 / UA-10~UA-17 审计 |
+| Enhance | `SKILL.md`（description 触发词、v1.11 增量段、阶段 1 缓存面/上传下载面、阶段 3 两条专项、十八条规则表、阶段 4 自检、索引） | 只增量，不改五阶段与四层模型 |
+| Enhance | `references/dissect.md` §6/§8、`references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵 | 缓存/上传两面路由、结论作废判据、18 行矩阵 |
+| Enhance | `scripts/selfcheck.py` §5/§7f、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 6 个新文件字段、2 个新脚本门禁、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 34 份手册与 23 份模板 | 不重复造，仅在路由/交叉项里引用 |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- RFC 9111 HTTP Caching（`no-store`/`no-cache`/`private`/`public`/`s-maxage`/`must-revalidate` 语义）：https://www.rfc-editor.org/rfc/rfc9111.html
+- RFC 5861 `stale-while-revalidate` / `stale-if-error`：https://www.rfc-editor.org/rfc/rfc5861.html
+- RFC 8246 `immutable`：https://www.rfc-editor.org/rfc/rfc8246.html
+- RFC 9211 `Cache-Status`：https://www.rfc-editor.org/rfc/rfc9211.html
+- RFC 9110 条件请求、`Vary`、`Age`：https://www.rfc-editor.org/rfc/rfc9110.html
+- Cloudflare Cache Deception Armor（URL 扩展名 ↔ 返回 `Content-Type` 一致性判据；源站 Cache-Control / Edge TTL 可覆盖）：https://developers.cloudflare.com/cache/cache-security/cache-deception-armor/
+- PortSwigger Web Cache Deception：https://portswigger.net/web-security/web-cache-deception
+- OWASP WSTG（缓存与信息泄露测试项）：https://owasp.org/www-project-web-security-testing-guide/
+- OWASP File Upload Cheat Sheet（白名单、UUID 重命名、ADS/双扩展/空字节绕过、webroot 外存储、解码重编码）：https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+- RFC 6266 `Content-Disposition`：https://www.rfc-editor.org/rfc/rfc6266.html
+- Fetch `X-Content-Type-Options`（`nosniff`）：https://fetch.spec.whatwg.org/#x-content-type-options-header
+- AWS S3 presigned URL（bearer token、到期前可重复使用、能力受生成者权限限制、`s3:signatureAge`）：https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html
+- sharp 构造器（`limitInputPixels` 默认 268402689、`limitInputChannels` 默认 5、`unlimited` 移除防护）：https://sharp.pixelplumbing.com/api-constructor/
+- ImageTragick（ImageMagick 处理不可信输入的策略要求）：https://imagetragick.com/
+- CWE-434 / CWE-22 / CWE-409（不受限上传、路径穿越、解压炸弹）：https://cwe.mitre.org/data/definitions/434.html
+
+### 口径诚实
+
+- `cache-audit.py` **不联网、不代填**：只读本地源码/配置/头清单，不连 CDN、不回源；`scan` 命中只是「可疑写法」，`headers` 只审 `headers.json` 自述的策略，**不证明线上真实响应头**；`--fail-on-gap` 只把发现的缺口变成非零退出码，不把「没发现」变成「缓存安全」。
+- `upload-audit.py` 的 `scan`/`matrix` 同理：魔数只读文件头，**不证明内容安全**（图片马、SVG 脚本、压缩炸弹都可能绕过扩展名与魔数）；`matrix` 数据由测试者提供，可伪造；presign 判据基于「断签/登出后仍有效或 uses>1」，不证明桶策略正确。
+- Cloudflare Cache Deception Armor 是**平台侧缓解**，不是规范；官方文档明确写「源站 `Cache-Control` 或 Edge TTL 可覆盖该保护」，故手册要求看实际响应头与双会话结果，**不得**把「开了 Armor」写成「缓存安全」。
+- ASVS 5.0 的「拒绝超大图片（pixel flood）」与「净化用户上传 SVG」两项要求只从他人标题侧证核到，官方 raw 文件 404，故手册只写「ASVS 5.0 有要求」**不写具体控制编号**，避免伪造引用。
+- S3 presigned 官方页只承诺「bearer token、到期前可多次使用、受生成者权限约束」，**未承诺限制大小/类型/Content-Length**；手册据此要求配条件策略（`content-length-range`/前缀/`signatureAge`），不把「presign 能生成」写成「上传受限」。
+- R-17 不认「响应头写对」「`Age` 小」「purge 接口存在」；R-18 不认「上传成功」「扩展名合法」「presign 未过期」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+在项目外临时目录 `C:\Users\摩羯座\AppData\Local\Temp\pt-v111-dogfood\cache-upload-demo` 建了一个零依赖 Express 夹具（静态页 + 双会话接口 + 上传路由 + webroot 落盘 + 4 条头策略 + 4 条上传清单），全程只读技能目录：
+
+- `cache-audit.py scan`：4 处命中——CA-03 HIGH（`public` 与个性化/`Set-Cookie` 同现）、CA-01 MEDIUM（`no-cache` 冒充不存储）、CA-05 LOW ×2（`immutable` 配 `max-age=60`）；
+- `cache-audit.py headers`：8 处问题（**S1 4**）——CA-10 个性化标 public、CA-11 鉴权 public 缺 `Vary: Authorization`、CA-12 带 `Set-Cookie` 却非 private/no-store、CA-13 purge 未鉴权，另 CA-14 ×2、CA-15、CA-16；
+- `upload-audit.py scan`：7 处命中——UA-01（`.jpg` 装 PHP）、UA-02（`.php` 落 public）、UA-03（SVG `onload`）、UA-04（`'../' + filename` 穿越）、UA-05 ×2（原始文件名 `join` 落盘）、UA-08（webroot 落点）；
+- `upload-audit.py matrix`：10 处问题（**S1 9**）——UA-10/11/12/13/14/15/17 与 UA-16；
+- 合计 **29 项检查，S1 13 项**，质量状态 **FAIL**、发布建议 **No-Go**（按 `quality-gates.md` §3 无条件 No-Go）；
+- 两个脚本各自 `--self-test`：cache `SELFTEST GREEN（19 项断言）`、upload `SELFTEST GREEN（18 项断言）`，均 exit 0。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py`：**GREEN**（PASS 58 / WARN 0 / FAIL 0，exit 0）。
+- 负向测试三例（临时副本，不污染源）：① 删 `references/cache-freshness-testing.md` 的「不得」→ §5 关键字段 FAIL；② 删 `assets/report-template.md` 的 `| R-18` 行 → §7d 矩阵同步 FAIL；③ 删 `SKILL.md` R-17 规则行里的「不得」→ §7e 例外声明 FAIL。三例均按预期转 FAIL。
+- 同步全局 `C:\Users\摩羯座\.agents\skills\project-tester` 并 `diff -r`（排除 `.git`/`.workbuddy-ai`）0 差异；git commit + push 到 `https://github.com/Soren-Blade/project-tester.git`。
+
+### 提案处置
+
+- 采纳：dogfood 的「缓存头策略 ↔ 双会话串号」组合检查、「`Vary: Authorization` 缺失」与「purge 未鉴权」判据，「原始文件名 `join` 落盘」与「webroot 落点」判据，已写入两本手册与两份矩阵模板。
+- 采纳：两个审计脚本读 JSON 清单统一 `encoding="utf-8-sig"`，容忍 Windows 写出的 BOM；`upload-audit.py` 的 UA-05/UA-08 从「`os.path.join` + 原始文件名」扩展到任意 `join/resolve`，覆盖 Express 写法（首轮 dogfood 实测漏检后修正）。
+- 待评估：把「缓存键 × 身份 × tenant × locale」做成自动生成的双会话矩阵——需先定义 provider 无关的请求夹具格式。
+- 待评估：上传解码重编码的证据自动化（探测 sharp/ImageMagick + 对比输出像素与元数据）——依赖本机图形库，本轮只给命令与判据。
+- 待核实：Cloudflare 之外（Akamai / Fastly / CloudFront）的缓存欺骗缓解差异，需按厂商文档逐家核对，不把 Armor 判据当通用规范。
+
+---
+
 ## [v1.10.0] — 2026-11-14 · 每日升级 #11
 
 **主题**：从「接口、时间、恢复都正确」扩展到「**钱算得对 · 账记平衡 · 消息只达一次**」——金额/账务正确性与异步消息/Webhook 交付可靠性。一个接口全绿、时间也对、备份可恢复的系统，仍然会在 `0.1+0.2`、`2.675`、JPY×100、100 分 3 份、重复扣款、退款超退、签名不覆盖时间戳、同 `event_id` 发两次货、重试写死 1 秒、消息丢了不进 DLQ 上成片出错；这类缺陷不是「边界没测」，是「金额最小单位与交付语义没有可证伪判据」。新增 **R-15 金额与账务正确性**、**R-16 异步消息 / Webhook 交付可靠性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 ISO 4217 minor unit / IEEE 754 / Fowler Money 模式 / 最大余额法 / 复式记账 / Standard Webhooks / Stripe / GitHub / CloudEvents / Kafka / SQS / AWS 退避抖动 / OWASP API7。按每日升级序列记为 #11。

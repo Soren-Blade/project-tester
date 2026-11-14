@@ -1,10 +1,10 @@
 ---
 name: project-tester
-version: 1.10.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。**时间与时区正确性（时区 / DST / 夏令时 / 时间戳 / 过期 / TTL / 时钟回拨 / 定时任务）与备份恢复可验证性（备份 / 恢复演练 / restore drill / RPO / RTO / PITR / 数据不丢）也在覆盖范围内。**金额与账务正确性（金额 / 小数 / 舍入 / 多币种 / 分币 / 分摊 / 折扣 / 税 / 利息 / 借贷平衡 / 对账 / 退款 / 重复扣款）与异步消息交付可靠性（webhook / 回调 / 签名验签 / 幂等 / 重试 / 退避 / DLQ / 乱序 / 消息丢失 / event_id 去重）也在覆盖范围内。**凡是用户说"钱算得对不对""对账不平""重复扣款了""退款多退了""webhook 验签""回调收不到""重试把订单发重了""消息丢了一条"时也使用本技能；凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）；以及"登录 / 认证 / 会话 / 令牌 / JWT / OAuth / OIDC / SSO / 刷新令牌 / 会话固定 / 登出没失效 / 密码重置 / 验证码 / MFA / 双因素 / Passkey / 账户枚举 / 越权改 ID / 认证绕过 / token 能不能伪造 / alg none / 审计登录"等说法（authentication / session / token / JWT / OAuth / OIDC / MFA / passkey / session fixation / refresh token rotation / account enumeration / auth bypass / ASVS / RFC 8725 / RFC 9700）。
+version: 1.11.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。**时间与时区正确性（时区 / DST / 夏令时 / 时间戳 / 过期 / TTL / 时钟回拨 / 定时任务）与备份恢复可验证性（备份 / 恢复演练 / restore drill / RPO / RTO / PITR / 数据不丢）也在覆盖范围内。**金额与账务正确性（金额 / 小数 / 舍入 / 多币种 / 分币 / 分摊 / 折扣 / 税 / 利息 / 借贷平衡 / 对账 / 退款 / 重复扣款）与异步消息交付可靠性（webhook / 回调 / 签名验签 / 幂等 / 重试 / 退避 / DLQ / 乱序 / 消息丢失 / event_id 去重）也在覆盖范围内。**凡是用户说"钱算得对不对""对账不平""重复扣款了""退款多退了""webhook 验签""回调收不到""重试把订单发重了""消息丢了一条"时也使用本技能；凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）；以及"登录 / 认证 / 会话 / 令牌 / JWT / OAuth / OIDC / SSO / 刷新令牌 / 会话固定 / 登出没失效 / 密码重置 / 验证码 / MFA / 双因素 / Passkey / 账户枚举 / 越权改 ID / 认证绕过 / token 能不能伪造 / alg none / 审计登录"等说法（authentication / session / token / JWT / OAuth / OIDC / MFA / passkey / session fixation / refresh token rotation / account enumeration / auth bypass / ASVS / RFC 8725 / RFC 9700）；以及"缓存 / CDN / 缓存策略 / Cache-Control / Vary / ETag / 304 / 缓存键 / 缓存投毒 / 缓存欺骗 / 内容新鲜度 / 发布后还是旧页面 / purge"等说法（cache / CDN / cache key / cache poisoning / web cache deception / freshness / stale-while-revalidate / surrogate key）；以及"文件上传 / 下载 / 附件 / 头像 / 预签名 URL / presigned / 对象存储 / 魔数 / 文件类型校验 / 路径穿越 / 双扩展 / 图片马 / SVG XSS / 压缩炸弹"等说法（file upload / download / attachment / magic bytes / content-type sniffing / path traversal / polyglot / zip bomb / presigned URL / object storage）。
 ---
 
-# 通用项目测试 (project-tester) · v1.10.0
+# 通用项目测试 (project-tester) · v1.11.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
@@ -27,6 +27,8 @@ v1.8 增量：**从「功能与数据的正确」扩展到「身份不可冒充 
 v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 灾难后可恢复」**——「跨时区、跨夏令时还对不对」「令牌是不是真的在该过期时过期」「每日任务在 DST 那天会不会双跑或漏跑」「备份到底能不能恢复、恢复后行数/附件/序列全不全」。新增 **R-13（时间与时区正确性）** 与 **R-14（备份与恢复可验证性）**，配套 `references/time-correctness-testing.md` / `assets/time-matrix-template.md` / `scripts/time-audit.py`（T-01~T-10 静态扫描 + gap/fold 计算 + `--self-test`）与 `references/backup-recovery-testing.md` / `assets/restore-drill-template.md` / `scripts/restore-audit.py`（源/恢复双清单对账 RST-01~RST-11 + `--self-test`）。蒸馏底座：RFC 3339、IANA tzdb（2026f 取消古巴 2026-11-01 回拨，证明 tzdata 漂移是实证风险）、NIST SP 800-34 Rev.1 的 RPO/RTO 业务口径、cronie `crontab(5)` 的 DST gap/fold 原文语义，以及 `pg_verifybackup` / restic / borg 自己写明的「结构校验 ≠ 内容校验、校验通过 ≠ 可恢复」。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 · 消息只达一次」**——「界面 2.68 元，扣款也是 2.68 吗」「0.1+0.2 在账本里是多少」「同一笔订单重复扣款了两次吗」「退款能不能退超」「webhook 签名能用别的 body 复用吗」「回调超时后重试，订单会不会发两次货」。新增 **R-15（金额与账务正确性）** 与 **R-16（异步消息 / Webhook 交付可靠性）**，配套 `references/money-correctness-testing.md` / `assets/money-matrix-template.md` / `scripts/money-audit.py`（MO-01~MO-09 金额反模式扫描 + LG-00~LG-06 借贷对账 + `cases` 反例 + `--self-test`）与 `references/webhook-delivery-testing.md` / `assets/webhook-delivery-matrix-template.md` / `scripts/webhook-audit.py`（WH-01~WH-11 交付审计 + Standard/Stripe 签名复算 + `--self-test`）。蒸馏底座：ISO 4217 的 minor unit（JPY 0 位、KWD 3 位）与 IEEE 754 二进制浮点的十进制不可表示（0.1+0.2≠0.3、2.675 舍入陷阱）、Martin Fowler 的 Money/Currency 模式与「分配须最大余额法且 Σ 守恒」、复式记账的借贷平衡与不可变分录、Standard Webhooks 规范的 `id.timestamp.body` 签名与 `whsec_` base64 密钥、Stripe 的 `t.payload` hex 签名与容忍窗、GitHub webhook 的 `X-Hub-Signature-256`，以及 Stripe/Shopify 自己写明的 at-least-once + 去重责任在消费者。四层模型与五阶段语义未变，仍按 MINOR 升级。
+
+v1.11 增量：**从「功能正确」扩展到「缓存不串号 · 发布即生效 · 文件不可当代码」**——「A 登录后 B 用同一 URL 能不能看到 A 的页面」「发布了但 CDN 还吐旧页面」「换个扩展名就能上传可执行文件」「预签名 URL 断签后还能不能往桶里写」。新增 **R-17（缓存与内容新鲜度）** 与 **R-18（文件上传下载与内容边界）**，配套 `references/cache-freshness-testing.md` / `assets/cache-freshness-matrix-template.md` / `scripts/cache-audit.py`（CA-01~CA-08 缓存反模式 + CA-10~CA-16 头策略 + `cases` 反例 + `--self-test`）与 `references/file-upload-download-testing.md` / `assets/upload-security-matrix-template.md` / `scripts/upload-audit.py`（UA-01~UA-08 源码规则 + UA-10~UA-17 清单规则 + 魔数校验 + `--self-test`）。蒸馏底座：RFC 9111（缓存语义）、RFC 5861（`stale-while-revalidate` / `stale-if-error`）、RFC 8246（`immutable`）、RFC 9211（`Cache-Status`）、RFC 9110（条件请求与 `Vary`）、Cloudflare Cache Deception Armor 的「URL 扩展名 ↔ 返回 Content-Type 一致性」判据、OWASP File Upload Cheat Sheet 的绕过清单与「签名校验不可单独使用」，以及 S3 presigned 官方页写明的「bearer token、到期前可重复使用、不限制大小类型」。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -147,7 +149,9 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 **恢复面**（v1.9：备份对象与频率 / 保留期 / 是否异地·离线·不可变 / 是否加密及密钥位置 / 最近一次**实际恢复**时间 / RPO·RTO 声明 / 多租户与删除权交叉）——见 `dissect.md` §6 与 `references/backup-recovery-testing.md`
 **金额面**（v1.10：金额字段类型是整数最小单位、`DECIMAL(p,s)` 还是浮点；currency 字段与 exponent 来源；舍入模式写在契约哪一处；计价/折扣/税/运费/退款分摊代码位置；有无账本/分录/对账文件；客户端能否直接传 `amount`/`price`）——见 `dissect.md` §6 与 `references/money-correctness-testing.md`
 **交付面**（v1.10：webhook 端点与签名方案（Standard Webhooks / Stripe / 自定义）/ 是否保留原始 body 验签 / `event_id` 去重表与保留窗口 / 重试与 DLQ / 消费者幂等键 / 渠道沙箱与回调可达性）——见 `dissect.md` §6 与 `references/webhook-delivery-testing.md`
-5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 叠加项）
+**缓存面**（v1.11：有无 CDN / 反向代理 / 共享缓存；`Cache-Control` / `Vary` / `ETag` / `s-maxage` 由哪一层注入；缓存键是否含 tenant 与身份；purge / invalidate 端点与鉴权；发布后是否有主动失效）——见 `dissect.md` §6 与 `references/cache-freshness-testing.md`
+**上传 / 下载面**（v1.11：上传入口、大小与类型限制落在哪层；扩展名白名单与魔数校验、是否解码重编码；落盘是否在 webroot；下载鉴权与直链可猜性；presigned URL 的生成者权限与过期；SVG / ZIP / 解压后大小）——见 `dissect.md` §6 与 `references/file-upload-download-testing.md`
+5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 / v1.11 叠加项）
 
 原则：解剖够用即止——能支撑测试计划就停，不做无死角的代码审读。大型项目只解剖本次范围内的模块。
 
@@ -196,6 +200,8 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 - **备份与恢复可验证性**（v1.9）→ RPO/RTO 实测、隔离环境实恢复、行数/hash/外键/序列/blob/密钥/版本不变量、强校验真读数据、PITR 丢失窗口、删除权与多租户交叉 → `references/backup-recovery-testing.md` + `assets/restore-drill-template.md` + `scripts/restore-audit.py`
 - **金额与账务正确性**（v1.10）→ 币种 exponent 与舍入模式口径、`money-audit.py cases` 反例、展示价/应付额/实扣额/入账额四层对齐、分摊守恒（Σ==原额）、并发重复扣款与超卖、退款累计 ≤ 实付、借贷平衡与不可变分录、渠道对账单逐笔对账 → `references/money-correctness-testing.md` + `assets/money-matrix-template.md` + `scripts/money-audit.py`
 - **异步消息 / Webhook 交付可靠性**（v1.10）→ 签名覆盖字段与原始 body 验签、时间戳容忍窗与重放、`event_id` 去重（含并发）、重试退避与重启续投、乱序终态、DLQ 与渠道侧对账、at-least-once 语义下的副作用次数 → `references/webhook-delivery-testing.md` + `assets/webhook-delivery-matrix-template.md` + `scripts/webhook-audit.py`
+- **缓存与内容新鲜度**（v1.11）→ 共享/私有缓存分层与键、双会话串号、缓存欺骗（URL 扩展名与返回 `Content-Type` 不符）、`Vary` 缺失 / `Vary: *`、`Set-Cookie` 与 `public` 同现、purge 无鉴权、发布后陈旧与 `stale-while-revalidate` 滥用、`Age` / `Cache-Status` 原文 → `references/cache-freshness-testing.md` + `assets/cache-freshness-matrix-template.md` + `scripts/cache-audit.py`
+- **文件上传下载与内容边界**（v1.11）→ 三道闸（扩展名白名单 / 魔数与 `Content-Type` / 解码重编码）、双扩展·大小写·ADS·前导点·空字节、路径穿越与 webroot 落盘、SVG XSS 与 ZIP 炸弹、presigned URL 的 bearer 语义与过期、下载 IDOR 与直链可猜、`Content-Disposition` 注入 → `references/file-upload-download-testing.md` + `assets/upload-security-matrix-template.md` + `scripts/upload-audit.py`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -239,8 +245,10 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 | **R-14 备份与恢复可验证性** | 声称"有备份 / 可恢复 / 满足 RPO·RTO / 数据不丢"，须附 ① 备份对象清单、频率、保留期、加密与密钥位置；② 最近一次**实际恢复**的隔离环境记录（恢复点、耗时三段、RTO 实测）；③ `scripts/restore-audit.py compare` 输出原文（RST-01~RST-11 缺口与 warnings）或等价对账表；④ 强校验输出（restic `--read-data` / borg `--verify-data` / `pg_verifybackup` checksum + test restore）；⑤ 不变量：行数、hash、外键悬空、`max(id)`/序列、blob、配置/版本；⑥ PITR 数据丢失窗口与删除权/多租户交叉结论 | 无持久化数据、纯无状态服务、明确声明不备份 → 只写「不适用：无持久化数据与备份面」，**不得**写「有备份 / 可恢复」；未做过实际恢复 → 写「未做过恢复演练，R-14 降级为待确认」，**不得**把「备份任务成功」冒充「可恢复」，**不得**把「结构校验通过」冒充「内容完整 / 可恢复」 |
 | **R-15 金额与账务正确性** | 声称"金额正确 / 扣款准确 / 账记平衡 / 对账通过 / 退款不超额 / 多币种支持"，须附 ① 币种与 exponent 表（ISO 4217 minor unit 来源）与存储类型；② 舍入模式与所在层（展示 / 计算 / 入账）及 2.675、0.1+0.2 类反例的十进制期望值；③ 展示价 / 应付额 / 实扣额 / 入账额四层对齐证据；④ 分摊守恒（Σ 分项 == 原额，最大余额法）与至少一个不可整除例；⑤ `scripts/money-audit.py scan` 输出原文 + 命中逐条裁决，`ledger` 的借贷平衡 / 单边 / 精度 / 混币负向结果；⑥ 并发重复扣款与超卖用例、退款累计 ≤ 实付；⑦ 有渠道对账单时逐笔对账差异数 | 无任何资金流、纯展示价格、非货币积分 → 只写「不适用：无交易金额」，**不得**写「金额正确 / 对账通过」；无渠道对账单 → 只写「仅验证账本内部平衡，未与渠道对账」，**不得**把「账本内部数字相等」冒充「对账通过」，**不得**把「界面显示 2.68」冒充「实扣 2.68」，**不得**把「单笔用例通过」冒充「全量金额正确」 |
 | **R-16 异步消息 / Webhook 交付可靠性** | 声称"消息可靠 / webhook 安全 / 幂等已做 / 不丢不重 / 重试生效"，须附 ① 签名方案与覆盖字段（是否含 id / timestamp）+ `scripts/webhook-audit.py verify` 的原始 body 复算输出（正例 + 篡改 body / timestamp / 错密钥反例）；② 时间戳容忍窗实测（窗内接受、窗外拒绝）；③ 同 `event_id` 串行与并发各一次，副作用次数 = 1 的证据（去重键与保留窗口）；④ 重试退避实测（间隔递增、上限、重启后仍续投）与最终失败进 DLQ；⑤ 乱序投递后的终态正确性；⑥ at-least-once 语义声明 + 渠道侧对账差异数 | 纯同步请求-响应、无异步事件 / 回调 → 只写「不适用：无异步交付」，**不得**写「消息必达 / 不丢不重」；无渠道沙箱或无法注入重试 → 写「仅完成静态审计与本地复算，未做端到端投递」，**不得**把「验签函数存在」冒充「签名不可伪造」，**不得**把「回调返回 200」冒充「已处理不重复」，**不得**把「配了重试」冒充「重试生效」 |
+| **R-17 缓存与内容新鲜度** | 声称「缓存配置正确 / 发布即生效 / 不会串号 / 缓存安全」，须附 ① 缓存分层表（浏览器 / CDN / 反向代理 / 应用）与每层策略来源（响应头 / 源站配置 / 平台默认）；② 缓存键与 `Vary` 声明，含身份与 tenant 维度的键证据；③ 双会话串号实测：A 登录后请求私有页，B 用同一 URL 是否拿到 A 的内容（响应体 + `Age` / `Cache-Status` 原文）；④ 缓存欺骗用例：`/account/x.jpg` 类路径返回 HTML 时的 `Content-Type` 与是否入缓存；⑤ `no-store` vs `no-cache`、`s-maxage` vs `max-age`、`immutable` 的实际语义证据；⑥ 发布/删除后的失效实测（purge 鉴权、失效后首请求是否仍旧） | 纯静态资源且无 shared cache → 只写「不适用：无共享缓存面」，**不得**写「缓存安全 / 无缓存风险」；只核对响应头文本 → 写「仅完成头策略静态核对，未做双会话实测」，**不得**把「头看起来对」冒充「不会串号」，**不得**把「purge 接口存在」冒充「失效生效」 |
+| **R-18 文件上传下载与内容边界** | 声称「上传安全 / 只允许图片 / 文件类型已校验 / 私有下载 / 预签名安全」，须附 ① 白名单与限制位置（前端 / 网关 / 应用 / 存储）与服务端强制证据；② 绕过矩阵实测：双扩展、大小写、`.php%00.jpg`、`shell.asp:.jpg`、前导点、SVG 脚本、ZIP 炸弹；③ 魔数与 `Content-Type` 对照 + 解码重编码证据（图片马是否存活）；④ 落盘路径与执行权限（webroot 外、目录禁执行）；⑤ 下载鉴权与直链可猜、`Content-Disposition` / `X-Content-Type-Options` 头；⑥ presigned URL 生成者权限、过期、断签后复用与重复 PUT 换内容 | 无文件进出口 → 只写「不适用：无文件上传下载面」，**不得**写「上传安全 / 类型已校验」；只有扩展名检查 → 写「仅完成扩展名白名单核对，未做魔数与重编码验证」，结论降为「待确认」，**不得**把「上传成功」冒充「文件安全」，**不得**把「presign 未过期」冒充「授权正确」 |
 
-详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6、`references/auth-session-testing.md` §8、`references/time-correctness-testing.md` §9、`references/backup-recovery-testing.md` §8、`references/money-correctness-testing.md` §9、`references/webhook-delivery-testing.md` §7。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏，登录成功 ≠ 认证安全，令牌可解码 ≠ 可伪造，Cookie 有 HttpOnly ≠ 会话安全，**未命中静态扫描 ≠ 时间正确，备份任务成功 ≠ 可恢复，界面显示 2.68 ≠ 实扣 2.68，账本内部平衡 ≠ 与渠道对账通过，验签函数存在 ≠ 不可伪造，回调返回 200 ≠ 已处理且不重复**。
+详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6、`references/auth-session-testing.md` §8、`references/time-correctness-testing.md` §9、`references/backup-recovery-testing.md` §8、`references/money-correctness-testing.md` §9、`references/webhook-delivery-testing.md` §7、`references/cache-freshness-testing.md` §8、`references/file-upload-download-testing.md` §7。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏，登录成功 ≠ 认证安全，令牌可解码 ≠ 可伪造，Cookie 有 HttpOnly ≠ 会话安全，**未命中静态扫描 ≠ 时间正确，备份任务成功 ≠ 可恢复，界面显示 2.68 ≠ 实扣 2.68，账本内部平衡 ≠ 与渠道对账通过，验签函数存在 ≠ 不可伪造，回调返回 200 ≠ 已处理且不重复，**响应头写对 ≠ 不会串号，purge 接口存在 ≠ 失效生效，上传成功 ≠ 文件安全，presigned 未过期 ≠ 授权正确，扩展名合法 ≠ 内容安全**。
 
 ## 阶段 4：记忆与进化（本技能的灵魂）
 
@@ -248,7 +256,7 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 2. **更新 tree.md**：模块叶节点状态、严重度与回归用例、新增模块、已知问题表、"下次待办"三类（回归/待测/阻塞）
 3. **沉淀教训**：项目级 → `.test-memory/lessons.md`；跨项目 → 本技能 `memory/global-lessons.md`
 4. **进化检查四问**（`references/evolution.md` §1）：踩了什么坑、什么手法有效、证据够不够、流程哪里不足 → 通用项写 global-lessons.md，`[技能改进]` 提案进提案区
-5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-16 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十六行**都填了结论或「不适用 / 待确认」声明；用了 v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
+5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-18 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十八行**都填了结论或「不适用 / 待确认」声明；用了 v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 / v1.11 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
 
 最后用 `assets/report-template.md` 输出测试报告，**必须给出明确的 `PASS/FAIL` 与 `Go/No-Go`**，禁止"基本可以"。发布验收用 `assets/release-gate-template.md` 打 12 分。
 
@@ -282,7 +290,7 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 
 | 文件 | 内容 |
 |---|---|
-| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、交付链/locale/租户边界/无障碍面/设备形态面/时间面/恢复面/金额面/交付面、能力层路由 |
+| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、交付链/locale/租户边界/无障碍面/设备形态面/时间面/恢复面/金额面/交付面/缓存面/上传下载面、能力层路由 |
 | `references/tools.md` | 工具总表、专项工具、可用性探测、降级策略、shell 断言模板 |
 | `references/personas.md` | 7 日常 + 8 刁钻画像、判 bug 标准、手册映射 |
 | `references/test-design.md` | 测试设计九式、六维矩阵 v2、风险分、覆盖准则与退出标准 |
@@ -291,7 +299,7 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 | `references/performance-testing.md` | 五种负载、p95 口径、k6 模板、性能预算、瓶颈定位 |
 | `references/frontend-testing.md` | 五态矩阵、WCAG 2.2 最小清单、Core Web Vitals、错误映射、动效运行时纪律 |
 | `references/fullstack-integration.md` | 测试金字塔、隔离与工厂、集成边界、六门禁 12 分 Go/No-Go |
-| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-16 Go/No-Go |
+| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-18 Go/No-Go |
 | `references/ai-native-testing.md` | 四层能力模型、AI for QA vs Testing for AI、AI 生成测试审查、AI 系统评测 |
 | `references/observability-testing.md` | 三大信号、Trace 驱动测试、W3C Trace Context、SLI/SLO/错误预算、R-1 可证伪规则 |
 | `references/chaos-resilience.md` | 稳态假设、故障注入矩阵、三级工具阶梯、恢复判据、R-2 可证伪规则 |
@@ -313,11 +321,13 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 | `references/backup-recovery-testing.md` | 备份与恢复：RPO/RTO 实测、3-2-1、恢复演练八步、不变量对账 RST-01~RST-11、强校验真读数据、PITR 与删除权/多租户、R-14 六项证据 |
 | `references/money-correctness-testing.md` | 金额与账务：ISO 4217 minor unit、IEEE 754 十进制陷阱、四种舍入模式与所在层、最大余额法与分摊守恒、复式借贷不变量、M-01~M-24 六面用例、账本三步对账、MO-01~MO-09 / LG-00~LG-06、R-15 七项证据 |
 | `references/webhook-delivery-testing.md` | 异步交付：at-least-once 三种语义、Standard Webhooks/Stripe/GitHub 签名对比（原始 body、`whsec_` base64、`t.payload` hex）、时间戳容忍窗、`event_id` 去重、重试退避与重启续投、乱序状态机、DLQ 与渠道对账、D-01~D-22、WH-01~WH-11、R-16 六项证据 |
+| `references/cache-freshness-testing.md` | 缓存与内容新鲜度：四层缓存分层、`Cache-Control` 指令语义、`Vary` 与缓存键、ETag/304/Range、C-01~C-08 共享缓存安全用例（缓存欺骗 / 双会话串号 / `Vary: *` / purge 无鉴权 / 缺 tenant 键）、缺陷判定、R-17 六项证据 |
+| `references/file-upload-download-testing.md` | 文件上传下载：三道闸、U-01~U-09 绕过矩阵（双扩展 / 大小写 / ADS / 前导点 / 空字节 / SVG XSS / ZIP 炸弹）、落盘与执行权限、presigned URL bearer 语义、下载 IDOR 与 `Content-Disposition`、解码重编码、R-18 六项证据 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
 | `assets/tree-template.md` | 记忆树初始化模板 |
-| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-16 证据矩阵） |
+| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-18 证据矩阵） |
 | `assets/bug-report-template.md` | 缺陷报告八字段 + MRE |
 | `assets/test-plan-template.md` | 测试计划/测试矩阵模板 |
 | `assets/release-gate-template.md` | 六门禁 12 分发布验收模板 |
@@ -339,6 +349,8 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 | `assets/restore-drill-template.md` | 恢复演练记录：RPO/RTO 声明 vs 实测、备份清单核对、恢复步骤计时、不变量 12 行校验、强校验输出、R-14 结论 |
 | `assets/money-matrix-template.md` | 金额矩阵：币种/exponent/舍入模式、M-01~M-24 六面用例、分摊守恒与不可整除、账本负向（LG 反例）、四层对齐、R-15 结论与降级声明 |
 | `assets/webhook-delivery-matrix-template.md` | 交付矩阵：D-01~D-22 六面（签名/幂等/重试/顺序/丢失 DLQ/观测对账）、签名复算夹具、副作用次数、R-16 结论与不适用声明 |
+| `assets/cache-freshness-matrix-template.md` | 缓存矩阵：策略表、双会话对照、投毒与键空间、失效与发布、R-17 结论与「不得」写法 |
+| `assets/upload-security-matrix-template.md` | 上传矩阵：三道闸、U-01~U-09 绕过、存储与访问、预签名、处理管线、R-18 结论与「不得」写法 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
 | `scripts/evidence-audit.py` | 本地确定性证据链对账：`audit --manifest` / `--fail-on-gap` / `--format json\|markdown\|oscal` / `--output`、`--self-test`；检出悬空引用、过期证据、不可解析锚点、PASS 无证据、未分类结论；`--format oscal` 导出 OSCAL `assessment-results` JSON |
 | `scripts/device-matrix.py` | 本地 CSV/JSON install-base 导出汇总：`build --input/--source/--window/--min-coverage --format`、`--self-test`；占比/累计/截断点/CrUX 口径声明，不联网、不代填载体 |
@@ -348,6 +360,8 @@ v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 �
 | `scripts/restore-audit.py` | 零依赖恢复对账：`compare --source --restored`（RST-01~RST-11：缺文件/多文件/hash/行数/序列/版本/陈旧恢复/时区缺失，`--fail-on-gap`）、`--self-test`；不联网、不代填、不证明未提供的清单 |
 | `scripts/money-audit.py` | 零依赖金额审计：`scan <path>`（MO-01~MO-09：浮点解析/`toFixed`/`*100`/`Math.round`/SQL FLOAT/浮点相等/除以份数/信任客户端金额，`--fail-on-gap`）、`ledger --file`（LG-00~LG-06：空/缺币种/不平/单边/精度越界/负额/混币，ISO 4217 exponent 表）、`cases`（0.1+0.2、2.675、JPY 1000、KWD 1.234、最大余额法）、`--self-test`；不联网、不代填、不证明财务合规 |
 | `scripts/webhook-audit.py` | 零依赖交付审计：`check --file deliveries.json`（WH-01~WH-11：无签名/签名未覆盖 id·timestamp/缺时间戳/超容忍窗/重复处理无去重/重试未退避/失败无 DLQ/乱序/状态与结果矛盾）、`verify --scheme standard\|stripe`（HMAC-SHA256 原始 body 复算）、`--self-test`；不联网、不代填、不证明渠道侧实际投递 |
+| `scripts/cache-audit.py` | 零依赖缓存审计：`scan <path>`（CA-01~CA-08 缓存反模式）、`headers --file`（CA-10~CA-16 头策略：个性化 public / 鉴权 public 缺 `Vary: Authorization` / `Set-Cookie` 未 private·no-store / purge 无鉴权 / 无 Vary / `no-cache` 误用 / `immutable` 短）、`cases`、`--self-test`；不联网、不代填、不证明线上命中 |
+| `scripts/upload-audit.py` | 零依赖上传审计：`scan <path>`（UA-01~UA-08：扩展名与魔数不符 / 可执行扩展名 / SVG 脚本 / 路径穿越 / 原始文件名落盘 / webroot 落点）、`matrix --file uploads.json`（UA-10~UA-17：白名单 / 文件名 / 魔数 / webroot / 私有访问 / presign 复用 / 匿名上传 / 未重编码）、`cases`、`--self-test`；不联网、不代填、不证明线上安全 |
 | `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、索引覆盖、路由闭环与规则同步、**报告证据矩阵表格行同步（§7d 加固）与规则例外声明**、**§7f 脚本可证伪性静态门禁** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |
 

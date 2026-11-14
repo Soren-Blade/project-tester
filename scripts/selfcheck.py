@@ -144,6 +144,10 @@ checks = {
     "assets/money-matrix-template.md": ["R-15", "exponent", "舍入", "分摊", "不适用", "不得"],
     "references/webhook-delivery-testing.md": ["R-16", "Standard Webhooks", "event_id", "DLQ", "不适用", "不得"],
     "assets/webhook-delivery-matrix-template.md": ["R-16", "签名", "幂等", "DLQ", "不适用", "不得"],
+    "references/cache-freshness-testing.md": ["R-17", "Cache-Control", "Cache-Status", "不适用", "不得"],
+    "assets/cache-freshness-matrix-template.md": ["R-17", "不适用", "不得"],
+    "references/file-upload-download-testing.md": ["R-18", "魔数", "presigned", "不适用", "不得"],
+    "assets/upload-security-matrix-template.md": ["R-18", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -286,6 +290,14 @@ SCRIPT_GATES = {
     "scripts/webhook-audit.py": [
         "--self-test", "SELFTEST GREEN", "WH-", "hmac", "standard",
         "stripe", "不联网", "不代填", "不证明",
+    ],
+    "scripts/cache-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "CA-",
+        "Cache-Status", "Vary", "不联网", "不代填", "不证明",
+    ],
+    "scripts/upload-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "UA-",
+        "magic", "presign", "不联网", "不代填", "不证明",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

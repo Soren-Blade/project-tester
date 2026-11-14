@@ -261,6 +261,15 @@
 - [流程] handler 中途失败必须零残留，否则渠道重投会与残留叠加成双份副作用 — 应用：测「第 N 步失败 → 无半条数据 → replay 后副作用仍为 1」
 - [环境] Windows PowerShell 5.1 的 `Get-Content`/`Out-File` 默认 GBK/UTF-16，读写 UTF-8 中文证据会乱码甚至写坏；`curl` 是 `Invoke-WebRequest` 别名会吞掉 `--data-binary @file` — 应用：证据用 Node `fs.writeFileSync(...,'utf8')`，请求用 `curl.exe`，判端口用 `Get-NetTCPConnection -State Listen`，起服务轮询 `/health` 不用 `Start-Sleep`
 
+- [手法] 缓存正确性不是「响应头看起来对」：必须双会话对照 + `Cache-Status`/`Age` 原文，`public` 与个性化内容/`Set-Cookie` 同现即 S1 — 应用：R-17 证据 = 头策略 + 双会话 + 缓存欺骗用例三件套
+- [安全] `no-cache` ≠ 不存储（仍会缓存、可复用），`no-store` 才是不落盘；只设 `s-maxage` 不设 `max-age` 会让 CDN 与浏览器口径分裂 — 应用：按响应头原文逐层核对，不按框架默认值推断
+- [安全] 缓存欺骗的判据是「URL 扩展名 ↔ 返回 `Content-Type` 不一致却仍入缓存」；Cloudflare Cache Deception Armor 只是平台缓解，源站 `Cache-Control` 或 Edge TTL 可覆盖它 — 应用：测试时先确认 Armor 是否真生效，再验一次源站直连
+- [安全] 上传安全的三道闸 = 扩展名白名单 + 魔数与 `Content-Type` + 解码重编码；只做一道都等于没做，魔数只读文件头也不证明内容安全 — 应用：R-18 六项证据逐项留原文，AV/沙箱复核另记
+- [安全] presigned URL 是 bearer token：登出/断签后仍可能有效、可重复使用；能力只受生成者权限限制，官方不承诺限制大小/类型 — 应用：最小权限生成者 + 条件策略（大小/前缀/`signatureAge`）+ 短过期 + 单次上传指纹
+- [安全] 用原始文件名落盘 = 覆盖、NTFS ADS（`shell.asp:.jpg`）、双扩展的风险源；服务端应生成 UUID 并限制字符 / 长度 / 前导点 — 应用：`join/resolve` 里出现 `originalname`/`filename` 直接判 UA-05，落点含 `public`/`webroot` 加判 UA-08
+- [环境] Windows PowerShell `Set-Content -Encoding utf8` 会写 BOM，JSON 清单读取报 `Unexpected UTF-8 BOM (decode using utf-8-sig)` — 应用：脚本统一 `encoding="utf-8-sig"` 读取，写侧用 Node 或 `utf8NoBOM`
+- [环境] 本机安全软件会拦截含 webshell 特征串的 `.php` 读取（`OSError [Errno 22]`），自检夹具应用良性内容 — 应用：自检样例避开 `system($_GET` 等特征串，误报先怀疑环境再怀疑代码
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -283,4 +292,7 @@
 - [技能改进] ✅ **已吸收（v1.10）**：金额与账务正确性、异步消息/Webhook 交付可靠性 → 落地为 `references/money-correctness-testing.md` + `references/webhook-delivery-testing.md` + 两份矩阵模板 + `scripts/money-audit.py` / `scripts/webhook-audit.py`，新增 **R-15/R-16**；理由：dogfood 的 `shopdemo` 用 v1.9 实测出 15×S1（0.1+0.2、JPY×100、幂等失效、退款超退、单边账本、混币种相加、重启丢账、签名不覆盖 ts、事件重复、乱序落退款、handler 残留、无重试/DLQ），旧手册无对应判据
 - [技能改进] 待评估（v1.10 提出）：按税务辖区做「舍入/计税口径矩阵」→ 需要逐国读官方文档（本轮只给 HMRC 示例），不做全球通用断言
 - [技能改进] 已驳回（v1.10，理由保留）：让 `money-audit.py` 自动拉取渠道对账单 → 需真实凭据与网络，违反零依赖/不联网边界；保持离线审计，渠道对账仍由测试者提供数据
+- [技能改进] ✅ **已吸收（v1.11）**：缓存与内容新鲜度、文件上传下载与内容边界 → 落地为 `references/cache-freshness-testing.md` + `references/file-upload-download-testing.md` + 两份矩阵模板 + `scripts/cache-audit.py` / `scripts/upload-audit.py`，新增 **R-17/R-18**；理由：dogfood 的 `cache-upload-demo` 用 v1.10 实测出 4 类缓存反模式 + 8 项头策略缺口（4×S1）与 7 类上传反模式 + 10 项清单缺口（9×S1），旧手册只有散句没有判据
+- [技能改进] 待评估（v1.11 提出）：把「缓存键 × 身份 × tenant × locale」做成自动生成的双会话矩阵 → 先定义 provider 无关的请求夹具格式，否则会绑死某框架
+- [技能改进] 待评估（v1.11 提出）：上传解码重编码的证据自动化（探测 sharp/ImageMagick + 对比输出像素与元数据）→ 依赖本机图形库，本轮只给命令与判据
 - [技能改进] 待核实（v1.10 提出）：各支付渠道对 ISK/UGX/HUF/TWD 的「最小单位」处理随 API 版本变化 — 应用：以接入时渠道文档为准，证据里写清币种、amount 原值、期望 minor 值，不把特例写成通则
