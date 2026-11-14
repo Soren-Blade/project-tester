@@ -5,6 +5,82 @@
 
 ---
 
+## [v1.10.0] — 2026-11-14 · 每日升级 #11
+
+**主题**：从「接口、时间、恢复都正确」扩展到「**钱算得对 · 账记平衡 · 消息只达一次**」——金额/账务正确性与异步消息/Webhook 交付可靠性。一个接口全绿、时间也对、备份可恢复的系统，仍然会在 `0.1+0.2`、`2.675`、JPY×100、100 分 3 份、重复扣款、退款超退、签名不覆盖时间戳、同 `event_id` 发两次货、重试写死 1 秒、消息丢了不进 DLQ 上成片出错；这类缺陷不是「边界没测」，是「金额最小单位与交付语义没有可证伪判据」。新增 **R-15 金额与账务正确性**、**R-16 异步消息 / Webhook 交付可靠性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 ISO 4217 minor unit / IEEE 754 / Fowler Money 模式 / 最大余额法 / 复式记账 / Standard Webhooks / Stripe / GitHub / CloudEvents / Kafka / SQS / AWS 退避抖动 / OWASP API7。按每日升级序列记为 #11。
+
+**遵循上轮建议**：未重写已覆盖的 14 个主题与五阶段、四层模型、路由闭环，以 **New 为主 + Enhance 为辅**；四层模型与五阶段流程**未改语义**，只升 MINOR。上轮遗留「AUTH/S/F 三张卡做成可执行 adapter」继续**待评估**（本轮聚焦金额与交付）；「AI 变异杀伤跨语言自动跑数」仍受变异工具 JSON schema 未定阻塞，顺延。每轮至少一条可证伪规则 → 本轮引入 **R-15 / R-16**，并做了**三例负向测试**（临时副本分别删 R-15 手册「不得」、删报告矩阵 R-16 行、删 SKILL.md R-15 规则行，确认 `selfcheck.py` 对应检查确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/money-correctness-testing.md`、`assets/money-matrix-template.md`、`scripts/money-audit.py` | 新增 R-15 能力：ISO 4217 exponent（0/2/3/4 位）、IEEE 754 十进制陷阱、四种舍入模式与所在层、最大余额法分摊守恒、复式借贷不变量与只追加分录、M-01~M-24 六面、MO-01~MO-09 反模式扫描、LG-00~LG-06 账本负向、渠道对账三步法 |
+| New | `references/webhook-delivery-testing.md`、`assets/webhook-delivery-matrix-template.md`、`scripts/webhook-audit.py` | 新增 R-16 能力：at-least-once / at-most-once / exactly-once 语义、Standard/Stripe/GitHub 签名与原始 body、时间戳容忍窗、`event_id` 去重与并发、指数退避 + jitter、重启续投、乱序状态机、DLQ 与渠道对账、D-01~D-22 六面、WH-01~WH-11 审计 |
+| Enhance | `SKILL.md`（description 触发词、v1.10 增量段、阶段 1 金额面/交付面、阶段 3 两条专项、判 bug 第 11 条、十六条规则表、阶段 4 自检、索引） | 只增量，不改五阶段与四层模型 |
+| Enhance | `references/dissect.md` §6/§7/§8、`references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵 | 金额/交付两面路由与攻击面、结论作废判据、16 行矩阵 |
+| Enhance | `scripts/selfcheck.py` §5/§7f、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 4 个新文件字段、2 个新脚本门禁、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 32 份手册与 21 份模板 | 不重复造，仅在路由/交叉项里引用 |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- SIX ISO 4217 `list-one.xml`（货币 minor unit 权威表）：https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml
+- Stripe Currencies（零小数币种与特例口径）：https://docs.stripe.com/currencies
+- Stripe Idempotent requests（`Idempotency-Key` ≤255 字符、24h 清理、仅 POST）：https://docs.stripe.com/api/idempotent_requests
+- Python `decimal` / floating-point 教程（`round(2.675, 2) == 2.67` 与 HALF_EVEN）：https://docs.python.org/3/tutorial/floatingpoint.html
+- PostgreSQL 17 §8.1 Numeric Types（精确十进制、舍入模式）：https://www.postgresql.org/docs/17/datatype-numeric.html
+- MySQL 8.4 Fixed-Point Types（DECIMAL 精确存储）：https://dev.mysql.com/doc/refman/8.4/en/fixed-point-types.html
+- Java `RoundingMode`（HALF_UP / HALF_EVEN / DOWN 语义）：https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/math/RoundingMode.html
+- HMRC VATREC12010 / 12030（逐行舍入与 0.004p/0.005p 示例）：https://www.gov.uk/hmrc-internal-manuals/vat-records/vatrec12010
+- OpenStax 复式记账（借贷相等与分录只追加）：https://openstax.org/books/principles-accounting/pages/3-1-describe-principles-of-accounting
+- moneyphp（`allocate` 余数分配 334/333/333）：https://moneyphp.org/
+- dinero.js（不可变 Money、amount+currency 成对）：https://dinerojs.com/
+- Largest remainder method：https://en.wikipedia.org/wiki/Largest_remainder_method
+- Standard Webhooks 规范（签 `id.timestamp.body`、`whsec_` base64、多签名）：https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md
+- Stripe Webhooks（默认 300 秒容差、原始 body、勿设 0）：https://docs.stripe.com/webhooks
+- GitHub Validating webhook deliveries（`X-Hub-Signature-256` hex、`X-GitHub-Delivery`）：https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
+- CloudEvents 核心规范（只规定 `source`+`id` 去重，不承诺投递语义）：https://github.com/cloudevents/spec/blob/main/cloudevents/spec.md
+- Kafka Producer Configs（幂等生产者、仅 partition 内有序）：https://kafka.apache.org/documentation/#producerconfigs
+- Amazon SQS 标准队列（at-least-once、可能乱序）/ FIFO 去重 5 分钟 / DLQ：https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues-at-least-once-delivery.html
+- AWS Builders' Library — Timeouts, retries, and backoff with jitter（加大 jitter，不是去掉退避）：https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+- OWASP API Security Top 10 2023 API7（SSRF，webhook 回调地址校验）：https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/
+
+### 口径诚实
+
+- `money-audit.py` **不联网、不代填**：只读本地源码/JSON，不连接支付渠道、不调用汇率服务；`ledger` 只验证「给出的分录是否平衡」，**不证明账本与渠道对账单一致**，也不证明符合当地财务/税务合规。静态扫描命中只是「可疑写法」，**未命中不证明金额正确**——浮点错误在特定输入才出现，必须跑用例。
+- `webhook-audit.py` 的 `verify` 只证明「给定 payload+secret 能复算出该签名」，**不证明密钥真实、不证明服务端校验、不证明渠道侧投递成功**；`check` 对 `deliveries.json` 做规则审计，数据由测试者提供，可伪造；`--fail-on-gap` 只把「发现的缺口」变成非零退出码，不把「没发现」变成「没问题」。
+- ISO 指数以 SIX 表为准，但 Stripe 等渠道有**特例**：ISK/UGX 历史上按两位表示（5 ISK 传 `amount=500`）；HUF/TWD 仅 payout 视为零小数且金额须被 100 整除；其余零小数币种直接传（500 JPY ⇒ `amount=500`，不要 ×100）。特例已写进手册，**不得**把「渠道按最小单位」当成「所有货币都 ×100」。
+- Standard Webhooks 规范**只要求**时间戳在可接受容差内，**未给具体秒数**；±5 分钟是常见约定，Stripe 官方库默认 300 秒且明确说不要设 0。手册以「被测实现的实际配置」为准，要求证据写清数值，不把「常见约定」冒充「规范规定」。
+- R-15 不认「界面显示 2.68」「账本内部平衡」「单笔用例通过」；R-16 不认「验签函数存在」「回调返回 200」「配了重试」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+在项目外临时目录 `C:\Users\摩羯座\AppData\Local\Temp\pt-v110-dogfood\shopdemo` 建了一个零依赖 Node 商城（商品/购物车/下单/支付/退款/账本/webhook 接收端，带 18 处预埋缺陷），全程只读技能目录，按五阶段走完：
+
+- 记忆树 69 行、run 记录 1 份、报告 1 份、证据 21 份 `<ID>.json`（含完整 request/response + `results.json` + `env.json` + `server.log` + `MANIFEST.sha256.json`，22 条 sha256 校验 0 mismatch）；
+- 执行 21 个检查点：**PASS 3 / FAIL 18 / BLOCKED 0**；缺陷 S1 15 / S2 3 / S3 0；质量状态 **FAIL**、发布建议 **No-Go**（15 个未闭环 S1，按 `quality-gates.md` §3 无条件 No-Go）；
+- 复跑：`node tools/dogfood-tests.mjs`（自起停，约 4s）；服务已停，端口 3419 无监听；
+- 典型命中：3×0.10 合计 `0.30000000000000004`；JPY 1000 记成 100000；客户端 `unitPrice=0.01` 覆盖目录价；同幂等键两笔支付；退款 200 超退；账本 9 条单边、Σ=840.28；混币种直接相加；`qty=-2` 订单 -20；10.999 入账 10.99 而账本 10.999；重启后账本 19→0；`ts=now-3600` 与「只签 body 改 ts」均 200；同 `webhook-id` 两事件两账本；`refund` 先于 `capture` 落退款；handler 失败留残留、replay 后翻倍；`attempts` 不增、`dropped: no retry configured`、无 DLQ。仅 3 项通过：合法签名 200、篡改 body 401、缺签名头 401。
+- **回灌**：dogfood 提出的 15 条检查已蒸馏进手册（不回写 demo 目录）——M-01 零小数币种、M-02 浮点禁令、M-03 服务端定价、M-04 支付幂等、M-05 退款上限、M-06 账本平衡、M-07 税额口径、M-08 混币种、M-09 符号/精度、M-10 持久化往返、W-01 签名覆盖 timestamp、W-02 容差边界三值、W-03 去重持久化、W-04 乱序状态机、W-05 原子与重试/DLQ 判据；其中「落盘往返（面 7）」「税额按行 vs 按订单」「混币种/数量行」「timestamp 进签名 + 容差三值」「handler 零残留」「attempt/nextRetryAt 实测」「前置事件缺失」为本轮**新增**到手册的检查点。
+- Windows 实测坑（已写入 `memory/global-lessons.md`）：PowerShell 5.1 默认 GBK/UTF-16 读写会破坏 UTF-8 中文证据 → 证据用 Node `fs.writeFileSync(...,'utf8')`；`curl` 是 `Invoke-WebRequest` 别名、`--data-binary @file` 语义丢失 → 用 `curl.exe`；`Stop-Process` 后 TIME_WAIT 短暂占端口 → 用 `Get-NetTCPConnection -LocalPort ... -State Listen` 判定；起服务用轮询 `/health` 代替 `Start-Sleep`；同一 body 两次签名 sha256 一致，夹具可复现。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py`：**GREEN**（PASS 52 / WARN 0 / FAIL 0，exit 0）。
+- `python scripts/money-audit.py --self-test`：SELFTEST GREEN（16 项断言，exit 0）；`cases` 输出与手册期望一致。
+- `python scripts/webhook-audit.py --self-test`：SELFTEST GREEN（12 项断言，exit 0）；`verify --scheme standard` 支持多签名。
+- 负向测试三例（临时副本，不污染源）：①删 `money-correctness-testing.md` 的「不得」→ §5 FAIL；②删 `report-template.md` 的 `| R-16` 行 → §7d FAIL；③删 `SKILL.md` 的 `**R-15` 规则行 → §7c FAIL。三例均按预期转 FAIL。
+- 同步全局 `C:\Users\摩羯座\.agents\skills\project-tester` 并 `diff -r`（排除 `.git`/`.workbuddy-ai`）0 差异；git commit + push 到 `https://github.com/Soren-Blade/project-tester.git`。
+
+### 提案处置
+
+- 采纳：dogfood 的「持久化往返」「税额口径」「混币种/数量」「签名覆盖 timestamp + 容差三值」「handler 原子性」「attempt/DLQ 实测」「前置事件缺失」七项检查，已写入两本手册与本轮矩阵模板。
+- 采纳：`webhook-audit.py` 的 `verify` 增加 `--scheme` 区分 standard/stripe，避免把两种 `whsec_` 处理混为一谈。
+- 待评估：金额四舍五入的「税务辖区矩阵」（按国家/税种给出权威舍入规则）——需要逐辖区读官方文档，本轮只给 HMRC 示例，不冒充全球口径。
+- 暂不采纳：把 `money-audit.py` 扩展成「自动对渠道账单」——需要真实 API 凭据与网络，违反零依赖/不联网边界，保持离线审计定位。
+
+---
+
 ## [v1.9.0] — 2026-11-14 · 每日升级 #10
 
 **主题**：从「正常路径与数据形态的正确」扩展到「**时间维度正确 · 灾难后可恢复**」——时间/时区正确性与备份/恢复可验证性。同一套功能全绿的 API，只要按 UTC 日过滤、每日任务固定 `+24h`、`exp` 无时区、备份只备一个文件、恢复按字符串挑「最新」，就会在跨时区用户、DST 切换日、真实故障恢复时成片出错；这类缺陷不是「边界没测」，是「时间语义与恢复目标没有可证伪判据」。新增 **R-13 时间与时区正确性**、**R-14 备份与恢复可验证性** 与六份文件（2 手册 + 2 矩阵/演练模板 + 2 零依赖脚本），蒸馏底座为 IANA tzdb 2026f / RFC 3339 / cronie crontab(5) / PostgreSQL 17 §8.5 / MySQL 8.4 §13.2.2 / SQLite Date Functions / NIST SP 800-34 Rev.1 / pg_verifybackup / restic / Borg / GDPR Art.17。按每日升级序列记为 #10。

@@ -140,6 +140,10 @@ checks = {
     "assets/time-matrix-template.md": ["R-13", "DST", "gap", "fold", "不适用"],
     "references/backup-recovery-testing.md": ["R-14", "RPO", "RTO", "PITR", "不得"],
     "assets/restore-drill-template.md": ["R-14", "RPO", "RTO", "sha256", "不适用"],
+    "references/money-correctness-testing.md": ["R-15", "ISO 4217", "exponent", "舍入", "不适用", "不得"],
+    "assets/money-matrix-template.md": ["R-15", "exponent", "舍入", "分摊", "不适用", "不得"],
+    "references/webhook-delivery-testing.md": ["R-16", "Standard Webhooks", "event_id", "DLQ", "不适用", "不得"],
+    "assets/webhook-delivery-matrix-template.md": ["R-16", "签名", "幂等", "DLQ", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -274,6 +278,14 @@ SCRIPT_GATES = {
     "scripts/restore-audit.py": [
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "RST-",
         "不联网", "不代填", "不证明",
+    ],
+    "scripts/money-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "MO-",
+        "LG-", "exponent", "不联网", "不代填", "不证明",
+    ],
+    "scripts/webhook-audit.py": [
+        "--self-test", "SELFTEST GREEN", "WH-", "hmac", "standard",
+        "stripe", "不联网", "不代填", "不证明",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

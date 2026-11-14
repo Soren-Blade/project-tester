@@ -96,6 +96,8 @@
 | **身份 / 会话面**（v1.8） | 登录/注册/找回/改密/登出端点；会话载体（Cookie/JWT/opaque）与属性（HttpOnly/Secure/SameSite）；token 签发/校验/刷新/撤销代码位置；`alg`/`exp`/`aud`/`iss` 校验是否存在；refresh 是否轮换、登出是否作废；重置令牌来源与 TTL；密码哈希函数与参数；OAuth/OIDC/SSO/MFA/Passkey 是否接入 | 决定能否叠加 `references/auth-session-testing.md`（R-12）；**无认证的静态页、无会话状态的纯离线库/CLI 标「不适用：无身份与会话维度」**，不写「认证安全 / 令牌不可伪造」 |
 | **时间面**（v1.9） | 时间字段的 DB 类型（`timestamptz` vs `timestamp` / `TIMESTAMP` vs `DATETIME` / TEXT）、应用内时区来源（`TZ` / `user.timezone` / 配置项）、是否有跨时区用户与按日聚合、有无定时任务/调度器与 TTL/过期机制、时间比较与排序写法、应用与 DB 的 tzdata/tz 版本、是否出现过 DST 日双跑或漏跑 | 决定能否叠加 `references/time-correctness-testing.md`（R-13）与 `scripts/time-audit.py`；**无时间维度、无定时任务且无跨时区用户标「不适用：无时间与时区维度」**，不写「时间正确 / DST 无影响」 |
 | **恢复面**（v1.9） | 持久化对象清单（DB / 对象存储 / 文件 / 搜索索引 / 队列）、备份方式与频率/保留期/是否异地·离线·不可变、是否加密与密钥位置、最近一次**实际恢复**记录、RPO/RTO 是否有书面目标、多租户是否可选择性恢复、删除权与备份的交叉声明 | 决定能否叠加 `references/backup-recovery-testing.md`（R-14）与 `scripts/restore-audit.py`；**无持久化数据、纯无状态服务、明确声明不备份标「不适用：无持久化数据与备份面」**，不写「有备份 / 可恢复」 |
+| **金额面**（v1.10） | 金额字段类型（整数最小单位 / `DECIMAL(p,s)` / 浮点）、currency 字段与 exponent 来源、舍入模式写在契约哪一处、计价/折扣/税/运费代码位置、优惠与退款分摊算法、账本/分录表、渠道对账单可得性、是否多币种、客户端能否直接传 `amount`/`price` | 决定能否叠加 `references/money-correctness-testing.md`（R-15）与 `scripts/money-audit.py`；**纯展示价格、无资金流、非货币积分标「不适用：无交易金额」**，不写「金额正确 / 对账通过」 |
+| **交付面**（v1.10） | webhook 端点与签名方案（Standard Webhooks / Stripe / GitHub / 自定义）、是否保留原始 body 验签、`event_id` 与去重表/保留窗口、重试策略与 DLQ、消费者幂等键、渠道沙箱与真实回调可达性、是否有 MQ 消费与 outbox | 决定能否叠加 `references/webhook-delivery-testing.md`（R-16）与 `scripts/webhook-audit.py`；**纯同步请求-响应、无异步事件标「不适用：无异步交付」**，不写「消息必达 / 不丢不重」 |
 
 ## 7. 攻击面、观测面与依赖拓扑（v1.0 新增，v1.1 / v1.2 扩充）
 
@@ -112,6 +114,7 @@
 - **交付链攻击面**（v1.2）：lockfile 是否入库、是否有浮动版本（`latest`/`^`/git 分支）、`preinstall`/`postinstall`/`setup.py` 是否联网外联、CI workflow 是否可绕过 review、是否有直连公共 registry 的旁路、构建机是否 ephemeral、产物有没有 digest/签名/provenance → 输入 `references/supply-chain-testing.md` §2/§6
 - **locale 与文本面**（v1.2）：硬编码文案与字符串拼接、图片内嵌文字、`toUpperCase()`/裸 `sort()`、硬编码 `toLocaleString('en-US')`、CSS 里用 `direction`/固定 `left|right` 代替 `dir`/logical properties → 输入 `references/i18n-localization-testing.md` §7 静态审查
 - **租户边界与共享资源**（v1.2）：客户端 `X-Tenant-ID` 是否被直接当权威 context、cache key 是否含 `tenant_id`、queue payload 的 `tenant_id` 是否被 consumer 采信、object prefix 是否被当授权、是否有 superuser/`BYPASSRLS` request role、session 级 `SET`（应为 `SET LOCAL`）、platform admin 是否有 explicit authorization → 输入 `references/multi-tenancy-testing.md` §10 静态降级
+- **金额与交付攻击面**（v1.10）：客户端可传的 `amount`/`price`/`currency`/`discount` 字段、负数与超大数、币种篡改、金额是否先转 float、是否有 `toFixed(2)`/`*100` 硬编码；webhook 验签是否用原始 body、签名覆盖哪些字段、时间戳容忍窗、`event_id` 去重表与保留窗口、重试与 DLQ 配置、回调端点是否鉴权 → 输入 `references/money-correctness-testing.md` §3/§5 与 `references/webhook-delivery-testing.md` §2/§7
 
 这些是**静态也能做的测试**，项目跑不起来时尤其有价值。
 
@@ -145,6 +148,8 @@
 | **有登录/注册/找回/改密/登出、Cookie 会话、JWT/Opaque Token、OAuth 2.0 / OIDC / SSO / MFA / Passkey，或声称「认证安全 / JWT 校验正确 / 令牌不可伪造 / 登出即失效 / 双因素」**（v1.8） | `references/auth-session-testing.md` + `assets/auth-matrix-template.md` + `scripts/jwt-audit.py` | 令牌清单与载体、`jwt-audit.py decode` 结构审计、alg=none/算法混淆/空签名三连、exp/nbf/aud/iss/typ 五类负向、登出改密重置后旧 access+refresh 均拒、refresh 轮换与 reuse detection、枚举三列+限流、密码存储源码（R-12）；无认证静态页/无会话离线库标「不适用：无身份与会话维度」 |
 | **有跨时区用户 / 定时任务·调度器 / TTL·过期 / 按日·按月聚合·报表 / 历史 DST 或 tzdata 变更，或声称「时间显示正确 / 跨时区一致 / DST 无影响 / 令牌按时过期 / 定时任务可靠」**（v1.9） | `references/time-correctness-testing.md` + `assets/time-matrix-template.md` + `scripts/time-audit.py` | 存/算/显示三层口径、`time-audit.py scan` 反模式与 `dst` 的 gap/fold 转换、应用与 DB 的 tzdata 版本、DST 日实际执行次数（调度日志/幂等键）、TTL 三值边界、RFC 3339 解析与排序（R-13）；无时间维度标「不适用：无时间与时区维度」，无 tzdata 只写「未做 DST 实测」并降级 |
 | **有持久化数据 / 备份任务 / 快照 / PITR，或声称「有备份 / 可恢复 / 满足 RPO·RTO / 数据不丢」「已经异地备份」**（v1.9） | `references/backup-recovery-testing.md` + `assets/restore-drill-template.md` + `scripts/restore-audit.py` | 备份清单与 RPO 声明、隔离环境**实际恢复**与 RTO 三段计时、`restore-audit.py compare` 的 RST-01~RST-11、强校验真读数据（`--read-data`/`--verify-data`/`pg_verifybackup` checksum）、行数/hash/外键/序列/blob/密钥/版本不变量、PITR 丢失窗口与删除权/多租户交叉（R-14）；无持久化数据/明确不备份标「不适用：无持久化数据与备份面」，未做过恢复演练只写「未做恢复演练」 |
+| **有交易/计价/优惠/税/退款/订阅/分账/多币种，或声称「金额正确 / 账记平衡 / 对账通过 / 退款不超额 / 多币种支持」**（v1.10） | `references/money-correctness-testing.md` + `assets/money-matrix-template.md` + `scripts/money-audit.py` | 币种 exponent 与舍入模式口径、`money-audit.py cases` 反例与 `scan` 反模式逐条裁决、`ledger` 借贷平衡/单边/精度/混币负向、展示价/应付额/实扣额/入账额四层对齐、分摊守恒、并发重复扣款与超卖、退款累计 ≤ 实付（R-15）；无交易金额标「不适用：无交易金额」，无渠道对账单只写「账本内部平衡」 |
+| **接第三方 webhook / 发事件订阅 / 用 MQ 消费业务事件，或声称「消息必达 / 回调安全 / 幂等已做 / 不丢不重」**（v1.10） | `references/webhook-delivery-testing.md` + `assets/webhook-delivery-matrix-template.md` + `scripts/webhook-audit.py` | 签名方案与覆盖字段、`webhook-audit.py verify` 原始 body 复算、时间戳容忍窗与重放、`event_id` 去重与并发、重试退避与重启续投、乱序终态、DLQ 与渠道侧对账（R-16）；无异步事件标「不适用：无异步交付」，无渠道沙箱只写「部分覆盖」 |
 
 路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 

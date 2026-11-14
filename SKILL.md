@@ -1,10 +1,10 @@
 ---
 name: project-tester
-version: 1.9.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。**时间与时区正确性（时区 / DST / 夏令时 / 时间戳 / 过期 / TTL / 时钟回拨 / 定时任务）与备份恢复可验证性（备份 / 恢复演练 / restore drill / RPO / RTO / PITR / 数据不丢）也在覆盖范围内。**凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）；以及"登录 / 认证 / 会话 / 令牌 / JWT / OAuth / OIDC / SSO / 刷新令牌 / 会话固定 / 登出没失效 / 密码重置 / 验证码 / MFA / 双因素 / Passkey / 账户枚举 / 越权改 ID / 认证绕过 / token 能不能伪造 / alg none / 审计登录"等说法（authentication / session / token / JWT / OAuth / OIDC / MFA / passkey / session fixation / refresh token rotation / account enumeration / auth bypass / ASVS / RFC 8725 / RFC 9700）。
+version: 1.10.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。**时间与时区正确性（时区 / DST / 夏令时 / 时间戳 / 过期 / TTL / 时钟回拨 / 定时任务）与备份恢复可验证性（备份 / 恢复演练 / restore drill / RPO / RTO / PITR / 数据不丢）也在覆盖范围内。**金额与账务正确性（金额 / 小数 / 舍入 / 多币种 / 分币 / 分摊 / 折扣 / 税 / 利息 / 借贷平衡 / 对账 / 退款 / 重复扣款）与异步消息交付可靠性（webhook / 回调 / 签名验签 / 幂等 / 重试 / 退避 / DLQ / 乱序 / 消息丢失 / event_id 去重）也在覆盖范围内。**凡是用户说"钱算得对不对""对账不平""重复扣款了""退款多退了""webhook 验签""回调收不到""重试把订单发重了""消息丢了一条"时也使用本技能；凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）；以及"登录 / 认证 / 会话 / 令牌 / JWT / OAuth / OIDC / SSO / 刷新令牌 / 会话固定 / 登出没失效 / 密码重置 / 验证码 / MFA / 双因素 / Passkey / 账户枚举 / 越权改 ID / 认证绕过 / token 能不能伪造 / alg none / 审计登录"等说法（authentication / session / token / JWT / OAuth / OIDC / MFA / passkey / session fixation / refresh token rotation / account enumeration / auth bypass / ASVS / RFC 8725 / RFC 9700）。
 ---
 
-# 通用项目测试 (project-tester) · v1.9.0
+# 通用项目测试 (project-tester) · v1.10.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
@@ -25,6 +25,8 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 v1.8 增量：**从「功能与数据的正确」扩展到「身份不可冒充 · 会话可终止 · 令牌不可伪造」**——「能登录」只是入口，真正的质量问题是：别人能不能变成你（alg=none / 算法混淆 / 弱密钥 / 令牌侧信道）、令牌过期与受众是否真被校验、刷新是否轮换且旧令牌重用时整个 family 失效、登出/改密/重置后旧会话是否真被拒、密码重置令牌可不可预测、登录是否可枚举与可爆破。新增 **R-12（身份与会话不可冒充）** 与 `references/auth-session-testing.md` / `assets/auth-matrix-template.md` / `scripts/jwt-audit.py`（零依赖：结构审计 + HMAC 校验 + `--self-test` 诚实边界），以 ASVS 5.0、RFC 8725（JWT BCP）、RFC 9700（OAuth 2.0 Security BCP）与 OWASP 密码存储/认证/会话手册为蒸馏底座。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 灾难后可恢复」**——「跨时区、跨夏令时还对不对」「令牌是不是真的在该过期时过期」「每日任务在 DST 那天会不会双跑或漏跑」「备份到底能不能恢复、恢复后行数/附件/序列全不全」。新增 **R-13（时间与时区正确性）** 与 **R-14（备份与恢复可验证性）**，配套 `references/time-correctness-testing.md` / `assets/time-matrix-template.md` / `scripts/time-audit.py`（T-01~T-10 静态扫描 + gap/fold 计算 + `--self-test`）与 `references/backup-recovery-testing.md` / `assets/restore-drill-template.md` / `scripts/restore-audit.py`（源/恢复双清单对账 RST-01~RST-11 + `--self-test`）。蒸馏底座：RFC 3339、IANA tzdb（2026f 取消古巴 2026-11-01 回拨，证明 tzdata 漂移是实证风险）、NIST SP 800-34 Rev.1 的 RPO/RTO 业务口径、cronie `crontab(5)` 的 DST gap/fold 原文语义，以及 `pg_verifybackup` / restic / borg 自己写明的「结构校验 ≠ 内容校验、校验通过 ≠ 可恢复」。四层模型与五阶段语义未变，仍按 MINOR 升级。
+
+v1.10 增量：**从「系统正确」扩展到「钱算得对 · 账记平衡 · 消息只达一次」**——「界面 2.68 元，扣款也是 2.68 吗」「0.1+0.2 在账本里是多少」「同一笔订单重复扣款了两次吗」「退款能不能退超」「webhook 签名能用别的 body 复用吗」「回调超时后重试，订单会不会发两次货」。新增 **R-15（金额与账务正确性）** 与 **R-16（异步消息 / Webhook 交付可靠性）**，配套 `references/money-correctness-testing.md` / `assets/money-matrix-template.md` / `scripts/money-audit.py`（MO-01~MO-09 金额反模式扫描 + LG-00~LG-06 借贷对账 + `cases` 反例 + `--self-test`）与 `references/webhook-delivery-testing.md` / `assets/webhook-delivery-matrix-template.md` / `scripts/webhook-audit.py`（WH-01~WH-11 交付审计 + Standard/Stripe 签名复算 + `--self-test`）。蒸馏底座：ISO 4217 的 minor unit（JPY 0 位、KWD 3 位）与 IEEE 754 二进制浮点的十进制不可表示（0.1+0.2≠0.3、2.675 舍入陷阱）、Martin Fowler 的 Money/Currency 模式与「分配须最大余额法且 Σ 守恒」、复式记账的借贷平衡与不可变分录、Standard Webhooks 规范的 `id.timestamp.body` 签名与 `whsec_` base64 密钥、Stripe 的 `t.payload` hex 签名与容忍窗、GitHub webhook 的 `X-Hub-Signature-256`，以及 Stripe/Shopify 自己写明的 at-least-once + 去重责任在消费者。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -143,7 +145,9 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 **身份 / 会话面**（v1.8：认证方式（密码 / OAuth2·OIDC / SAML / Passkey / 服务间 mTLS·JWT / 无认证）；令牌类型与存放位置（Authorization / Cookie / URL / localStorage）；会话生命周期（签发 / 刷新轮换 / 空闲与绝对超时 / 登出 / 改密 / 踢人）；是否声明 alg 白名单、aud/iss 绑定、HttpOnly/Secure/SameSite、MFA、限流；未挂认证中间件的旁路端点）——见 `dissect.md` §6 与 `references/auth-session-testing.md`
 **时间面**（v1.9：有无跨时区用户 / 定时任务 / TTL·过期 / 时间排序与范围查询；存储是 UTC 还是本地 naive；tzdata 版本与配置面（`TZ` / DB `TimeZone` / JVM `user.timezone` / `CRON_TZ`）；DST 转换日是否有任务）——见 `dissect.md` §6 与 `references/time-correctness-testing.md`
 **恢复面**（v1.9：备份对象与频率 / 保留期 / 是否异地·离线·不可变 / 是否加密及密钥位置 / 最近一次**实际恢复**时间 / RPO·RTO 声明 / 多租户与删除权交叉）——见 `dissect.md` §6 与 `references/backup-recovery-testing.md`
-5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 / v1.8 / v1.9 叠加项）
+**金额面**（v1.10：金额字段类型是整数最小单位、`DECIMAL(p,s)` 还是浮点；currency 字段与 exponent 来源；舍入模式写在契约哪一处；计价/折扣/税/运费/退款分摊代码位置；有无账本/分录/对账文件；客户端能否直接传 `amount`/`price`）——见 `dissect.md` §6 与 `references/money-correctness-testing.md`
+**交付面**（v1.10：webhook 端点与签名方案（Standard Webhooks / Stripe / 自定义）/ 是否保留原始 body 验签 / `event_id` 去重表与保留窗口 / 重试与 DLQ / 消费者幂等键 / 渠道沙箱与回调可达性）——见 `dissect.md` §6 与 `references/webhook-delivery-testing.md`
+5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 叠加项）
 
 原则：解剖够用即止——能支撑测试计划就停，不做无死角的代码审读。大型项目只解剖本次范围内的模块。
 
@@ -190,6 +194,8 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 - **身份 / 会话 / 令牌安全**（v1.8）→ 令牌清单与结构审计、`alg=none`/算法混淆/弱密钥/键注入、`exp`·`nbf`·`aud`·`iss`·`typ` 负向用例、会话固定与登出/改密失效、刷新轮换与 reuse detection、枚举与限流、密码重置令牌、MFA/Passkey/OAuth 流程 → `references/auth-session-testing.md` + `assets/auth-matrix-template.md` + `scripts/jwt-audit.py`
 - **时间与时区正确性**（v1.9）→ 存/算/显示三层口径、T-01~T-10 反模式扫描 + T-11 tzdata 漂移 + T-12 配置面、DST gap/fold 调度执行次数、TTL 三值边界、时钟回拨与单调时钟、RFC 3339 解析/排序/`-00:00` → `references/time-correctness-testing.md` + `assets/time-matrix-template.md` + `scripts/time-audit.py`
 - **备份与恢复可验证性**（v1.9）→ RPO/RTO 实测、隔离环境实恢复、行数/hash/外键/序列/blob/密钥/版本不变量、强校验真读数据、PITR 丢失窗口、删除权与多租户交叉 → `references/backup-recovery-testing.md` + `assets/restore-drill-template.md` + `scripts/restore-audit.py`
+- **金额与账务正确性**（v1.10）→ 币种 exponent 与舍入模式口径、`money-audit.py cases` 反例、展示价/应付额/实扣额/入账额四层对齐、分摊守恒（Σ==原额）、并发重复扣款与超卖、退款累计 ≤ 实付、借贷平衡与不可变分录、渠道对账单逐笔对账 → `references/money-correctness-testing.md` + `assets/money-matrix-template.md` + `scripts/money-audit.py`
+- **异步消息 / Webhook 交付可靠性**（v1.10）→ 签名覆盖字段与原始 body 验签、时间戳容忍窗与重放、`event_id` 去重（含并发）、重试退避与重启续投、乱序终态、DLQ 与渠道侧对账、at-least-once 语义下的副作用次数 → `references/webhook-delivery-testing.md` + `assets/webhook-delivery-matrix-template.md` + `scripts/webhook-audit.py`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -203,6 +209,7 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 8. **焦点被整体遮挡 / 目标 <24×24 CSS px 且无例外 / 认证强制认知测试却无替代**（`accessibility-testing.md` §1/§4）、**仿真被写成真机 / 设备矩阵无来源却声称跨端通过**（`cross-platform-testing.md` §7）
 9. **`alg=none`/空签名被接受、过期或错受众令牌被接受、登出/改密后旧会话仍有效、刷新令牌可无限重用、重置令牌可预测或出现在响应里、账户可枚举或可无限制爆破**（`auth-session-testing.md` §2/§3/§4）
 10. **DST 转换日任务双跑/漏跑且无幂等去重、跨时区时间错位、令牌过期不生效、TTL off-by-one**（`time-correctness-testing.md` §2~§4）、**备份无法恢复、恢复后丢行/丢附件/主键冲突、恢复点早于备份、只跑结构校验就宣称可恢复**（`backup-recovery-testing.md` §2~§3）
+11. **金额精度丢失或舍入方向与契约不符、展示价≠实扣价、分摊 Σ≠原额、借贷不平/单边分录、重复扣款、退款累计超过实付**（`money-correctness-testing.md` §1~§5）、**webhook 签名可被别的 body 复用或未覆盖时间戳、同 event_id 处理多次产生重复副作用、失败最终无 DLQ、乱序覆盖终态**（`webhook-delivery-testing.md` §2~§6）
 
 严重度 S1 数据损坏·安全·崩溃 ＞ S2 功能错误但有绕过 ＞ S3 体验/提示。缺陷按 `assets/bug-report-template.md` 八字段记录。
 
@@ -212,7 +219,7 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 
 **安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。**多租户测试须构造自己的合成租户与数据，禁止拿真实客户数据做越权验证**（`multi-tenancy-testing.md` §1）。**影子流量只做只读比对，不得对真实用户产生写副作用**。**认证与会话测试只用自己注册/构造的测试账号与合成令牌**：不猜测真实用户密码、不对外部服务做撞库/暴力破解、限流测试保持小样本并立即停止、发现令牌泄漏先脱敏再记录（`auth-session-testing.md` §7）。
 
-**十四条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11，v1.8 引入 R-12，v1.9 引入 R-13/R-14）——规则的价值在于写清「什么时候不适用」：
+**十六条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11，v1.8 引入 R-12，v1.9 引入 R-13/R-14，v1.10 引入 R-15/R-16）——规则的价值在于写清「什么时候不适用」：
 
 | 规则 | 结论必须附的证据 | 不适用时的写法 |
 |---|---|---|
@@ -230,8 +237,10 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 | **R-12 身份与会话不可冒充** | 声称"认证安全 / JWT 校验正确 / 令牌不可伪造 / 登出即失效 / 支持 MFA / 会话已终止"，须附 ① 令牌清单与存放位置（Authorization / Cookie / URL / localStorage / 日志）+ `scripts/jwt-audit.py decode` 的结构审计输出（alg / exp / aud / iss / kid / jku 结论）；② `alg=none`、算法混淆、空签名三类伪造请求的**请求原文 + 响应码 + 响应体**（拒绝才算通过）；③ 过期 / 未来时间 / 错 `aud` / 错 `iss` / 类型混用五类负向用例逐条结果；④ 登出、改密、重置后旧 access **与** refresh 均被拒的实测；⑤ 刷新轮换与旧 refresh 重用（reuse detection、family 失效）证据，或明确声明未实现并降级；⑥ 账户枚举三列对照（状态码 / 响应体 / 响应时间）+ 限流触发记录；⑦ 密码存储（算法 / 参数 / 每用户 salt）源码证据 | 无认证的静态页、无会话状态的纯离线库/CLI → 只写「不适用：无身份与会话维度」，**不得**写「认证安全 / 令牌不可伪造」；只有黑盒、无源码时密码存储写「未验证（需源码审计）」，**不得**写「密码已加盐哈希」；只有部分证据时写「身份与会话存在 N 处缺口，R-12 降级为待确认」，**不得**把「登录成功」冒充「认证安全」，**不得**把「令牌能解码」冒充「能伪造」，**不得**把「Cookie 有 HttpOnly」冒充「会话安全」 |
 | **R-13 时间与时区正确性** | 声称"时间显示正确 / 跨时区一致 / DST 无影响 / 令牌按时过期 / 定时任务可靠"，须附 ① 存/算/显示三层口径表（DB 列类型、应用时区、输出偏移）与 tzdata 版本（应用 + DB）；② `scripts/time-audit.py scan` 输出原文 + 命中逐条裁决；③ DST gap/fold 日期上的**实际执行次数**（`dst` 输出 + 调度器日志/幂等键证据），至少一个 zone 的 gap 与 fold 各一；④ TTL 边界：`exp` 前一秒 / 等于 / 后一秒三值响应；⑤ 时钟回拨/单调时钟用例（超时、限流、幂等键）；⑥ 时间比较与排序（RFC 3339 偏移、`-00:00`、字符串排序）实测 | 无时间维度、纯静态算法/无定时任务且无跨时区用户 → 只写「不适用：无时间与时区维度」，**不得**写「时间正确 / DST 无影响」；tzdata 不可用或无法控制时钟 → 写「未做 DST / 时钟实测，R-13 降级为待确认」，**不得**把「能解析时间」冒充「时区正确」，**不得**把「静态扫描未命中」冒充「时间逻辑正确」 |
 | **R-14 备份与恢复可验证性** | 声称"有备份 / 可恢复 / 满足 RPO·RTO / 数据不丢"，须附 ① 备份对象清单、频率、保留期、加密与密钥位置；② 最近一次**实际恢复**的隔离环境记录（恢复点、耗时三段、RTO 实测）；③ `scripts/restore-audit.py compare` 输出原文（RST-01~RST-11 缺口与 warnings）或等价对账表；④ 强校验输出（restic `--read-data` / borg `--verify-data` / `pg_verifybackup` checksum + test restore）；⑤ 不变量：行数、hash、外键悬空、`max(id)`/序列、blob、配置/版本；⑥ PITR 数据丢失窗口与删除权/多租户交叉结论 | 无持久化数据、纯无状态服务、明确声明不备份 → 只写「不适用：无持久化数据与备份面」，**不得**写「有备份 / 可恢复」；未做过实际恢复 → 写「未做过恢复演练，R-14 降级为待确认」，**不得**把「备份任务成功」冒充「可恢复」，**不得**把「结构校验通过」冒充「内容完整 / 可恢复」 |
+| **R-15 金额与账务正确性** | 声称"金额正确 / 扣款准确 / 账记平衡 / 对账通过 / 退款不超额 / 多币种支持"，须附 ① 币种与 exponent 表（ISO 4217 minor unit 来源）与存储类型；② 舍入模式与所在层（展示 / 计算 / 入账）及 2.675、0.1+0.2 类反例的十进制期望值；③ 展示价 / 应付额 / 实扣额 / 入账额四层对齐证据；④ 分摊守恒（Σ 分项 == 原额，最大余额法）与至少一个不可整除例；⑤ `scripts/money-audit.py scan` 输出原文 + 命中逐条裁决，`ledger` 的借贷平衡 / 单边 / 精度 / 混币负向结果；⑥ 并发重复扣款与超卖用例、退款累计 ≤ 实付；⑦ 有渠道对账单时逐笔对账差异数 | 无任何资金流、纯展示价格、非货币积分 → 只写「不适用：无交易金额」，**不得**写「金额正确 / 对账通过」；无渠道对账单 → 只写「仅验证账本内部平衡，未与渠道对账」，**不得**把「账本内部数字相等」冒充「对账通过」，**不得**把「界面显示 2.68」冒充「实扣 2.68」，**不得**把「单笔用例通过」冒充「全量金额正确」 |
+| **R-16 异步消息 / Webhook 交付可靠性** | 声称"消息可靠 / webhook 安全 / 幂等已做 / 不丢不重 / 重试生效"，须附 ① 签名方案与覆盖字段（是否含 id / timestamp）+ `scripts/webhook-audit.py verify` 的原始 body 复算输出（正例 + 篡改 body / timestamp / 错密钥反例）；② 时间戳容忍窗实测（窗内接受、窗外拒绝）；③ 同 `event_id` 串行与并发各一次，副作用次数 = 1 的证据（去重键与保留窗口）；④ 重试退避实测（间隔递增、上限、重启后仍续投）与最终失败进 DLQ；⑤ 乱序投递后的终态正确性；⑥ at-least-once 语义声明 + 渠道侧对账差异数 | 纯同步请求-响应、无异步事件 / 回调 → 只写「不适用：无异步交付」，**不得**写「消息必达 / 不丢不重」；无渠道沙箱或无法注入重试 → 写「仅完成静态审计与本地复算，未做端到端投递」，**不得**把「验签函数存在」冒充「签名不可伪造」，**不得**把「回调返回 200」冒充「已处理不重复」，**不得**把「配了重试」冒充「重试生效」 |
 
-详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6、`references/auth-session-testing.md` §8、`references/time-correctness-testing.md` §9、`references/backup-recovery-testing.md` §8。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏，登录成功 ≠ 认证安全，令牌可解码 ≠ 可伪造，Cookie 有 HttpOnly ≠ 会话安全，**未命中静态扫描 ≠ 时间正确，备份任务成功 ≠ 可恢复**。
+详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6、`references/auth-session-testing.md` §8、`references/time-correctness-testing.md` §9、`references/backup-recovery-testing.md` §8、`references/money-correctness-testing.md` §9、`references/webhook-delivery-testing.md` §7。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏，登录成功 ≠ 认证安全，令牌可解码 ≠ 可伪造，Cookie 有 HttpOnly ≠ 会话安全，**未命中静态扫描 ≠ 时间正确，备份任务成功 ≠ 可恢复，界面显示 2.68 ≠ 实扣 2.68，账本内部平衡 ≠ 与渠道对账通过，验签函数存在 ≠ 不可伪造，回调返回 200 ≠ 已处理且不重复**。
 
 ## 阶段 4：记忆与进化（本技能的灵魂）
 
@@ -239,7 +248,7 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 2. **更新 tree.md**：模块叶节点状态、严重度与回归用例、新增模块、已知问题表、"下次待办"三类（回归/待测/阻塞）
 3. **沉淀教训**：项目级 → `.test-memory/lessons.md`；跨项目 → 本技能 `memory/global-lessons.md`
 4. **进化检查四问**（`references/evolution.md` §1）：踩了什么坑、什么手法有效、证据够不够、流程哪里不足 → 通用项写 global-lessons.md，`[技能改进]` 提案进提案区
-5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-14 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十四行**都填了结论或「不适用 / 待确认」声明；用了 v1.5 / v1.6 / v1.7 / v1.8 / v1.9 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
+5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-16 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十六行**都填了结论或「不适用 / 待确认」声明；用了 v1.5 / v1.6 / v1.7 / v1.8 / v1.9 / v1.10 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
 
 最后用 `assets/report-template.md` 输出测试报告，**必须给出明确的 `PASS/FAIL` 与 `Go/No-Go`**，禁止"基本可以"。发布验收用 `assets/release-gate-template.md` 打 12 分。
 
@@ -273,7 +282,7 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 
 | 文件 | 内容 |
 |---|---|
-| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、交付链/locale/租户边界/无障碍面/设备形态面/时间面/恢复面、能力层路由 |
+| `references/dissect.md` | 解剖：栈指纹、入口、可运行性、测试设施、攻击面、观测面与依赖拓扑、交付链/locale/租户边界/无障碍面/设备形态面/时间面/恢复面/金额面/交付面、能力层路由 |
 | `references/tools.md` | 工具总表、专项工具、可用性探测、降级策略、shell 断言模板 |
 | `references/personas.md` | 7 日常 + 8 刁钻画像、判 bug 标准、手册映射 |
 | `references/test-design.md` | 测试设计九式、六维矩阵 v2、风险分、覆盖准则与退出标准 |
@@ -282,7 +291,7 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 | `references/performance-testing.md` | 五种负载、p95 口径、k6 模板、性能预算、瓶颈定位 |
 | `references/frontend-testing.md` | 五态矩阵、WCAG 2.2 最小清单、Core Web Vitals、错误映射、动效运行时纪律 |
 | `references/fullstack-integration.md` | 测试金字塔、隔离与工厂、集成边界、六门禁 12 分 Go/No-Go |
-| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-14 Go/No-Go |
+| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-16 Go/No-Go |
 | `references/ai-native-testing.md` | 四层能力模型、AI for QA vs Testing for AI、AI 生成测试审查、AI 系统评测 |
 | `references/observability-testing.md` | 三大信号、Trace 驱动测试、W3C Trace Context、SLI/SLO/错误预算、R-1 可证伪规则 |
 | `references/chaos-resilience.md` | 稳态假设、故障注入矩阵、三级工具阶梯、恢复判据、R-2 可证伪规则 |
@@ -302,11 +311,13 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 | `references/auth-session-testing.md` | 身份·会话·令牌：JWT 十类攻击测试卡、会话生命周期（固定/轮换/登出/改密）、登录与重置与 MFA/Passkey/OAuth 流程、ASVS 5.0 / RFC 8725 / RFC 9700 / OWASP 手册、AUTH-1~AUTH-12、R-12 |
 | `references/time-correctness-testing.md` | 时间与时区：存/算/显示三层、T-01~T-12 反模式（含 tzdata 漂移与配置面）、DST gap/fold 强制实测、TTL 与时钟、RFC 3339、PG/MySQL/SQLite 差异、R-13 七项证据 |
 | `references/backup-recovery-testing.md` | 备份与恢复：RPO/RTO 实测、3-2-1、恢复演练八步、不变量对账 RST-01~RST-11、强校验真读数据、PITR 与删除权/多租户、R-14 六项证据 |
+| `references/money-correctness-testing.md` | 金额与账务：ISO 4217 minor unit、IEEE 754 十进制陷阱、四种舍入模式与所在层、最大余额法与分摊守恒、复式借贷不变量、M-01~M-24 六面用例、账本三步对账、MO-01~MO-09 / LG-00~LG-06、R-15 七项证据 |
+| `references/webhook-delivery-testing.md` | 异步交付：at-least-once 三种语义、Standard Webhooks/Stripe/GitHub 签名对比（原始 body、`whsec_` base64、`t.payload` hex）、时间戳容忍窗、`event_id` 去重、重试退避与重启续投、乱序状态机、DLQ 与渠道对账、D-01~D-22、WH-01~WH-11、R-16 六项证据 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
 | `assets/tree-template.md` | 记忆树初始化模板 |
-| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-14 证据矩阵） |
+| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-16 证据矩阵） |
 | `assets/bug-report-template.md` | 缺陷报告八字段 + MRE |
 | `assets/test-plan-template.md` | 测试计划/测试矩阵模板 |
 | `assets/release-gate-template.md` | 六门禁 12 分发布验收模板 |
@@ -326,6 +337,8 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 | `assets/auth-matrix-template.md` | 身份与会话矩阵：令牌清单与结构审计、J1~J11 伪造/降级负向用例、S1~S9 会话生命周期、F1~F12 认证流程、A1~A3 授权、R-12 结论与不适用声明 |
 | `assets/time-matrix-template.md` | 时间矩阵：TM-01~TM-20 六面用例、tzdata 版本、DST 夹具执行记录（gap/fold 执行次数）、TTL 三值、R-13 结论与降级声明 |
 | `assets/restore-drill-template.md` | 恢复演练记录：RPO/RTO 声明 vs 实测、备份清单核对、恢复步骤计时、不变量 12 行校验、强校验输出、R-14 结论 |
+| `assets/money-matrix-template.md` | 金额矩阵：币种/exponent/舍入模式、M-01~M-24 六面用例、分摊守恒与不可整除、账本负向（LG 反例）、四层对齐、R-15 结论与降级声明 |
+| `assets/webhook-delivery-matrix-template.md` | 交付矩阵：D-01~D-22 六面（签名/幂等/重试/顺序/丢失 DLQ/观测对账）、签名复算夹具、副作用次数、R-16 结论与不适用声明 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
 | `scripts/evidence-audit.py` | 本地确定性证据链对账：`audit --manifest` / `--fail-on-gap` / `--format json\|markdown\|oscal` / `--output`、`--self-test`；检出悬空引用、过期证据、不可解析锚点、PASS 无证据、未分类结论；`--format oscal` 导出 OSCAL `assessment-results` JSON |
 | `scripts/device-matrix.py` | 本地 CSV/JSON install-base 导出汇总：`build --input/--source/--window/--min-coverage --format`、`--self-test`；占比/累计/截断点/CrUX 口径声明，不联网、不代填载体 |
@@ -333,6 +346,8 @@ v1.9 增量：**从「功能与数据正确」扩展到「时间维度正确 · 
 | `scripts/jwt-audit.py` | 零依赖 JWT 结构审计：`decode`（alg=none / 缺 exp·aud·iss / kid·jku·x5u 注入面 / 弱 HMAC 密钥字典 / 过期判定）、`verify --secret`、`--self-test`；诚实边界（不联网/不代填/不冒充/不证明服务端校验） |
 | `scripts/time-audit.py` | 零依赖时间审计：`scan <path>`（T-01~T-10 静态反模式、`--fail-on-gap`）、`dst --zone --year --at`（gap/fold 转换点与每日时刻判定；无 tzdata 明确报错不伪造）、`--self-test` |
 | `scripts/restore-audit.py` | 零依赖恢复对账：`compare --source --restored`（RST-01~RST-11：缺文件/多文件/hash/行数/序列/版本/陈旧恢复/时区缺失，`--fail-on-gap`）、`--self-test`；不联网、不代填、不证明未提供的清单 |
+| `scripts/money-audit.py` | 零依赖金额审计：`scan <path>`（MO-01~MO-09：浮点解析/`toFixed`/`*100`/`Math.round`/SQL FLOAT/浮点相等/除以份数/信任客户端金额，`--fail-on-gap`）、`ledger --file`（LG-00~LG-06：空/缺币种/不平/单边/精度越界/负额/混币，ISO 4217 exponent 表）、`cases`（0.1+0.2、2.675、JPY 1000、KWD 1.234、最大余额法）、`--self-test`；不联网、不代填、不证明财务合规 |
+| `scripts/webhook-audit.py` | 零依赖交付审计：`check --file deliveries.json`（WH-01~WH-11：无签名/签名未覆盖 id·timestamp/缺时间戳/超容忍窗/重复处理无去重/重试未退避/失败无 DLQ/乱序/状态与结果矛盾）、`verify --scheme standard\|stripe`（HMAC-SHA256 原始 body 复算）、`--self-test`；不联网、不代填、不证明渠道侧实际投递 |
 | `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、索引覆盖、路由闭环与规则同步、**报告证据矩阵表格行同步（§7d 加固）与规则例外声明**、**§7f 脚本可证伪性静态门禁** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |
 

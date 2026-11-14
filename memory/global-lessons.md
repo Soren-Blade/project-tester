@@ -254,6 +254,13 @@
 - [环境] Windows + Python zoneinfo 缺 tzdata 会直接抛 `ModuleNotFoundError`；Node 的 `Intl` 可作独立对照实现 — 应用：脚本缺 tzdb 时明确报错并给 `pip install tzdata` 提示，绝不伪造转换结果
 - [流程] 「服务器跑 UTC」不是时区正确的证据：用户本地日边界、DST 调度、日志口径仍可能全错 — 应用：报告分开写「存储口径 / 计算口径 / 展示口径」三行结论
 
+- [流程] 金额系统的第一层证据只是「账本内部借贷平衡」；它不证明与渠道对账单一致，也不证明税额口径正确 — 应用：报告分开写「内部平衡 / 渠道对账 / 税务口径」三行，缺一行就标待确认
+- [流程] 零小数币种不得 ×100：500 JPY 传 `amount=500`；但渠道有特例（Stripe 的 ISK/UGX 历史两位、HUF/TWD 仅 payout 为零小数且需被 100 整除）— 应用：先查渠道币种表再写期望值，不套用「最小单位=分」
+- [流程] 「写进去 = 读回来」是金额系统最低要求：进程内 Map/缓存做去重键或账本唯一副本，重启即归零 — 应用：每个金额流做一次 kill→重启→读回，`data.json` 有记录但没加载属 S1
+- [流程] webhook 返回 200 不等于已处理：验签在业务前、业务失败要回非 2xx 或进 DLQ；验签函数存在不等于签名覆盖 timestamp — 应用：改 ts 保留旧签名必须 401，容差窗口用 `now±301/299s` 三值实跑
+- [流程] handler 中途失败必须零残留，否则渠道重投会与残留叠加成双份副作用 — 应用：测「第 N 步失败 → 无半条数据 → replay 后副作用仍为 1」
+- [环境] Windows PowerShell 5.1 的 `Get-Content`/`Out-File` 默认 GBK/UTF-16，读写 UTF-8 中文证据会乱码甚至写坏；`curl` 是 `Invoke-WebRequest` 别名会吞掉 `--data-binary @file` — 应用：证据用 Node `fs.writeFileSync(...,'utf8')`，请求用 `curl.exe`，判端口用 `Get-NetTCPConnection -State Listen`，起服务轮询 `/health` 不用 `Start-Sleep`
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -273,4 +280,7 @@
 - [技能改进] 待评估（v1.8 提出）：把 AUTH/S/F 三张测试卡做成「可执行 adapter」（统一 `token-provider` 接口：登录/刷新/重置取令牌 → 跑卡 → 出 JSON），减少手工 curl；暂不落地，理由：先确认 adapter 接口不绑定某框架，且不能替代人工判据
 - [技能改进] ✅ **已吸收（v1.9）**：时间/时区正确性与备份/恢复可验证性 → 落地为 `references/time-correctness-testing.md` + `references/backup-recovery-testing.md` + 两份矩阵/演练模板 + `scripts/time-audit.py` / `scripts/restore-audit.py`，新增 **R-13/R-14**；理由：dogfood 的 `timedemo` 用 v1.8 实测出 2×S1（令牌跨时区多活 8h、错误备份覆盖新数据）与 UTC 日过滤、`+86400` 调度漂移，旧手册无对应判据
 - [技能改进] 待后续轮次（v1.9 提出）：把「5xx 响应体不得含堆栈 / 绝对路径 / SQL」做成安全手册的固定检查项与报告字段 → 来源：dogfood F7（非法 `at` 入库 201，列表 500 回显 `time.js:7:24` 与绝对路径）；本轮只记提案，不扩 scope
-- [技能改进] 待核实（v1.9 提出）：systemd timer 与 Quartz 在 DST gap/fold 的实际行为、`tzdata 2026.6 ↔ IANA 2026f` 映射、pgBackRest `verify` 细节 — 应用：读官方原文或实跑前，手册保留【不确定】，不得写成结论
+- [技能改进] ✅ **已吸收（v1.10）**：金额与账务正确性、异步消息/Webhook 交付可靠性 → 落地为 `references/money-correctness-testing.md` + `references/webhook-delivery-testing.md` + 两份矩阵模板 + `scripts/money-audit.py` / `scripts/webhook-audit.py`，新增 **R-15/R-16**；理由：dogfood 的 `shopdemo` 用 v1.9 实测出 15×S1（0.1+0.2、JPY×100、幂等失效、退款超退、单边账本、混币种相加、重启丢账、签名不覆盖 ts、事件重复、乱序落退款、handler 残留、无重试/DLQ），旧手册无对应判据
+- [技能改进] 待评估（v1.10 提出）：按税务辖区做「舍入/计税口径矩阵」→ 需要逐国读官方文档（本轮只给 HMRC 示例），不做全球通用断言
+- [技能改进] 已驳回（v1.10，理由保留）：让 `money-audit.py` 自动拉取渠道对账单 → 需真实凭据与网络，违反零依赖/不联网边界；保持离线审计，渠道对账仍由测试者提供数据
+- [技能改进] 待核实（v1.10 提出）：各支付渠道对 ISK/UGX/HUF/TWD 的「最小单位」处理随 API 版本变化 — 应用：以接入时渠道文档为准，证据里写清币种、amount 原值、期望 minor 值，不把特例写成通则
