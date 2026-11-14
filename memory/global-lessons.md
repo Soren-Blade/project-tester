@@ -227,6 +227,19 @@
 - [手法] 子集须保引用完整：外键图抽取后悬空外键数必须为 0，否则关联查询会跑出脏数据 — 应用：子集制备后查 `LEFT JOIN ... WHERE fk IS NULL` 计数（test-data-management.md §4）
 - [流程] 前端/媒体测试数据的真实感也要可复现：`--seed` 相同提示词产出相同图/音，视觉回归才能比对 — 应用：生成媒体统一带种子，避免每次基线漂移（frontend-dev minimax --seed）
 
+## 身份 / 会话 / 令牌类（v1.8 蒸馏）
+
+- [安全] 登录成功 ≠ 认证安全；令牌可解码 ≠ 可伪造；Cookie 有 HttpOnly ≠ 会话安全 — 应用：R-12 三不认，认证结论只认「负向请求原文 + 响应码 + 登出/改密后重放结果」
+- [安全] alg=none、空签名、算法混淆必须实测而不是读代码猜测；RFC 8725 明文只点名 `kid`/`jku`/`x5u`，`x5c`/`jwk` 注入不是其明文条款 — 应用：拒绝 `none` 用请求原文 + 200/401 证据；别把「RFC 没写」当成「不可能被接受」
+- [安全] 弱 HMAC 密钥只能证明「命中 N 条字典」，不能证明「必然可爆破」；`jwt-audit.py verify` 只回答签名是否匹配 — 应用：报告写「该值在字典中命中」，不写「密钥可爆破/已被攻破」
+- [手法] 登出/改密/重置后必须**同时**重放旧 access 与旧 refresh 两类令牌；只测 access 会漏掉 refresh 继续换新令牌 — 应用：S4/S5 成对用例，缺一列即不算覆盖
+- [手法] 重置令牌可预测性先 `base64` 解码看是否含 email/序号/时间戳；`reset_token` 出现在 HTTP 响应里本身就是缺陷（应带外投递）— 应用：F7 双判据（可解码 + 响应暴露）
+- [流程] 枚举判定用「三列不可区分」：状态码 + 文案 + 时序；只比状态码不够，时序没测就写「未测」— 应用：F1 至少两列实测，第三列显式标注
+- [安全] 认证测试只用自建账号与合成令牌；限流小样本即停；证据里的 `password_hash`/token 截断 — 应用：执行纪律 §6，生产只读且先授权
+- [手法] 模拟项目要内建「README 宣称 vs 实现」落差（如宣称过期校验/轮换/HttpOnly/限流），否则测不出「宣称不可冒充」门禁 — 应用：dogfood 种子项目让 README 写全套宣称，报告逐条对账
+- [流程] 测试脚本必须自备份/恢复夹具（`users.json`/`notes.json`），并固定 `--now` 判定过期，否则第二次跑结果漂移 — 应用：`finally` 恢复 + 固定 epoch，回归才可比
+- [环境] Windows 下 Python 中文输出经 PowerShell 管道会乱码，`Out-File` 还会写 BOM 破坏 JSON — 应用：`$env:PYTHONUTF8=1` + `cmd /c "python ... > out.json"`；读回用 `utf-8` 并跑 `json.load` 验证
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -243,3 +256,4 @@
 - [技能改进] ✅ **已吸收（v1.5）**：把设备矩阵与真实安装量数据源做成可复用采集脚本 → 落地为 `scripts/device-matrix.py` + `references/cross-platform-testing.md` §6A；理由：**不臆造 analytics API**，只接受本地 CSV/JSON 导出，算占比/累计/80% 截断点并固定输出 CrUX 口径局限；载体与实测结论仍人工填，不冒充真机证据
 - [技能改进] ✅ **已吸收（v1.6）**：把 `scripts/evidence-audit.py` 的 manifest 与 OSCAL `assessment-results` 做格式互转 → 落地为 `evidence-audit.py --format oscal` + `references/evidence-chain-audit.md` §10 字段映射；理由：本轮确认确有 GRC/审计消费场景，且明确「只搬字段不裁决合规」，EA-13 纳入 `--self-test` 对等性校验，不造无人消费的转换层
 - [技能改进] 待后续轮次（v1.7 已打底）：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → TDM 的确定性 `--seed` 现为跨语言变异基准的可复现数据底座；本提案仍保留至具体变异工具输出 schema 确定，不硬编码某一家 JSON schema
+- [技能改进] 待评估（v1.8 提出）：把 AUTH/S/F 三张测试卡做成「可执行 adapter」（统一 `token-provider` 接口：登录/刷新/重置取令牌 → 跑卡 → 出 JSON），减少手工 curl；暂不落地，理由：先确认 adapter 接口不绑定某框架，且不能替代人工判据

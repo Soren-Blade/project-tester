@@ -5,6 +5,58 @@
 
 ---
 
+## [v1.8.0] — 2026-11-14 · 每日升级 #9
+
+**主题**：从「功能与数据的正确」扩展到「**身份不可冒充 · 会话可终止 · 令牌不可伪造**」——身份认证 / 会话 / 令牌安全。同一套功能全绿的 API，只要 `alg:none` 被接受、过期 `exp` 被忽略、登出后旧令牌仍可用，攻击者就能直接变成管理员；这类缺陷不是「边界没测」，是「认证的可信前提没测」。新增 **R-12 身份与会话不可冒充** 与三份文件（手册 + 矩阵模板 + 零依赖 `jwt-audit.py`），蒸馏底座为 ASVS 5.0.0 / RFC 8725（BCP 225）/ RFC 9700（BCP 240）/ OWASP 认证·会话·密码存储 Cheat Sheet / NIST SP 800-63B-4 / WebAuthn L3。注：与 #1~#8 同属每日升级自动化序列，按轮次记为 #9。
+
+**遵循上轮建议**：未重写已覆盖主题（五阶段、四层模型、可观测、韧性、数据、协议、供应链、i18n、多租户、契约、隐私、有效性、无障碍、跨端、ROI、证据链、特性开关、TDM），以 **New 为主 + Enhance 为辅**；四层模型与五阶段流程**未改语义**（按 `self-evolution.md` §7 只升 MINOR）；每轮至少一条可证伪规则 → 本轮引入 **R-12**；本轮做了**负向测试**（临时副本分别删 R-12 定义行 / 删报告矩阵行 / 删手册「不得」，确认 `selfcheck.py` §7c/§7d/§5 确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 动作 | 对象 |
+|---|---|
+| **New** | `references/auth-session-testing.md`、`assets/auth-matrix-template.md`、`scripts/jwt-audit.py` |
+| **Enhance** | `SKILL.md`（version 1.8.0、description 触发词、v1.8 增量说明与叠加项、阶段1 身份/会话面、R-12 定义行、参考索引、对账边界）、`README.md`（徽章 / 问题表 +1 / 59 文件结构 / 速查 +1 / 设计要点 R-12 + 身份不可冒充 / 版本史）、`CHANGELOG.md`（本条目）、`references/dissect.md`（§6 身份/会话面 + §8 路由）、`references/quality-gates.md`（§3 R-12 作废行 + §8 十二条）、`assets/report-template.md`（R-12 行 + 十二行矩阵 + 边界）、`scripts/selfcheck.py`（§5 两文件字段 + §7f jwt-audit 门禁）、`references/tools.md`（JWT/OAuth 工具行 + 纪律 15）、`memory/global-lessons.md`（身份/会话/令牌教训组 + 提案） |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- OWASP ASVS 5.0.0（tag `v5.0.0_release`，2025-05-30；`latest` 是自动重建的 bleeding edge，不作为版本依据）：6.2.1 密码≥8（推荐 15）、6.2.5 无组成规则、6.2.10 不强制周期改密、6.3.8 枚举三列不可区分、6.5.1 OTP 一次性、7.2.3 引用令牌≥128bit CSPRNG、7.2.4 认证时换新令牌、7.3.1 服务端强制空闲/绝对超时、7.4.1 登出失效、7.5.1 敏感操作再认证、9.1.2 算法 allowlist 禁 none、9.2.1 校验 nbf/exp、10.4.1 redirect_uri 精确匹配、10.4.2 code 一次性、10.4.6 PKCE 拒 plain → `references/auth-session-testing.md` §2~§4、R-12
+- RFC 8725 JWT BCP（BCP 225，2020-02）：算法白名单、拒绝 `none`、`kid`/`jku`/`x5u` 属不可信头；**注意**：`x5c`/`jwk` 注入不是 RFC 8725 明文条款，手册按「同类风险」标注而非冒充条款 → §2 AUTH-9/AUTH-10
+- RFC 9700 OAuth 2.0 Security BCP（BCP 240，2025-01，取代 oauth-security-topics draft）：PKCE 必须、redirect_uri 精确匹配、code 一次性与短 TTL、refresh 轮换与 sender-constrained → §4 F11
+- OWASP Password Storage Cheat Sheet：Argon2id 最低 m=19MiB,t=2,p=1；bcrypt cost≥10 且 72 字节上限；scrypt N=2^17/r=8/p=1；PBKDF2-SHA256 600k / SHA512 220k；hash <1s → §4 F6
+- OWASP Authentication / Session Management Cheat Sheet：会话 ID≥64bit（自建≥128，建议≥160）、空闲 2–5min（高价值）/15–30min（低风险）、绝对 4–8h、SameSite 优先 Strict/Lax、None 必配 Secure、`__Host-` 三条件、登出撤销全部同逻辑会话、枚举统一文案、按账户限速 → §1/§3
+- NIST SP 800-63B-4（Final 2025-07）：AAL1 overall ≤30 天、AAL2 ≤24h + inactivity ≤1h、单因子≥15 / MFA 下≥8 / 最大≥64、不得截断、blocklist 全串比对、OOB 10 分钟、邮件不得作 OOB → §4 F4/F6/F10
+- WebAuthn L3（W3C Rec 2026-08-25）：RP ID/origin 校验、challenge 一次性 → §4 F10 附注（页面截断处标「推论」）
+- 工具链（GitHub）：`jwt_tool`（alg none `-X a`、JWKS 注入 `-X i`、kid 注入 `-I -hc kid`）、`hashcat -m 16500`（module_16500.c 仅 HS*）、`oauth2c`（PKCE/PAR/DPoP/JARM）、nuclei 官方 `cookies-without-httponly/-secure` 模板、ZAP/Autorize 低权重放 → `references/tools.md` §2、`§6` 边界
+
+### 口径诚实
+
+- `scripts/jwt-audit.py` 只做**离线结构审计**与 HMAC 签名匹配；**不联网、不代填、不冒充**服务端已校验。结构可疑 ≠ 服务端接受；未命中字典 ≠ 密钥强（只能证「未在 N 条字典中命中」）。
+- `--self-test` 只证明脚本自身解析/判定逻辑可用，**不证明**被测系统认证安全。
+- ASVS 5.0 改写为「动作 + 判据」而非抄条目；`latest` tag 不作为版本号；NIST 800-63B 未给具体限速次数，手册不编造「100 次」。
+- **R-12 不认「登录成功 / 令牌可解码 / Cookie 有 HttpOnly」**；只有黑盒时密码存储写「未验证（需源码）」，只有部分证据时降级「待确认」，无认证系统写「不适用：无身份与会话维度」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+- 在项目外搭建含种缺陷的模拟项目 `authdemo`（零依赖 Node 笔记 API + 前端，README 声称 9 项安全措施而实现 0 项成立），用新手册 AUTH-1~12 / S1~S9 / F1~F12 实际执行。
+- 结果：**30 项检查 = FAIL 24 / PASS 4 / 观察 2**，18 个缺陷（S0 2 个：`alg:none` 与 `secret123` 均可伪造 admin；S1 10 个：exp/nbf/aud/iss 不校验、登出与重置不撤销、refresh 不轮换、reset_token=base64(email)、`password_hash` 外泄、无盐 SHA-256；S2 6 个：枚举、无限速、弱密码、BOLA、Cookie 缺属性/localStorage/innerHTML、POST 笔记 404）。
+- 记忆树：`.test-memory/tree.md`（<100 行）+ `runs/2026-11-14-1.*`（结果 JSON / HTTP 原文 / 令牌样本 / jwt-audit JSON）+ `reports/2026-11-14-auth-report.md`（PASS/FAIL、No-Go、R-12 七类证据、R-1~R-12 全矩阵、未测/不适用明细）。验证「宣称 vs 实际」「不适用不冒充」「观察项不写成漏洞」三条门禁真实可执行。
+- 实测暴露并已修正的工具问题：`--now` 只属 `decode`（`verify` 无此参数）；Windows 控制台中文经管道会乱码、`Out-File` 会写 BOM 破坏 JSON → 用 `PYTHONUTF8=1` + `cmd /c "python ... > out.json"` 并 `json.load` 回读校验（已写入 global-lessons）。
+
+### 自检与门禁
+
+- `scripts/selfcheck.py`：源与全局安装均 **PASS 40 / WARN 0 / FAIL 0 / GREEN**（规则 11→12；§7c 双向同步、§7d 逐行矩阵、§7e 例外声明、§7f jwt-audit 门禁全过；路由闭环 22 份专项）
+- `scripts/jwt-audit.py --self-test` 退出码 0（8 项断言，`SELFTEST GREEN`）；`evidence-audit.py` / `device-matrix.py` / `test-data-gen.py --self-test` 均 0；`py_compile` OK
+- **负向测试**（项目外临时副本，Python 改文件避免 PowerShell 编码破坏）：删 `SKILL.md` 的 R-12 定义行 → §7c/§7d FAIL；删 `report-template.md` 的 `| R-12 ... |` 行 → §7d FAIL；删 `auth-session-testing.md` 的「不得」→ §5 FAIL；三例 exit=1，干净副本仅剩（未写本条目时的）CHANGELOG 缺口
+- 文件数 56 → 59（references 29→30、assets 18→19、scripts 4→5），`diff -r` 源与全局安装零差异
+
+### 提案处置
+
+- 上轮顺延「AI 生成用例变异杀伤贡献跨语言自动跑数」仍保留（理由：变异工具输出 schema 未定，不硬编码某一家 JSON；TDM `--seed` 已是可复现底座）。
+- 新增待评估提案：「AUTH/S/F 三张卡做成可执行 adapter（统一 token-provider 接口）」，暂不落地，先确认接口不绑定框架且不替代人工判据。
+
+---
+
 ## [v1.7.0] — 2026-11-13 · 每日升级 #8
 
 **主题**：从「结论可复核」扩展到「**喂给测试的数据本身可信 · 合规 · 可复现**」——测试数据管理（TDM）：合成数据生成、PII 脱敏 / 掩码、确定性种子、数据子集与制备、绝不用生产数据。同一份测试结论若建立在「假数据 / 泄漏的生产 PII / 每次跑都不一样的随机样本」之上，再多用例也只是沙上筑塔。新增 **R-11 测试数据可信与合规** 与三份文件（手册 + 模板 + 零依赖脚本），蒸馏来源含权威 TDM 定义与用户附加技能 `fullstack-dev` / `frontend-dev` 的二次蒸馏。注：与 #1~#7 同属每日升级自动化序列，按轮次记为 #8。

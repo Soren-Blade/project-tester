@@ -93,6 +93,7 @@
 | **证据链面**（v1.5） | 有无留档要求与合规声明清单（SOC2 / 等保 / SSDF / GDPR）、原始输出落点（`runs/` / CI artifacts / 日志）、能否取到 commit / 环境指纹 / 时间窗、是否有视觉快照基线与 install-base 本地导出、报告结论是否可指到文件行 | 决定能否叠加 `references/evidence-chain-audit.md`（R-9）与 `scripts/evidence-audit.py`；**一次性探索、无留档要求标「不适用：无留档要求」**，不写「可审计」 |
 | **配置 / 开关面**（v1.6） | 有无特性开关 / kill-switch / 远程配置 / 实验开关 / A-B、开关默认态与缺失态是否回退到安全路径、目标群体属性来源（user/tenant/region/account 的 selector 是否可信）、env / 文件 / 远程配置三处的优先级声明、是否有灰度比例与「一键停」能力 | 决定能否叠加 `references/feature-flag-testing.md`（R-10）；**纯静态、无任何开关与配置化的离线脚本标「不适用：无开关与配置维度」**，不写「开关安全」 |
 | **测试数据面**（v1.7） | 有无测试数据库 / fixtures / 工厂 / 种子脚本；数据来源是否合成生成、有无 `--seed` 可复现；是否含 PII 须脱敏、有无"连生产库抽数"反模式；迁移是否在类生产数据量上验证；测试结束临时含 PII 数据是否退役 | 决定能否叠加 `references/test-data-management.md`（R-11）；**纯静态算法库、无数据依赖的纯离线脚本标「不适用：无测试数据维度」**，不写「数据已脱敏 / 数据可复现」 |
+| **身份 / 会话面**（v1.8） | 登录/注册/找回/改密/登出端点；会话载体（Cookie/JWT/opaque）与属性（HttpOnly/Secure/SameSite）；token 签发/校验/刷新/撤销代码位置；`alg`/`exp`/`aud`/`iss` 校验是否存在；refresh 是否轮换、登出是否作废；重置令牌来源与 TTL；密码哈希函数与参数；OAuth/OIDC/SSO/MFA/Passkey 是否接入 | 决定能否叠加 `references/auth-session-testing.md`（R-12）；**无认证的静态页、无会话状态的纯离线库/CLI 标「不适用：无身份与会话维度」**，不写「认证安全 / 令牌不可伪造」 |
 
 ## 7. 攻击面、观测面与依赖拓扑（v1.0 新增，v1.1 / v1.2 扩充）
 
@@ -139,6 +140,7 @@
 | **有视觉快照基线 / install-base 导出数据，或要按真实安装量定设备矩阵**（v1.5） | `references/cross-platform-testing.md` §6A + `scripts/device-matrix.py` + `assets/device-matrix-template.md` | 基线环境指纹与 `--update-snapshots` 留痕、`maxDiffPixels`/`mask`/`threshold` 变更批准；本地 CSV/JSON 导出的占比/累计/80% 截断点与 CrUX 口径声明，载体列人工填（R-8 增强，不新增规则） |
 | **用了特性开关 / kill-switch / 远程配置 / 实验开关 / A-B，或声称「开关关掉系统还安全 / kill-switch 能止血 / 灰度可控 / 配置正确 / 目标群体隔离」**（v1.6） | `references/feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md` | 开关 off 态与缺失态回退安全路径、目标群体否定用例、env/文件/远程三处配置比对、kill-switch 真关实测、灰度比例实测（R-10）；纯静态、无开关与配置化的离线脚本标「不适用：无开关与配置维度」 |
 | **有测试数据库 / fixtures / 工厂 / 种子脚本，或声称「测试数据已脱敏 / 合成数据无 PII 泄漏 / 数据可复现 / 子集引用完整 / 没用生产数据」，或要验证「迁移在类生产数据量上跑通」**（v1.7） | `references/test-data-management.md` + `assets/test-data-matrix-template.md` + `scripts/test-data-gen.py` | 数据来源声明（合成种子值 / 脱敏命令原文 + 退出码 / 明确"未使用生产数据"）、脱敏字段清单 + 掩码后残留核查 + 人工复核、同 `--seed` 两次生成逐字节一致校验、子集外键悬空数 = 0 核查、无生产数据声明（R-11）；纯静态算法库、无数据依赖的纯离线脚本标「不适用：无测试数据维度」 |
+| **有登录/注册/找回/改密/登出、Cookie 会话、JWT/Opaque Token、OAuth 2.0 / OIDC / SSO / MFA / Passkey，或声称「认证安全 / JWT 校验正确 / 令牌不可伪造 / 登出即失效 / 双因素」**（v1.8） | `references/auth-session-testing.md` + `assets/auth-matrix-template.md` + `scripts/jwt-audit.py` | 令牌清单与载体、`jwt-audit.py decode` 结构审计、alg=none/算法混淆/空签名三连、exp/nbf/aud/iss/typ 五类负向、登出改密重置后旧 access+refresh 均拒、refresh 轮换与 reuse detection、枚举三列+限流、密码存储源码（R-12）；无认证静态页/无会话离线库标「不适用：无身份与会话维度」 |
 
 路由结果写进阶段 2 的计划，避免"不管什么项目都同一套用例"。**叠加项按触发条件选，不是所有项目都做**；无日志埋点、无外部依赖、单存储的项目对应专项标「不适用」并写明原因，别为凑维度造测试。
 

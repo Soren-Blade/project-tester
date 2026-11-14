@@ -1,10 +1,10 @@
 ---
 name: project-tester
-version: 1.7.0
-description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）。
+version: 1.8.0
+description: 通用项目深度测试技能：自动解剖任意项目的功能结构，按风险生成并完善测试需求，熟练调用匹配技术栈的测试工具，以「日常用户 + 刁钻用户」双视角做功能/边界/异常/安全/性能/体验六维深度测试，用测试记忆树记录每次过程与结果（下次免重复探索、大幅省 token），并持续沉淀经验、每日自我进化。覆盖 API 契约与 OWASP API Top 10 安全测试、k6 性能分位数、前端五态与 WCAG 可访问性、全栈集成与六门禁发布验收、契约/属性/变异测试、AI 辅助测试与 AI 系统评测；并支持可观测性与 Trace 驱动测试、韧性与故障注入演练、数据库迁移与数据一致性验证、GraphQL/gRPC/WebSocket/SSE 非 REST 协议端点矩阵，以及软件供应链与制品完整性验证（SBOM/签名/provenance/可复现构建）、国际化与本地化测试（伪本地化/RTL/locale 格式往返）、多租户隔离测试（双租户否定路径/共享资源/平台管理员）、契约演进兼容性（消费者契约 + 影子流量）、无障碍可达性深度实测（WCAG 2.2 AA / 键盘路径 / 读屏组合 / ARIA 快照）、跨端与设备形态真实性（设备矩阵 / 仿真 vs 真机 / 端侧特有面）、测试有效性与经济性（DORA / 变异得分 / ROI）。凡是用户想测试、验收、找 bug、检查质量、回归、上线前门禁、模拟用户操作、压测、安全审查任何项目时使用——包括"测一下这个项目""帮我测测""这项目稳不稳""上线前查一下""找找 bug""回归测试""模拟用户用一下""能不能发布""接口测一下""链路查一下""依赖挂了会怎样""迁移有没有问题""故障演练""数据一致性""安全有没有问题""制品有没有被改过""SBOM/依赖清单全不全""换个语言/地区还正常吗""RTL 排布对不对""多租户会不会串数据""租户隔离""test this project""find bugs""SBOM""i18n""multi-tenant"等说法，即使没说"测试"二字（如"检查一下有没有问题"）也应用本技能；以及"契约演进兼容性""API 升级老客户端会不会挂""隐私合规/PII 最小化/删除权 GDPR""测试有效性度量/变更失败率/flaky/变异得分"等说法（contract evolution / privacy / test effectiveness / mutation score / DORA / change failure rate）；以及"无障碍合规 / WCAG 2.2 AA / 焦点被遮挡 / 读屏 / 屏幕阅读器 / 键盘走查 / 目标尺寸 / 移动端可用 / 真机验证 / 设备矩阵 / 折叠屏 / 跨浏览器 / 仿真与真机区别 / 测试成本 / ROI / 自动化测试值不值"等说法（WCAG 2.2 / accessibility / screen reader / cross-platform / real device / test ROI）；以及"证据链 / 结论可复核 / 可审计 / 合规声明对账 / SOC2 / 等保 / SSDF / OSCAL / provenance 溯源 / 审计导出 / 视觉回归基线 / 快照更新 / CrUX / 真实安装量 / 设备矩阵数据源 / AI 生成测试用例有没有用"等说法（evidence chain / traceability / compliance mapping / audit export / visual regression baseline / install-base / AI-generated test review）；以及"特性开关 / 配置漂移 / 灰度放量 / kill-switch / 实验开关 / A-B / 远程配置 / 配置三处不一致 / 默认态安全 / 废弃开关没删干净"等说法（feature flag / config drift / canary / kill-switch / rollout safety / default state / dead flag）；以及"测试数据 / 合成数据 / 脱敏 / 掩码 / 测试数据管理 / 造数 / 测试数据库 / seed / 绝不用生产数据跑测试"等说法（test data management / synthetic data / PII masking / TDM）；以及"登录 / 认证 / 会话 / 令牌 / JWT / OAuth / OIDC / SSO / 刷新令牌 / 会话固定 / 登出没失效 / 密码重置 / 验证码 / MFA / 双因素 / Passkey / 账户枚举 / 越权改 ID / 认证绕过 / token 能不能伪造 / alg none / 审计登录"等说法（authentication / session / token / JWT / OAuth / OIDC / MFA / passkey / session fixation / refresh token rotation / account enumeration / auth bypass / ASVS / RFC 8725 / RFC 9700）。
 ---
 
-# 通用项目测试 (project-tester) · v1.7.0
+# 通用项目测试 (project-tester) · v1.8.0
 
 一句话：**解剖 → 计划 → 深测 → 记忆 → 进化**，五阶段循环。记忆树让下一次测试从"接力点"出发，而不是从零开始。
 
@@ -21,6 +21,8 @@ v1.5 增量：**从「结论正确」扩展到「结论可复核 · 声称可对
 v1.6 增量：**从「结论可复核」扩展到「动态正确 · 配置可信 · 开关可控 · 合规可机读」**——「功能对」之上再加一层：开关的**默认态/缺失态是否回到安全路径**、目标群体是否真的隔离、env/文件/远程配置三处是否漂移、kill-switch 真关后是否回到安全态、灰度比例是否真的可控。新增 **R-10（特性开关 / 配置 / 灰度正确性）** 与 `references/feature-flag-testing.md` / `assets/flag-rollout-matrix-template.md`，以 Knight Capital 2012「废弃开关被重新点亮」反例打底，落地一个 v1.5 顺延提案：把 `scripts/evidence-audit.py` 的 manifest 增加 `--format oscal` 导出 OSCAL `assessment-results` JSON（manifest 字段 → OSCAL 模型字段的映射见 `references/evidence-chain-audit.md` §10），让 R-9 的证据链能直接喂给 GRC / 审计工具，不造无人消费的转换层。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身可信 · 合规 · 可复现」**——「结论对」之下再补一层地基：测试用的是什么数据、来源是否可信、有没有把生产 PII 漏进测试环境、同一用例两次跑是不是同一份数据。新增 **R-11（测试数据可信与合规）** 与 `references/test-data-management.md` / `assets/test-data-matrix-template.md` / `scripts/test-data-gen.py`（零依赖：合成生成 + 确定性种子 + 保留格式掩码 + `--self-test` 诚实边界）。蒸馏来源含 Thoughtworks / K2view / DATPROF / IRI 的 TDM 权威定义，以及用户附加技能 `fullstack-dev`（`testing-strategy.md` 的 factories / "no production data" 反模式 / 确定性 seeds）与 `frontend-dev`（`--seed` 可复现）。四层模型与五阶段语义未变，仍按 MINOR 升级。
+
+v1.8 增量：**从「功能与数据的正确」扩展到「身份不可冒充 · 会话可终止 · 令牌不可伪造」**——「能登录」只是入口，真正的质量问题是：别人能不能变成你（alg=none / 算法混淆 / 弱密钥 / 令牌侧信道）、令牌过期与受众是否真被校验、刷新是否轮换且旧令牌重用时整个 family 失效、登出/改密/重置后旧会话是否真被拒、密码重置令牌可不可预测、登录是否可枚举与可爆破。新增 **R-12（身份与会话不可冒充）** 与 `references/auth-session-testing.md` / `assets/auth-matrix-template.md` / `scripts/jwt-audit.py`（零依赖：结构审计 + HMAC 校验 + `--self-test` 诚实边界），以 ASVS 5.0、RFC 8725（JWT BCP）、RFC 9700（OAuth 2.0 Security BCP）与 OWASP 密码存储/认证/会话手册为蒸馏底座。四层模型与五阶段语义未变，仍按 MINOR 升级。
 
 适用对象：任何项目形态——代码库、Web 应用、API、CLI 工具、脚本、库/包、静态页面、LLM/Agent 应用。本技能不绑定语言框架、不绑定特定 agent：所有操作只用通用能力（读写文件、执行 shell、按需用浏览器/联网）。测试工具缺失时按 `references/tools.md` 降级策略执行，**绝不因"没有某某测试框架"而中止**。
 
@@ -97,7 +99,13 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 |---|---|---|
 | 有测试数据库 / fixtures / 工厂 / 种子脚本，或声称"测试数据已脱敏 / 合成数据无 PII 泄漏 / 数据可复现 / 子集引用完整 / 没用生产数据"，或要验证"迁移在类生产数据量上跑通" | `references/test-data-management.md` + `assets/test-data-matrix-template.md` + `scripts/test-data-gen.py` | 数据来源声明（合成种子值 / 脱敏命令原文 + 退出码 / 明确"未使用生产数据"）、脱敏字段清单 + 掩码后残留核查 + 人工复核、同 `--seed` 两次生成逐字节一致校验、子集外键悬空数 = 0 核查、无生产数据声明；**R-11**。纯静态算法库、无数据依赖的纯离线脚本写「不适用：无测试数据维度」 |
 
-> **对账边界**：`scripts/evidence-audit.py` 的对账 GREEN 只证明「结论 → 证据 → 原始输出」这条链**可解析**，**不证明**软件安全、合规通过、运行时质量或发布批准；`scripts/device-matrix.py` 的占比草稿**不是**真机证据。两者都不得越界写成「已通过审计 / 已验证真机」。
+**v1.8 横向叠加项**（同样不新增层级；四层模型与五阶段语义未变）：
+
+| 触发条件 | 叠加手册 | 必做动作 |
+|---|---|---|
+| 有登录 / 会话 / 令牌 / OAuth·OIDC / SSO / MFA / 密码重置，或声称「认证安全 / JWT 校验正确 / 登出即失效 / 支持双因素 / 令牌不可伪造」 | `references/auth-session-testing.md` + `assets/auth-matrix-template.md` + `scripts/jwt-audit.py` | 令牌清单与存放位置、`alg=none`/算法混淆/空签名负向实测、`exp`/`nbf`/`aud`/`iss`/`typ` 五类负向用例、登出与改密后旧 access+refresh 均被拒、刷新轮换与 reuse detection、枚举三列对照（状态码/响应体/时间）+ 限流触发、签名与 claim 校验证据；**R-12**。纯静态页、无认证的离线算法库写「不适用：无身份与会话维度」 |
+
+> **对账边界**：`scripts/evidence-audit.py` 的对账 GREEN 只证明「结论 → 证据 → 原始输出」这条链**可解析**，**不证明**软件安全、合规通过、运行时质量或发布批准；`scripts/device-matrix.py` 的占比草稿**不是**真机证据；`scripts/jwt-audit.py` 的结构发现**只是可疑项**，不证明服务端真的接受了该令牌、也不证明密钥强度。三者都不得越界写成「已通过审计 / 已验证真机 / 认证安全」。
 
 **先分清 "AI for QA"（用 AI 提效，横向）与 "Testing for AI"（测 AI 系统本身，L4）**——这是最容易混淆的一处。工具总表与降级见 `references/tools.md`。
 
@@ -130,7 +138,8 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 4. **测试设施、攻击面、观测面与依赖拓扑**：框架、规范文件、CI、E2E；认证位置、对象 ID、配置/密钥、影子端点；日志/埋点/健康检查、外部依赖清单与故障域；**交付链**（lockfile / 镜像 / 产物 / 签名 / SBOM）、**locale 面**（资源文件 / 格式化调用 / `dir`/`lang`）、**租户边界**（tenant 标识来源 / 共享资源清单 / 隔离策略声明）、**无障碍面**（交互控件 / 认证方式 / 焦点与 ARIA / 目标尺寸 / 读屏支持声明）、**设备形态面**（支持的 OS / 浏览器内核 / 屏幕形态 / 安装量分布数据是否可得）、**证据链面**（v1.5：有无留档要求、合规声明清单、原始输出落在哪、能否拿到 commit / 环境指纹 / 时间窗、有无视觉快照基线与 install-base 导出）——见 `dissect.md` §6~7
 **配置/开关面**（v1.6：有无特性开关 / kill-switch / 远程配置 / 实验开关 / A-B；开关默认态与缺失态是否回退到安全路径；目标群体属性来源；env / 文件 / 远程配置三处优先级声明；灰度比例与「一键停」能力）——见 `dissect.md` §6~7 与 `references/feature-flag-testing.md`
 **测试数据面**（v1.7：有无测试数据库 / fixtures / 工厂 / 种子脚本；数据来源是否合成生成、有无 `--seed` 可复现；是否含 PII 须脱敏、有无"连生产库抽数"反模式；迁移是否在类生产数据量上验证；测试结束临时含 PII 数据是否退役）——见 `dissect.md` §6 与 `references/test-data-management.md`
-5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 叠加项）
+**身份 / 会话面**（v1.8：认证方式（密码 / OAuth2·OIDC / SAML / Passkey / 服务间 mTLS·JWT / 无认证）；令牌类型与存放位置（Authorization / Cookie / URL / localStorage）；会话生命周期（签发 / 刷新轮换 / 空闲与绝对超时 / 登出 / 改密 / 踢人）；是否声明 alg 白名单、aud/iss 绑定、HttpOnly/Secure/SameSite、MFA、限流；未挂认证中间件的旁路端点）——见 `dissect.md` §6 与 `references/auth-session-testing.md`
+5. **能力层路由**：本项目主用哪些手册（§上表 + v1.1 / v1.2 / v1.3 / v1.4 / v1.5 / v1.6 / v1.7 / v1.8 叠加项）
 
 原则：解剖够用即止——能支撑测试计划就停，不做无死角的代码审读。大型项目只解剖本次范围内的模块。
 
@@ -173,6 +182,8 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 - **证据链与合规声明对账**（v1.5）→ 三级引用链可解析 + `sha256`/commit 绑定 + 自动对账缺口 + 控制项映射 → `evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py`
 - **视觉基线与真实安装量 / AI 用例有效性**（v1.5）→ 基线更新留痕与阈值批准、本地导出算 80% 截断点、假通过率与变异杀伤贡献 → `cross-platform-testing.md` §6A + `scripts/device-matrix.py` + `test-effectiveness-testing.md` §5B
 - **特性开关 / 配置 / 灰度正确性**（v1.6）→ 开关 off 态与缺失态回退、目标群体否定用例、三处配置漂移比对、kill-switch 真关实测、灰度比例实测 → `references/feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md`
+- **测试数据可信与合规**（v1.7）→ 数据来源声明、合成数据 + 确定性种子、PII 掩码 + 残留核查、子集外键完整性、绝不用生产数据 → `references/test-data-management.md` + `assets/test-data-matrix-template.md` + `scripts/test-data-gen.py`
+- **身份 / 会话 / 令牌安全**（v1.8）→ 令牌清单与结构审计、`alg=none`/算法混淆/弱密钥/键注入、`exp`·`nbf`·`aud`·`iss`·`typ` 负向用例、会话固定与登出/改密失效、刷新轮换与 reuse detection、枚举与限流、密码重置令牌、MFA/Passkey/OAuth 流程 → `references/auth-session-testing.md` + `assets/auth-matrix-template.md` + `scripts/jwt-audit.py`
 
 **判定 bug 的标准**（任一命中即算）：
 
@@ -184,6 +195,7 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 6. 前端五态缺失 / 焦点不可见 / 仅靠颜色表达状态 / 占位资源未替换（`frontend-testing.md` §8）
 7. **跨租户数据或副作用泄漏**（`multi-tenancy-testing.md` §2）、**制品 digest/SBOM/签名对不上**（`supply-chain-testing.md` §7）、**locale 切换后格式漂移或 RTL 未镜像**（`i18n-localization-testing.md` §1/§5）
 8. **焦点被整体遮挡 / 目标 <24×24 CSS px 且无例外 / 认证强制认知测试却无替代**（`accessibility-testing.md` §1/§4）、**仿真被写成真机 / 设备矩阵无来源却声称跨端通过**（`cross-platform-testing.md` §7）
+9. **`alg=none`/空签名被接受、过期或错受众令牌被接受、登出/改密后旧会话仍有效、刷新令牌可无限重用、重置令牌可预测或出现在响应里、账户可枚举或可无限制爆破**（`auth-session-testing.md` §2/§3/§4）
 
 严重度 S1 数据损坏·安全·崩溃 ＞ S2 功能错误但有绕过 ＞ S3 体验/提示。缺陷按 `assets/bug-report-template.md` 八字段记录。
 
@@ -191,9 +203,9 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 
 **证据纪律**：每个"失败"结论必须附 MRE 最小复现步骤 + 实际输出（命令、输出原文、截图路径）。推测标"待确认"，不得写成事实。指标写清分子/分母/口径。临时探针放 `.test-memory/tmp/`，用完即删。AI 生成的用例与"自愈"后的断言必须人工复核（`ai-native-testing.md` §3）。**有留档要求时**，结论还要能沿「结论 → 证据文件 → 原始输出」逐级定位：登记证据路径 + 可解析锚点 + `sha256` + 采集时的 commit/环境/时间窗，用 `scripts/evidence-audit.py` 对账并留缺口清单（`evidence-chain-audit.md` §4）；`--update-snapshots` 等基线更新必须留旧/新 hash 与批准人。**对账 GREEN 不等于合规通过或软件安全**。
 
-**安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。**多租户测试须构造自己的合成租户与数据，禁止拿真实客户数据做越权验证**（`multi-tenancy-testing.md` §1）。**影子流量只做只读比对，不得对真实用户产生写副作用**。
+**安全边界**：只测用户自己的或明确授权的项目；不对外部服务做压力/DoS 测试；注入类测试仅针对本地授权目标验证防御能力；复现命令中的 token/密码一律脱敏。故障注入只在隔离环境，且先写死中止条件与回滚动作（`chaos-resilience.md` §1）。**多租户测试须构造自己的合成租户与数据，禁止拿真实客户数据做越权验证**（`multi-tenancy-testing.md` §1）。**影子流量只做只读比对，不得对真实用户产生写副作用**。**认证与会话测试只用自己注册/构造的测试账号与合成令牌**：不猜测真实用户密码、不对外部服务做撞库/暴力破解、限流测试保持小样本并立即停止、发现令牌泄漏先脱敏再记录（`auth-session-testing.md` §7）。
 
-**十一条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11）——规则的价值在于写清「什么时候不适用」：
+**十二条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11，v1.8 引入 R-12）——规则的价值在于写清「什么时候不适用」：
 
 | 规则 | 结论必须附的证据 | 不适用时的写法 |
 |---|---|---|
@@ -208,8 +220,9 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 | **R-9 证据链可追溯与可复核性** | 声称"测试结论可复核 / 证据链完整 / 已通过审计 / 合规声明有证据支撑"，须附 ① 每条结论 → 证据文件 → 原始输出的三级引用链且锚点可解析（行号存在或片段命中）；② 证据 `sha256` + 被测对象 commit / 环境指纹 / 时间窗绑定（无 `stale_evidence`）；③ `scripts/evidence-audit.py` 自动对账结果含覆盖缺口、悬空引用、过期证据与四类结论区分；④ 合规声明 → 控制项 → 证据的映射表与未映射项声明；⑤ 审计导出件自身 hash 与生成时间 | 一次性探索测试、无留档要求的临时验证 → 只写「未做证据链对账 / 不适用：无留档要求」，**不得**写「可审计 / 证据链完整 / 通过审计」；只有部分证据时写「证据链存在 N 处缺口，结论降级为待确认」，**不得**写「证据齐全」，**不得**把对账 GREEN 冒充「合规通过」 |
 | **R-10 特性开关 / 配置 / 灰度正确性** | 声称"开关关掉系统还安全 / kill-switch 能止血 / 灰度可控 / 配置正确 / 目标群体隔离"或"开关两态都测过"，须附 ① 开关 off 态与**缺失态**（配置不可达）都回退到声明的安全路径、且无残留新副作用的实测；② 目标群体命中变体的同时，非目标群体的否定用例（不得泄露）；③ env / 文件 / 远程配置三处的比对与优先级声明，或明确写「无外部化配置」；④ kill-switch 真关后回到安全态的实测；⑤ 灰度比例实测采样（计划 vs 实际）与「一键停」能力 | 纯静态、无任何开关 / 配置化 / 灰度放量的离线脚本 → 只写「不适用：无开关与配置维度」，**不得**写「开关安全 / 灰度可控」；只有部分证据时写「证据链存在 N 处缺口，R-10 降级为待确认」，**不得**写「开关可控 / 灰度安全」，**不得**把「开态测过」冒充「关态也安全」 |
 | **R-11 测试数据可信与合规** | 声称"测试数据已脱敏 / 合成数据无 PII 泄漏 / 数据可复现 / 子集引用完整 / 没用生产数据"，须附 ① 数据来源声明（合成种子值 / 脱敏命令原文 + 退出码 / 明确"未使用生产数据"）；② 脱敏字段清单 + 掩码后**残留核查** + 人工复核结论；③ 同一 `--seed` 两次生成逐字节一致的校验值；④ 子集外键悬空数 = 0 的核查命令与输出；⑤ 测试环境无生产 host、临时含 PII 数据已退役的声明 | 纯静态算法库、无数据依赖的纯离线脚本 → 只写「不适用：无测试数据维度」，**不得**写"测试数据可信 / 数据已脱敏 / 数据可复现"；只有部分证据时写「测试数据存在 N 处缺口，R-11 降级为待确认」，**不得**把"用了生成器"冒充"数据已脱敏"，**不得**把"掩码了已知字段"冒充"无 PII 泄漏" |
+| **R-12 身份与会话不可冒充** | 声称"认证安全 / JWT 校验正确 / 令牌不可伪造 / 登出即失效 / 支持 MFA / 会话已终止"，须附 ① 令牌清单与存放位置（Authorization / Cookie / URL / localStorage / 日志）+ `scripts/jwt-audit.py decode` 的结构审计输出（alg / exp / aud / iss / kid / jku 结论）；② `alg=none`、算法混淆、空签名三类伪造请求的**请求原文 + 响应码 + 响应体**（拒绝才算通过）；③ 过期 / 未来时间 / 错 `aud` / 错 `iss` / 类型混用五类负向用例逐条结果；④ 登出、改密、重置后旧 access **与** refresh 均被拒的实测；⑤ 刷新轮换与旧 refresh 重用（reuse detection、family 失效）证据，或明确声明未实现并降级；⑥ 账户枚举三列对照（状态码 / 响应体 / 响应时间）+ 限流触发记录；⑦ 密码存储（算法 / 参数 / 每用户 salt）源码证据 | 无认证的静态页、无会话状态的纯离线库/CLI → 只写「不适用：无身份与会话维度」，**不得**写「认证安全 / 令牌不可伪造」；只有黑盒、无源码时密码存储写「未验证（需源码审计）」，**不得**写「密码已加盐哈希」；只有部分证据时写「身份与会话存在 N 处缺口，R-12 降级为待确认」，**不得**把「登录成功」冒充「认证安全」，**不得**把「令牌能解码」冒充「能伪造」，**不得**把「Cookie 有 HttpOnly」冒充「会话安全」 |
 
-详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏。
+详见 `references/observability-testing.md` §8、`references/chaos-resilience.md` §8、`references/supply-chain-testing.md` §7、`references/multi-tenancy-testing.md` §9、`references/contract-evolution-testing.md` §6、`references/privacy-compliance-testing.md` §7、`references/accessibility-testing.md` §5、`references/cross-platform-testing.md` §7、`references/evidence-chain-audit.md` §7、`references/feature-flag-testing.md` §4、`references/test-data-management.md` §6、`references/auth-session-testing.md` §8。证据不足时结论一律降级为「待确认」，**不许用"没报错"冒充"没问题"**；签名有效 ≠ 软件安全，一条 404 ≠ 隔离通过，axe 0 violations ≠ WCAG 合规，仿真绿 ≠ 真机可用，报告写全了 ≠ 结论可复核，对账 GREEN ≠ 合规通过、软件安全或发布批准，用了生成器 ≠ 数据已脱敏，掩码了已知字段 ≠ 无 PII 泄漏，登录成功 ≠ 认证安全，令牌可解码 ≠ 可伪造，Cookie 有 HttpOnly ≠ 会话安全。
 
 ## 阶段 4：记忆与进化（本技能的灵魂）
 
@@ -217,7 +230,7 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 2. **更新 tree.md**：模块叶节点状态、严重度与回归用例、新增模块、已知问题表、"下次待办"三类（回归/待测/阻塞）
 3. **沉淀教训**：项目级 → `.test-memory/lessons.md`；跨项目 → 本技能 `memory/global-lessons.md`
 4. **进化检查四问**（`references/evolution.md` §1）：踩了什么坑、什么手法有效、证据够不够、流程哪里不足 → 通用项写 global-lessons.md，`[技能改进]` 提案进提案区
-5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-11 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十一行**都填了结论或「不适用 / 待确认」声明；用了 v1.5/v1.6/v1.7 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
+5. **自检**：按 `references/quality-gates.md` §8 打勾（tree.md <100 行、探针已清、失败结论有证据、报告已出），核对 R-1~R-12 是否在不适用的场景里被误判为通过，并确认报告证据矩阵**十二行**都填了结论或「不适用 / 待确认」声明；用了 v1.5 / v1.6 / v1.7 / v1.8 脚本时确认其 `--self-test` 退出码为 0，且对账缺口声明已抄进报告
 
 最后用 `assets/report-template.md` 输出测试报告，**必须给出明确的 `PASS/FAIL` 与 `Go/No-Go`**，禁止"基本可以"。发布验收用 `assets/release-gate-template.md` 打 12 分。
 
@@ -260,7 +273,7 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 | `references/performance-testing.md` | 五种负载、p95 口径、k6 模板、性能预算、瓶颈定位 |
 | `references/frontend-testing.md` | 五态矩阵、WCAG 2.2 最小清单、Core Web Vitals、错误映射、动效运行时纪律 |
 | `references/fullstack-integration.md` | 测试金字塔、隔离与工厂、集成边界、六门禁 12 分 Go/No-Go |
-| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-11 Go/No-Go |
+| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、flaky 治理、覆盖率与变异测试、CI 门禁、R-1~R-12 Go/No-Go |
 | `references/ai-native-testing.md` | 四层能力模型、AI for QA vs Testing for AI、AI 生成测试审查、AI 系统评测 |
 | `references/observability-testing.md` | 三大信号、Trace 驱动测试、W3C Trace Context、SLI/SLO/错误预算、R-1 可证伪规则 |
 | `references/chaos-resilience.md` | 稳态假设、故障注入矩阵、三级工具阶梯、恢复判据、R-2 可证伪规则 |
@@ -277,11 +290,12 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 | `references/evidence-chain-audit.md` | PROV 三级引用链、OSCAL/SSDF 合规声明对账、in-toto 与 GitHub artifact attestations、manifest 字段与自动对账、EA-1~EA-13、R-9、**§10 manifest ↔ OSCAL `assessment-results` 字段映射** |
 | `references/feature-flag-testing.md` | 开关默认态/缺失态安全、目标群体隔离、env/文件/远程配置漂移、kill-switch 真关实测、灰度比例实测、FF-1~FF-12、R-10 |
 | `references/test-data-management.md` | 测试数据管理：合成数据生成、PII 脱敏/掩码、确定性种子、数据子集与制备、绝不用生产数据、R-11 可证伪规则、§8 路由 |
+| `references/auth-session-testing.md` | 身份·会话·令牌：JWT 十类攻击测试卡、会话生命周期（固定/轮换/登出/改密）、登录与重置与 MFA/Passkey/OAuth 流程、ASVS 5.0 / RFC 8725 / RFC 9700 / OWASP 手册、AUTH-1~AUTH-12、R-12 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 |
 | `assets/tree-template.md` | 记忆树初始化模板 |
-| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-11 证据矩阵） |
+| `assets/report-template.md` | 测试报告模板（含 PASS/FAIL、Go/No-Go 与 R-1~R-12 证据矩阵） |
 | `assets/bug-report-template.md` | 缺陷报告八字段 + MRE |
 | `assets/test-plan-template.md` | 测试计划/测试矩阵模板 |
 | `assets/release-gate-template.md` | 六门禁 12 分发布验收模板 |
@@ -297,10 +311,13 @@ v1.7 增量：**从「结论可复核」扩展到「喂给测试的数据本身�
 | `assets/device-matrix-template.md` | 设备矩阵：来源与覆盖占比、载体标注、端侧特有面、网络档位、真机证据、R-8 结论 |
 | `assets/evidence-chain-template.md` | 证据链对账：三级引用链（R-1~R-11）、控制项映射、缺口清单、锚点原文、四类结论、审计导出留痕、R-9 结论 |
 | `assets/flag-rollout-matrix-template.md` | 开关/配置/灰度验证矩阵：四类必测面、目标群体否定用例、三处配置比对、kill-switch 实测、灰度比例、R-10 结论与不适用声明 |
+| `assets/test-data-matrix-template.md` | 测试数据矩阵：数据来源、脱敏字段、确定性种子、子集外键完整性、R-11 结论 |
+| `assets/auth-matrix-template.md` | 身份与会话矩阵：令牌清单与结构审计、J1~J11 伪造/降级负向用例、S1~S9 会话生命周期、F1~F12 认证流程、A1~A3 授权、R-12 结论与不适用声明 |
 | `memory/global-lessons.md` | 跨项目经验（开局即读，自我进化载体） |
 | `scripts/evidence-audit.py` | 本地确定性证据链对账：`audit --manifest` / `--fail-on-gap` / `--format json\|markdown\|oscal` / `--output`、`--self-test`；检出悬空引用、过期证据、不可解析锚点、PASS 无证据、未分类结论；`--format oscal` 导出 OSCAL `assessment-results` JSON |
 | `scripts/device-matrix.py` | 本地 CSV/JSON install-base 导出汇总：`build --input/--source/--window/--min-coverage --format`、`--self-test`；占比/累计/截断点/CrUX 口径声明，不联网、不代填载体 |
 | `scripts/test-data-gen.py` | 零依赖测试数据生成与脱敏：`generate --count/--seed`、`mask --fields`、`self-test`；确定性种子、保留格式掩码、诚实边界（不联网/不代填/不冒充/不保证无泄漏） |
+| `scripts/jwt-audit.py` | 零依赖 JWT 结构审计：`decode`（alg=none / 缺 exp·aud·iss / kid·jku·x5u 注入面 / 弱 HMAC 密钥字典 / 过期判定）、`verify --secret`、`--self-test`；诚实边界（不联网/不代填/不冒充/不证明服务端校验） |
 | `scripts/selfcheck.py` | 升级自检：frontmatter、断链、版本一致、占位资源、模板字段、索引覆盖、路由闭环与规则同步、**报告证据矩阵表格行同步（§7d 加固）与规则例外声明**、**§7f 脚本可证伪性静态门禁** |
 | `CHANGELOG.md` | 每日升级记录：来源、改动、自检结果 |
 

@@ -83,6 +83,8 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **AI 生成用例有效性**（v1.5） | 变异测试（`npx stryker run` / `mutmut run`）+ 故意改坏 ≥1 处核心逻辑验假通过率 | 人工逐条审断言强度（`ai-native-testing.md` §3），注明「未做变异实测」，不写「有效性已验证」 | `test-effectiveness-testing.md` §5B |
 | **特性开关 / 配置 / 灰度**（v1.6） | 列开关清单 + 逐 flag 翻 off/on 实测；模拟配置缺失/中心不可达验默认态回退；非目标群体否定用例；env/文件/远程三处 `grep` 比对；kill-switch 真关实测；灰度曝光比例采样 | 静态审开关名/默认值/目标属性来源 + 手写「关态核心链路」用例，注明「未做开关动态实测」，不写「开关安全」 | `feature-flag-testing.md` §2/§3 |
 | **证据链 OSCAL 导出**（v1.6） | `python scripts/evidence-audit.py audit --manifest <json> --format oscal --output <json>`；仅在有 OSCAL 消费方时启用 | 无消费方时退回 `--format markdown`；不得因「有了 OSCAL 文件」写成「已通过合规评估」（`evidence-chain-audit.md` §10） | `evidence-chain-audit.md` §10 |
+| **JWT 结构审计与伪造重放**（v1.8） | `python scripts/jwt-audit.py decode --token-file t.txt --now <固定时间> --format markdown`；`verify --secret <s> --alg HS256`；`--self-test` 验门禁可证伪。可选外力：`jwt_tool.py <JWT> -X a`（alg:none）、`hashcat -m 16500 jwt.txt rockyou.txt`（仅 HS\*，仅自有副本） | 手工 base64 解 header/payload + 改 alg/exp/aud 重放，标注「未做结构审计」；**未命中字典不证明密钥强** | `auth-session-testing.md` §1/§2 |
+| **OAuth / OIDC 流程拆解**（v1.8） | `oauth2c <issuer> --client-id ... --grant-type authorization_code --pkce` 逐步去掉 PKCE/state/nonce；curl 手改 `redirect_uri` 变体；同一 code 换两次 token | 手工枚举 `redirect_uri` 变体 + 缺 PKCE 请求，注明「未做完整 OAuth 流程验证」 | `auth-session-testing.md` §4（F11） |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -98,6 +100,7 @@ done
 # v1.5 两个零依赖脚本：先证明门禁本身可证伪，再用于交付
 python scripts/evidence-audit.py --self-test || echo "evidence-audit SELFTEST FAIL -> 走 §8 人工链，结论标 BLOCKED"
 python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL -> 退回人工填模板，注明数据源口径"
+python scripts/jwt-audit.py --self-test || echo "jwt-audit SELFTEST FAIL -> 退回手工 base64 解码，结论标待确认"
 ```
 
 ## 工具使用纪律
@@ -116,3 +119,4 @@ python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL
 12. **占比草稿 ≠ 安装量真相**：`scripts/device-matrix.py` 只吃本地导出、不联网、不代填载体，缺 `--source` / `--window` 时不能作为 R-8 矩阵来源证据；CrUX 只覆盖符合条件的真实 Chrome 用户且 form factor 仅三值，不能推出机型/OS 版本/非 Chrome 内核分布（`cross-platform-testing.md` §6A）
 13. **开态测过 ≠ 关态也安全 / 配置三处没比对 ≠ 开关可控**：特性开关必须两个状态都跑常规测试（FF-12），缺失态/配置不可达必须验回退路径；env/文件/远程三处配置不一致而声称「配置正确」一律降级为「待确认」（`feature-flag-testing.md` §2/§4）
 14. **OSCAL 导出 ≠ 合规裁决**：`scripts/evidence-audit.py --format oscal` 只做证据链的可机读编码，manifest 里的 `待确认`/`缺口` 到 OSCAL 里仍是 `partial`/`gap`，不得因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（`evidence-chain-audit.md` §10）
+15. **令牌可解码 ≠ 可伪造 / 登录成功 ≠ 认证安全**：`scripts/jwt-audit.py decode` 只报结构可疑项，是否被服务端接受必须用请求原文 + 响应码证明；弱密钥字典未命中只能写「未在 N 条字典内命中」，不能写「密钥强」；`alg=none` 被接受即 No-Go（`auth-session-testing.md` §7）
