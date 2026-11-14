@@ -240,6 +240,20 @@
 - [流程] 测试脚本必须自备份/恢复夹具（`users.json`/`notes.json`），并固定 `--now` 判定过期，否则第二次跑结果漂移 — 应用：`finally` 恢复 + 固定 epoch，回归才可比
 - [环境] Windows 下 Python 中文输出经 PowerShell 管道会乱码，`Out-File` 还会写 BOM 破坏 JSON — 应用：`$env:PYTHONUTF8=1` + `cmd /c "python ... > out.json"`；读回用 `utf-8` 并跑 `json.load` 验证
 
+## 时间 / 时区 / 备份恢复类（v1.9 蒸馏）
+
+- [手法] 时间缺陷只在「区间过滤 / 调度 / 过期 / 排序」四类动作里现形，显示层往返全绿不代表时间语义正确 — 应用：同一请求用两个时区各打一次，比较返回集合与条数（R-13 T-01/T-02）
+- [手法] `+86400` 不是「加一天」；DST 切换日只有 23/25 小时 — 应用：每日任务必须用日历日加减，并实跑 gap/fold 两天的执行次数（cronie：gap 从不匹配、fold 跑两次；`time-audit.py` scan T-05）
+- [安全] `exp` 无偏移、`createdAt` 无时区、按字符串选「最新备份」都是跨时区错位源 — 应用：所有时间戳必须带偏移或 Z，比较用解析后的瞬时，禁止字符串排序（`restore-audit.py` RST-01/RST-02）
+- [手法] 静态扫描命中只是「可疑写法」，未命中不等于正确；tzdb 会漂移（IANA 2026f 取消古巴 2026-11-01 回拨） — 应用：记录应用/DB tzdata 版本 + 未来三次转换的 offset 对照，不一致即阻塞发布（T-11/T-12）
+- [安全] 备份任务成功 ≠ 可恢复；结构校验通过 ≠ 内容完整（restic 默认 `check` 不读数据、borg `check` 只查 CRC、`pg_verifybackup` 仍需 test restore） — 应用：强校验必须出现真读数据的命令与输出原文（R-14 §3.1）
+- [手法] 恢复必须对账六类不变量：文件覆盖域 / sha256 / 行数 / max(id) 与序列 / app·schema 版本 / 恢复时刻是否晚于备份 — 应用：`restore-audit.py compare` 的 RST-03~RST-10；缺 hash 也判失败，缺清单数组只报盲区
+- [安全] 恢复演练必须在隔离环境做，且恢复点早于备份、旧备份覆盖新库、删中间增量仍成功都是 S1 级 — 应用：先确认恢复环境隔离、再跑恢复、最后冒烟；非空库恢复默认拒绝覆盖
+- [流程] 删除权与备份天然冲突：备份里的用户数据不会随主库删除而消失 — 应用：要么 tombstone 重放，要么书面保留期 + 销毁证据（GDPR Art.17），不能写「已删除」了事
+- [流程] 恢复后多租户/密钥/配置/外部依赖都要单独验：T2 数据不得出现、密钥不得与备份同机、恢复环境的 TZ 不得默认成 UTC — 应用：把这几项写进 restore drill 模板的交叉项
+- [环境] Windows + Python zoneinfo 缺 tzdata 会直接抛 `ModuleNotFoundError`；Node 的 `Intl` 可作独立对照实现 — 应用：脚本缺 tzdb 时明确报错并给 `pip install tzdata` 提示，绝不伪造转换结果
+- [流程] 「服务器跑 UTC」不是时区正确的证据：用户本地日边界、DST 调度、日志口径仍可能全错 — 应用：报告分开写「存储口径 / 计算口径 / 展示口径」三行结论
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -257,3 +271,6 @@
 - [技能改进] ✅ **已吸收（v1.6）**：把 `scripts/evidence-audit.py` 的 manifest 与 OSCAL `assessment-results` 做格式互转 → 落地为 `evidence-audit.py --format oscal` + `references/evidence-chain-audit.md` §10 字段映射；理由：本轮确认确有 GRC/审计消费场景，且明确「只搬字段不裁决合规」，EA-13 纳入 `--self-test` 对等性校验，不造无人消费的转换层
 - [技能改进] 待后续轮次（v1.7 已打底）：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → TDM 的确定性 `--seed` 现为跨语言变异基准的可复现数据底座；本提案仍保留至具体变异工具输出 schema 确定，不硬编码某一家 JSON schema
 - [技能改进] 待评估（v1.8 提出）：把 AUTH/S/F 三张测试卡做成「可执行 adapter」（统一 `token-provider` 接口：登录/刷新/重置取令牌 → 跑卡 → 出 JSON），减少手工 curl；暂不落地，理由：先确认 adapter 接口不绑定某框架，且不能替代人工判据
+- [技能改进] ✅ **已吸收（v1.9）**：时间/时区正确性与备份/恢复可验证性 → 落地为 `references/time-correctness-testing.md` + `references/backup-recovery-testing.md` + 两份矩阵/演练模板 + `scripts/time-audit.py` / `scripts/restore-audit.py`，新增 **R-13/R-14**；理由：dogfood 的 `timedemo` 用 v1.8 实测出 2×S1（令牌跨时区多活 8h、错误备份覆盖新数据）与 UTC 日过滤、`+86400` 调度漂移，旧手册无对应判据
+- [技能改进] 待后续轮次（v1.9 提出）：把「5xx 响应体不得含堆栈 / 绝对路径 / SQL」做成安全手册的固定检查项与报告字段 → 来源：dogfood F7（非法 `at` 入库 201，列表 500 回显 `time.js:7:24` 与绝对路径）；本轮只记提案，不扩 scope
+- [技能改进] 待核实（v1.9 提出）：systemd timer 与 Quartz 在 DST gap/fold 的实际行为、`tzdata 2026.6 ↔ IANA 2026f` 映射、pgBackRest `verify` 细节 — 应用：读官方原文或实跑前，手册保留【不确定】，不得写成结论

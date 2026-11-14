@@ -136,6 +136,10 @@ checks = {
     "assets/test-data-matrix-template.md": ["R-11", "合成数据", "脱敏", "不适用", "不得"],
     "references/auth-session-testing.md": ["R-12", "ASVS 5.0", "RFC 8725", "RFC 9700", "不得"],
     "assets/auth-matrix-template.md": ["R-12", "J1", "S1", "F1", "不适用"],
+    "references/time-correctness-testing.md": ["R-13", "DST", "tzdata", "RFC 3339", "不得"],
+    "assets/time-matrix-template.md": ["R-13", "DST", "gap", "fold", "不适用"],
+    "references/backup-recovery-testing.md": ["R-14", "RPO", "RTO", "PITR", "不得"],
+    "assets/restore-drill-template.md": ["R-14", "RPO", "RTO", "sha256", "不适用"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -262,6 +266,14 @@ SCRIPT_GATES = {
     "scripts/jwt-audit.py": [
         "--self-test", "SELFTEST GREEN", "alg=none", "kid", "jku",
         "不联网", "不代填", "不冒充", "不证明",
+    ],
+    "scripts/time-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "DST",
+        "gap", "fold", "不联网", "不代填",
+    ],
+    "scripts/restore-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "RST-",
+        "不联网", "不代填", "不证明",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

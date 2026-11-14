@@ -5,6 +5,70 @@
 
 ---
 
+## [v1.9.0] — 2026-11-14 · 每日升级 #10
+
+**主题**：从「正常路径与数据形态的正确」扩展到「**时间维度正确 · 灾难后可恢复**」——时间/时区正确性与备份/恢复可验证性。同一套功能全绿的 API，只要按 UTC 日过滤、每日任务固定 `+24h`、`exp` 无时区、备份只备一个文件、恢复按字符串挑「最新」，就会在跨时区用户、DST 切换日、真实故障恢复时成片出错；这类缺陷不是「边界没测」，是「时间语义与恢复目标没有可证伪判据」。新增 **R-13 时间与时区正确性**、**R-14 备份与恢复可验证性** 与六份文件（2 手册 + 2 矩阵/演练模板 + 2 零依赖脚本），蒸馏底座为 IANA tzdb 2026f / RFC 3339 / cronie crontab(5) / PostgreSQL 17 §8.5 / MySQL 8.4 §13.2.2 / SQLite Date Functions / NIST SP 800-34 Rev.1 / pg_verifybackup / restic / Borg / GDPR Art.17。按每日升级序列记为 #10。
+
+**遵循上轮建议**：未重写已覆盖的 12 个主题（五阶段、四层模型、可观测、韧性、数据、协议、供应链、i18n、多租户、契约、隐私、有效性、无障碍、跨端、ROI、证据链、特性开关、TDM、认证会话），以 **New 为主 + Enhance 为辅**；四层模型与五阶段流程**未改语义**，只升 MINOR。上轮遗留的「AUTH/S/F 三张卡做成可执行 adapter」继续保持**待评估**（本轮聚焦时间与恢复，未动 auth 手册）；「AI 变异杀伤跨语言自动跑数」仍受变异工具 JSON schema 未定阻塞，顺延。每轮至少一条可证伪规则 → 本轮引入 **R-13 / R-14**，并做了**负向测试**（临时副本分别删 R-13 定义行 / 删报告矩阵行 / 删手册「不得」，确认 `selfcheck.py` 对应检查确实 FAIL）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/time-correctness-testing.md`、`assets/time-matrix-template.md`、`scripts/time-audit.py` | 新增 R-13 能力：存/算/显示三层口径、T-01~T-12 反模式（含 tzdata 漂移与配置面）、DST gap/fold 实跑、TTL 三值边界、wall vs monotonic、RFC 3339、PG/MySQL/SQLite 时间类型差异 |
+| New | `references/backup-recovery-testing.md`、`assets/restore-drill-template.md`、`scripts/restore-audit.py` | 新增 R-14 能力：RPO/RTO 实测、3-2-1、恢复演练八步、RST-01~RST-11 双清单对账、强校验真读数据、PITR 丢失窗口、删除权/多租户交叉 |
+| Enhance | `SKILL.md`（description 触发词、v1.9 增量段、阶段 1 时间面/恢复面、阶段 3 两条专项、判 bug 第 10 条、十四条规则表、索引） | 只增量，不改五阶段与四层模型 |
+| Enhance | `references/dissect.md` §6/§8、`references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵、`references/tools.md` | 时间/恢复两行路由、结论作废判据、14 行矩阵、两工具与两条纪律 |
+| Enhance | `scripts/selfcheck.py` §5/§7f、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 4 个新文件字段、2 个新脚本门禁、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 24 份专项手册与 19 份模板 | 不重复造，仅在路由/交叉项里引用 |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- IANA Time Zone Database 2026f：https://data.iana.org/time-zones/releases/
+- RFC 3339（Date and Time on the Internet: Timestamps）：https://www.rfc-editor.org/rfc/rfc3339
+- cronie `crontab(5)`（gap 从不匹配、fold 跑两次的原文）：https://cronie.org/
+- PostgreSQL 17 §8.5 Date/Time Types：https://www.postgresql.org/docs/17/datatype-datetime.html
+- MySQL 8.4 §13.2.2 Date and Time Data Types：https://dev.mysql.com/doc/refman/8.4/en/datetime.html
+- SQLite Date And Time Functions：https://sqlite.org/lang_datefunc.html
+- NIST SP 800-34 Rev.1（RPO/RTO 的业务连续性口径）：https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final
+- PostgreSQL `pg_verifybackup`：https://www.postgresql.org/docs/17/app-pgverifybackup.html
+- restic `check` / `--read-data`：https://restic.readthedocs.io/en/stable/045_working_with_repos.html
+- Borg `check` / `--verify-data`：https://borgbackup.readthedocs.io/en/stable/usage/check.html
+- Playwright Clock：https://playwright.dev/docs/clock
+- GDPR Art.17（删除权与备份保留期）：https://gdpr-info.eu/art-17-gdpr/
+
+### 口径诚实
+
+- 两个新脚本都**不联网、不代填**：`time-audit.py` 只读本地文件与系统时区库，不查 IANA 更新、不请求被测服务；`restore-audit.py` 只读两份本地 JSON，不连接数据库、不校验真实文件字节。
+- `time-audit.py` 的 `dst` 依赖 zoneinfo + tzdata；缺失时**明确报错并给安装提示，绝不伪造转换结果**。本机实算使用 tzdata 2026.6，`tzdata 2026.6 ↔ IANA 2026f` 的映射未独立核实（已列入手册不确定项）。静态扫描命中只是「可疑写法」，**未命中不证明时间正确**；调度器 gap/fold 行为必须实测，systemd timer / Quartz 的行为未读原文证实，手册保留【不确定】。
+- `restore-audit.py` 只证明「两份清单一致」，**不证明恢复出的系统业务可用**（索引/权限/密钥/扩展/外部依赖未覆盖）；清单本身可伪造；没有 `files`/`tables` 数组时只报盲区告警，**不当作通过**。
+- R-13 不认「能解析时间」「服务器跑 UTC」「用了某个库」；R-14 不认「备份任务成功」「结构校验通过」「有备份但没恢复过」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+用 v1.8.0 五阶段在项目外搭零依赖 Node 模拟项目 `timedemo`（事件时区过滤、DST 每日任务、令牌过期、backup/restore），全程真实命令证据（30 个证据文件、记忆树 37 行、运行记录/报告/教训齐备），结论 **No-Go**：**10 个缺陷（2×S1 / 5×S2 / 3×S3）+ 9 条盲区**。
+
+- S1：令牌无签名可伪造（伪造 admin → 200）；`exp` 无偏移，同一令牌在 Shanghai/UTC 多活 8h；restore 按字符串挑「最新」选错备份（09:00+08 vs 02:00Z），旧备份静默覆盖较新数据且 exit 0。
+- S2：事件按 UTC 日过滤（`2026-11-13` 返回 id2/id3，`2026-11-15` 返回 0 条）；每日任务固定 `+24h`，NY 春季 02:30→03:30 后永久漂移；backup 只备 `db.json`、`checksums:{}` 却 `verified:true`、`createdAt` 无时区；restore 不校验（manifest 99 行 vs db 3 行仍 `ok:true`）；非法 `at` 入库 201 → 列表 500 裸堆栈含绝对路径。
+- 盲区：旧版 i18n 只管显示/往返、不管区间过滤与调度；调度器无 DST 规则；`data-integrity` 全文无「备份/恢复」；时间戳表示、时钟回拨/单调时钟、5xx 错误体泄露均无规则。
+- 反哺：本轮新手册的 TZ-1~TZ-12 / BK-1~BK-16 已能覆盖上述缺陷（映射见 `.workbuddy-ai/dogfood/v1.9.0-dogfood.md` 22 条检查项）；「5xx 响应体不得含堆栈/绝对路径」作为**下一轮**安全手册提案写入 global-lessons，不在本轮扩 scope。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py` → **PASS 46 / WARN 0 / FAIL 0 / GREEN**；14 条规则双向同步、14 行报告矩阵、14 条例外声明、32 份手册全索引、24 份专项路由闭环、7 个脚本门禁全过。
+- 6 个脚本 `--self-test` 全部 exit 0：evidence-audit / device-matrix / test-data-gen / jwt-audit / time-audit（12 断言）/ restore-audit（12 断言）。
+- 负向测试三例：删 R-13 定义行 → §7c 双向同步 FAIL；删报告矩阵 R-13 行 → §7d FAIL；删时间手册「不得」→ §5 字段 FAIL；复原后全部 PASS。
+- 文件数 59 → 65（references 30→32、assets 19→21、scripts 5→7）；`diff -r` 源目录与全局安装目录零差异。
+- 提交：`feat(v1.9): 每日升级 #10 时间维度与灾难恢复`；push 到 `https://github.com/Soren-Blade/project-tester`。
+
+### 提案处置
+
+- 采纳：dogfood 提出的「备份必须做一次真实恢复演练」「时间过滤要用双时区对照」「DST 任务必须实跑执行次数」已分别落入 R-14/R-13 证据要求；新增 T-11（tzdata 漂移）与「强校验必须真读数据」两节。
+- 顺延：5xx 错误体泄露 → 下一轮安全手册；systemd timer / Quartz 的 gap/fold 原文核实；`tzdata 2026.6 ↔ IANA 2026f` 映射；变异杀伤贡献自动跑数；AUTH/S/F adapter。
+- 回写：automation memory 记录本轮结论与下轮建议（避免重复主题，优先把 5xx 错误体与调度器原文核实做掉）。
+
+---
+
 ## [v1.8.0] — 2026-11-14 · 每日升级 #9
 
 **主题**：从「功能与数据的正确」扩展到「**身份不可冒充 · 会话可终止 · 令牌不可伪造**」——身份认证 / 会话 / 令牌安全。同一套功能全绿的 API，只要 `alg:none` 被接受、过期 `exp` 被忽略、登出后旧令牌仍可用，攻击者就能直接变成管理员；这类缺陷不是「边界没测」，是「认证的可信前提没测」。新增 **R-12 身份与会话不可冒充** 与三份文件（手册 + 矩阵模板 + 零依赖 `jwt-audit.py`），蒸馏底座为 ASVS 5.0.0 / RFC 8725（BCP 225）/ RFC 9700（BCP 240）/ OWASP 认证·会话·密码存储 Cheat Sheet / NIST SP 800-63B-4 / WebAuthn L3。注：与 #1~#8 同属每日升级自动化序列，按轮次记为 #9。

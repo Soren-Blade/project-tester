@@ -85,6 +85,8 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **证据链 OSCAL 导出**（v1.6） | `python scripts/evidence-audit.py audit --manifest <json> --format oscal --output <json>`；仅在有 OSCAL 消费方时启用 | 无消费方时退回 `--format markdown`；不得因「有了 OSCAL 文件」写成「已通过合规评估」（`evidence-chain-audit.md` §10） | `evidence-chain-audit.md` §10 |
 | **JWT 结构审计与伪造重放**（v1.8） | `python scripts/jwt-audit.py decode --token-file t.txt --now <固定时间> --format markdown`；`verify --secret <s> --alg HS256`；`--self-test` 验门禁可证伪。可选外力：`jwt_tool.py <JWT> -X a`（alg:none）、`hashcat -m 16500 jwt.txt rockyou.txt`（仅 HS\*，仅自有副本） | 手工 base64 解 header/payload + 改 alg/exp/aud 重放，标注「未做结构审计」；**未命中字典不证明密钥强** | `auth-session-testing.md` §1/§2 |
 | **OAuth / OIDC 流程拆解**（v1.8） | `oauth2c <issuer> --client-id ... --grant-type authorization_code --pkce` 逐步去掉 PKCE/state/nonce；curl 手改 `redirect_uri` 变体；同一 code 换两次 token | 手工枚举 `redirect_uri` 变体 + 缺 PKCE 请求，注明「未做完整 OAuth 流程验证」 | `auth-session-testing.md` §4（F11） |
+| **时间反模式扫描与 DST 计算**（v1.9） | `python scripts/time-audit.py scan <path> --format markdown --fail-on-gap`；`python scripts/time-audit.py dst --zone America/New_York --year 2026 --at 02:30`；`--self-test` 验门禁可证伪（不依赖 tzdb） | 无 zoneinfo 时按 `time-correctness-testing.md` §3 手算 gap/fold 并标「未做 DST 运行时实测」；**扫描未命中 ≠ 时间正确**，`new Date()` 命中需逐条看上下文 | `time-correctness-testing.md` §2/§3/§8 |
+| **备份恢复对账**（v1.9） | `python scripts/restore-audit.py compare --source src.json --restored rst.json --format markdown --fail-on-gap`；`--self-test` 验门禁可证伪；强校验另跑 `restic check --read-data` / `borg check --verify-data` / `PRAGMA integrity_check` | 无待对账清单时人工填 `assets/restore-drill-template.md` 并写「未做自动对账」；**备份任务成功 ≠ 可恢复**，没在隔离环境实恢复过不算验证 | `backup-recovery-testing.md` §3/§8 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -97,10 +99,12 @@ command -v schemathesis || command -v uvx || echo "schemathesis MISSING -> 手�
 for c in syft grype osv-scanner cosign slsa-verifier trivy; do
   command -v "$c" >/dev/null || echo "$c MISSING -> 走 sha256sum / git grep 静态降级，结论标 BLOCKED"
 done
-# v1.5 两个零依赖脚本：先证明门禁本身可证伪，再用于交付
+# v1.5~v1.9 零依赖脚本：先证明门禁本身可证伪，再用于交付
 python scripts/evidence-audit.py --self-test || echo "evidence-audit SELFTEST FAIL -> 走 §8 人工链，结论标 BLOCKED"
 python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL -> 退回人工填模板，注明数据源口径"
 python scripts/jwt-audit.py --self-test || echo "jwt-audit SELFTEST FAIL -> 退回手工 base64 解码，结论标待确认"
+python scripts/time-audit.py --self-test || echo "time-audit SELFTEST FAIL -> 退回手工核对时区与 DST，结论标待确认"
+python scripts/restore-audit.py --self-test || echo "restore-audit SELFTEST FAIL -> 退回人工对账 restore-drill-template，结论标待确认"
 ```
 
 ## 工具使用纪律
@@ -120,3 +124,5 @@ python scripts/jwt-audit.py --self-test || echo "jwt-audit SELFTEST FAIL -> 退�
 13. **开态测过 ≠ 关态也安全 / 配置三处没比对 ≠ 开关可控**：特性开关必须两个状态都跑常规测试（FF-12），缺失态/配置不可达必须验回退路径；env/文件/远程三处配置不一致而声称「配置正确」一律降级为「待确认」（`feature-flag-testing.md` §2/§4）
 14. **OSCAL 导出 ≠ 合规裁决**：`scripts/evidence-audit.py --format oscal` 只做证据链的可机读编码，manifest 里的 `待确认`/`缺口` 到 OSCAL 里仍是 `partial`/`gap`，不得因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（`evidence-chain-audit.md` §10）
 15. **令牌可解码 ≠ 可伪造 / 登录成功 ≠ 认证安全**：`scripts/jwt-audit.py decode` 只报结构可疑项，是否被服务端接受必须用请求原文 + 响应码证明；弱密钥字典未命中只能写「未在 N 条字典内命中」，不能写「密钥强」；`alg=none` 被接受即 No-Go（`auth-session-testing.md` §7）
+16. **静态扫描未命中 ≠ 时间正确**：`scripts/time-audit.py scan` 只看代码形态（T-01~T-10），运行时真实时间行为必须另有 DST 日执行记录、TTL 三值响应、时钟控制证据；`dst` 只报转换点与判定，不证明调度器真的跳过或双跑（`time-correctness-testing.md` §3/§10）
+17. **备份任务成功 ≠ 可恢复 / 结构校验 ≠ 内容完整**：`scripts/restore-audit.py` 只对账「提供的两份清单」，清单本身缺失/伪造仍会通过，必须同时有隔离环境实恢复记录与强校验输出（`--read-data` / `--verify-data` / `pg_verifybackup` checksum）；恢复点早于备份、恢复后主键冲突即 S1（`backup-recovery-testing.md` §3.1/§9）
