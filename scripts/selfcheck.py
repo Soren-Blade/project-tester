@@ -148,6 +148,10 @@ checks = {
     "assets/cache-freshness-matrix-template.md": ["R-17", "不适用", "不得"],
     "references/file-upload-download-testing.md": ["R-18", "魔数", "presigned", "不适用", "不得"],
     "assets/upload-security-matrix-template.md": ["R-18", "不适用", "不得"],
+    "references/query-pagination-testing.md": ["R-19", "keyset", "cursor", "total", "不适用", "不得"],
+    "assets/query-pagination-matrix-template.md": ["R-19", "遍历", "total", "不适用", "不得"],
+    "references/error-contract-testing.md": ["R-20", "RFC 9457", "trace_id", "CWE-209", "不适用", "不得"],
+    "assets/error-contract-matrix-template.md": ["R-20", "trace_id", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -175,6 +179,16 @@ if unindexed:
     warn("未被 SKILL.md/README 索引的手册: " + ", ".join(unindexed))
 else:
     ok(f"references/ 全部 {len(refs)} 份手册已索引")
+
+# 7a) 工具表登记：scripts/ 下每个脚本都必须在 references/tools.md 有一行（v1.12 新增）
+#     背景：v1.10/v1.11 的 4 个脚本长期没进 tools.md，手册写了工具表却查不到命令。
+tools_doc = read(ROOT / "references/tools.md")
+script_files = sorted((ROOT / "scripts").glob("*.py"))
+missing_tools = [p.name for p in script_files if p.name not in tools_doc]
+if missing_tools:
+    fail("references/tools.md 未登记脚本: " + ", ".join(missing_tools))
+else:
+    ok(f"references/tools.md 已登记全部 {len(script_files)} 个脚本")
 
 # 7b) 路由闭环（孤儿文档门禁）：专项手册必须同时出现在 dissect.md §8 路由表与 SKILL.md
 #     L1 元手册对所有项目都读，不要求出现在 §8 路由表里。
@@ -298,6 +312,14 @@ SCRIPT_GATES = {
     "scripts/upload-audit.py": [
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "UA-",
         "magic", "presign", "不联网", "不代填", "不证明",
+    ],
+    "scripts/query-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "QP-",
+        "keyset", "collation", "不联网", "不代填", "不证明",
+    ],
+    "scripts/error-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "EC-",
+        "stack", "Retry-After", "不联网", "不代填", "不证明",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

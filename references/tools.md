@@ -87,6 +87,14 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **OAuth / OIDC 流程拆解**（v1.8） | `oauth2c <issuer> --client-id ... --grant-type authorization_code --pkce` 逐步去掉 PKCE/state/nonce；curl 手改 `redirect_uri` 变体；同一 code 换两次 token | 手工枚举 `redirect_uri` 变体 + 缺 PKCE 请求，注明「未做完整 OAuth 流程验证」 | `auth-session-testing.md` §4（F11） |
 | **时间反模式扫描与 DST 计算**（v1.9） | `python scripts/time-audit.py scan <path> --format markdown --fail-on-gap`；`python scripts/time-audit.py dst --zone America/New_York --year 2026 --at 02:30`；`--self-test` 验门禁可证伪（不依赖 tzdb） | 无 zoneinfo 时按 `time-correctness-testing.md` §3 手算 gap/fold 并标「未做 DST 运行时实测」；**扫描未命中 ≠ 时间正确**，`new Date()` 命中需逐条看上下文 | `time-correctness-testing.md` §2/§3/§8 |
 | **备份恢复对账**（v1.9） | `python scripts/restore-audit.py compare --source src.json --restored rst.json --format markdown --fail-on-gap`；`--self-test` 验门禁可证伪；强校验另跑 `restic check --read-data` / `borg check --verify-data` / `PRAGMA integrity_check` | 无待对账清单时人工填 `assets/restore-drill-template.md` 并写「未做自动对账」；**备份任务成功 ≠ 可恢复**，没在隔离环境实恢复过不算验证 | `backup-recovery-testing.md` §3/§8 |
+| **金额反模式扫描与账本对账**（v1.10） | `python scripts/money-audit.py scan <path> --format markdown --fail-on-gap`；`money-audit.py ledger --file ledger.json --format markdown`；`money-audit.py cases`；`--self-test` 验门禁可证伪 | 无脚本时按 `money-correctness-testing.md` §2/§4 手工核币种 exponent、舍入方向与借贷平衡；**扫描未命中 ≠ 金额正确**，四层对齐必须另有实测 | `money-correctness-testing.md` §2/§4/§9 |
+| **Webhook 交付审计与签名复算**（v1.10） | `python scripts/webhook-audit.py check --file deliveries.json --format markdown --fail-on-gap`；`webhook-audit.py verify --scheme standard\|stripe --secret <s> --body-file body.txt --header "<sig>"`；`--self-test` 验门禁可证伪 | 无夹具时手工复算 HMAC 并注明「未做端到端投递」；`verify` 绿只证明本地复算一致，**不证明渠道侧真的投递过** | `webhook-delivery-testing.md` §3/§7 |
+| **缓存反模式与响应头策略**（v1.11） | `python scripts/cache-audit.py scan <path> --format markdown --fail-on-gap`；`cache-audit.py headers --file headers.json`；`cache-audit.py cases`；`--self-test` | 无脚本时按 `cache-freshness-testing.md` §3 人工核对头与键；**头看起来对 ≠ 不会串号**，双会话实测不可省 | `cache-freshness-testing.md` §2/§8 |
+| **上传绕过与安全清单**（v1.11） | `python scripts/upload-audit.py scan <path> --format markdown --fail-on-gap`；`upload-audit.py matrix --file uploads.json`；`upload-audit.py cases`；`--self-test` | 无脚本时按 `file-upload-download-testing.md` §2 手工实传绕过矩阵；**上传成功 ≠ 文件安全**，魔数与重编码证据不可省 | `file-upload-download-testing.md` §2/§7 |
+| **查询与分页审计**（v1.12） | `python scripts/query-audit.py scan <path> --format markdown --fail-on-gap`；`query-audit.py matrix --file pagination.json`；`query-audit.py cases`；`--self-test` 验门禁可证伪 | 无夹具时手工做「翻页间插行」与「全量遍历去重计数」两个用例并注明「未做自动对账」；**静态扫描未命中 ≠ 分页正确**，必须另有全量遍历记录 | `query-pagination-testing.md` §4/§10 |
+| **错误契约与泄漏审计**（v1.12） | `python scripts/error-audit.py scan <path> --format markdown --fail-on-gap`；`error-audit.py check --file errors.json`；`error-audit.py cases`；`--self-test`；配合 `curl -sS -D -` 抓响应头与体 | 无夹具时手工触发一个真实 500 并 grep 堆栈/绝对路径/SQL 正则，注明「仅验证本地错误形态」；**返回 500 ≠ 已处理**，生产配置必须单独核对 | `error-contract-testing.md` §3/§10 |
+| **技能自检与门禁**（v1.12 补登记） | `python scripts/selfcheck.py`（frontmatter / 断链 / 版本一致 / 索引覆盖 / §7a 工具表登记 / §7b 路由闭环 / §7c 规则双向同步 / §7d 报告矩阵 / §7e 例外声明 / §7f 脚本门禁）；版本升级前必须 exit 0 | 环境无 Python 时按 `references/self-evolution.md` §3 手工逐项核清单，报告标「未跑自检」，**不得**写「已自检通过」 | `self-evolution.md` §3 / `quality-gates.md` §8 |
+| **测试数据生成与脱敏**（v1.12 补登记） | `python scripts/test-data-gen.py generate --seed <n> --count <n> --format json`（确定性种子）；`test-data-gen.py mask --file records.json --fields email,phone`（保留格式掩码）；`--self-test` 验确定性与掩码可证伪 | 手工造六类样本：空、单行、脏行（BOM/CRLF/缺列）、超长、重复键、Unicode 边界；注明「未用生成器，种子不可复现」 | `test-data-management.md` §2/§6 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -105,6 +113,14 @@ python scripts/device-matrix.py --self-test || echo "device-matrix SELFTEST FAIL
 python scripts/jwt-audit.py --self-test || echo "jwt-audit SELFTEST FAIL -> 退回手工 base64 解码，结论标待确认"
 python scripts/time-audit.py --self-test || echo "time-audit SELFTEST FAIL -> 退回手工核对时区与 DST，结论标待确认"
 python scripts/restore-audit.py --self-test || echo "restore-audit SELFTEST FAIL -> 退回人工对账 restore-drill-template，结论标待确认"
+python scripts/money-audit.py --self-test || echo "money-audit SELFTEST FAIL -> 退回手工核 exponent/舍入/借贷平衡，结论标待确认"
+python scripts/webhook-audit.py --self-test || echo "webhook-audit SELFTEST FAIL -> 退回手工复算签名，注明未做端到端投递"
+python scripts/cache-audit.py --self-test || echo "cache-audit SELFTEST FAIL -> 退回人工核头策略与双会话，结论标待确认"
+python scripts/upload-audit.py --self-test || echo "upload-audit SELFTEST FAIL -> 退回手工绕过矩阵，结论标待确认"
+python scripts/query-audit.py --self-test || echo "query-audit SELFTEST FAIL -> 退回手工全量遍历与翻页插行对账，结论标待确认"
+python scripts/error-audit.py --self-test || echo "error-audit SELFTEST FAIL -> 退回手工触发 500 与泄漏正则核对，结论标待确认"
+python scripts/test-data-gen.py --self-test || echo "test-data-gen SELFTEST FAIL -> 退回手工造六类样本，注明种子不可复现"
+python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版本/同步/提交，先修门禁（§7a~§7f）"
 ```
 
 ## 工具使用纪律
@@ -126,3 +142,8 @@ python scripts/restore-audit.py --self-test || echo "restore-audit SELFTEST FAIL
 15. **令牌可解码 ≠ 可伪造 / 登录成功 ≠ 认证安全**：`scripts/jwt-audit.py decode` 只报结构可疑项，是否被服务端接受必须用请求原文 + 响应码证明；弱密钥字典未命中只能写「未在 N 条字典内命中」，不能写「密钥强」；`alg=none` 被接受即 No-Go（`auth-session-testing.md` §7）
 16. **静态扫描未命中 ≠ 时间正确**：`scripts/time-audit.py scan` 只看代码形态（T-01~T-10），运行时真实时间行为必须另有 DST 日执行记录、TTL 三值响应、时钟控制证据；`dst` 只报转换点与判定，不证明调度器真的跳过或双跑（`time-correctness-testing.md` §3/§10）
 17. **备份任务成功 ≠ 可恢复 / 结构校验 ≠ 内容完整**：`scripts/restore-audit.py` 只对账「提供的两份清单」，清单本身缺失/伪造仍会通过，必须同时有隔离环境实恢复记录与强校验输出（`--read-data` / `--verify-data` / `pg_verifybackup` checksum）；恢复点早于备份、恢复后主键冲突即 S1（`backup-recovery-testing.md` §3.1/§9）
+18. **静态扫描未命中 ≠ 金额正确 / 验签复算绿 ≠ 渠道侧已投递**：`money-audit.py scan` 只看代码形态，`ledger` 只对账给定分录；`webhook-audit.py verify` 只证明「给定 body + 密钥 + 头」复算一致，不证明线上真的收到。（`money-correctness-testing.md` §9、`webhook-delivery-testing.md` §7）
+19. **头策略文案 ≠ 不会串号 / 上传成功 ≠ 文件安全**：`cache-audit.py headers` 只裁决给定头字典，`upload-audit.py matrix` 只裁决给定清单；缓存必须双会话实测，上传必须真传绕过样本并核魔数与重编码。（`cache-freshness-testing.md` §8、`file-upload-download-testing.md` §7）
+20. **查得准要靠遍历，不靠看第一页**：`query-audit.py scan` 是启发式，`matrix` 只裁决给定清单；R-19 的证据必须是「全量遍历去重后条数 == total」或翻页间插行/删行的重复与遗漏记录。（`query-pagination-testing.md` §4/§10）
+21. **错误审计只核「给到的样本」**：`error-audit.py scan` 只看代码形态，`check` 只裁决给定响应样本；真实泄漏需要真实 500 原文，生产配置需要生产证据；`SELFTEST GREEN` 只证明审计器自身可证伪。（`error-contract-testing.md` §3/§10）
+22. **自检 GREEN ≠ 技能正确，但自检 FAIL 一定不放行**：`selfcheck.py` 核的是结构一致性（frontmatter/断链/版本/索引/§7a 工具表登记/§7b 路由闭环/§7c 规则双向/§7d 报告矩阵/§7e 例外声明/§7f 脚本门禁），它不判断规则内容是否可证伪，也**不能替代 dogfood 实测**；新增脚本忘了登记本表会被 §7a 直接 FAIL。`test-data-gen.py` 的确定性只在「同脚本版本 + 同参数」下复现，跨版本不保证（`self-evolution.md` §3、`test-data-management.md` §2）

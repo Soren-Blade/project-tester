@@ -270,6 +270,15 @@
 - [环境] Windows PowerShell `Set-Content -Encoding utf8` 会写 BOM，JSON 清单读取报 `Unexpected UTF-8 BOM (decode using utf-8-sig)` — 应用：脚本统一 `encoding="utf-8-sig"` 读取，写侧用 Node 或 `utf8NoBOM`
 - [环境] 本机安全软件会拦截含 webshell 特征串的 `.php` 读取（`OSError [Errno 22]`），自检夹具应用良性内容 — 应用：自检样例避开 `system($_GET` 等特征串，误报先怀疑环境再怀疑代码
 
+- [流程] 手册清单会落后于手册/脚本本体：`references/tools.md` 此前从未登记 v1.10/v1.11 的 money/webhook/cache/upload 四个脚本 — 应用：每轮自检后核「tools.md 里出现的脚本名 ⊇ scripts 目录」，本轮已补 6 行工具表 + 6 条探测 + 4 条纪律（v1.12）
+- [手法] OFFSET 分页的不稳定是语义不是边界：翻页间插行会漏、删行会重，且 `offset = page * size` 让首屏永远不可见 — 应用：R-19 先拿「全量遍历去重后必须等于 total」的遍历证据，再谈单页对不对（v1.12 `pagerr-demo`：`missing=["3","6",…,"30"]`）
+- [手法] `total` 必须与「当前身份可见集合」同源：`total = rows.length`（当前页行数）与「可见但计数全表」是两类高发错误 — 应用：声明 total / 并集条数 / 可见条数三方对账，差 1 也判 S1（QP-23 / QP-29）
+- [安全] `ORDER BY` 拼接本身就是注入面，且 500 会把 SQL 一起回显：`sort=created_at LIMIT 1` 直接把 `near "LIMIT": syntax error` 送到客户端 — 应用：sort 白名单 + 参数化边界，同时按 R-20 核 5xx 体做交叉证据（QP-01/QP-25 + EC-20）
+- [安全] 5xx 回显堆栈/绝对路径是 S1 不是 LOW：V8 括号帧 `at handler (./src/app.js:41:23)` 与 `C:\…\server.js:41:23` 都要能被命中 — 应用：EC-20 五正则（堆栈/路径/SQL/主机/版本）+ 响应原文贴进报告，不接受「框架默认不回栈」的口头保证
+- [手法] 静态扫描用「全文件判定」会制造静音漏报：同文件里无关的 `COALESCE(MAX(id),0)` 让 QP-06 全文件不报分页参数无夹取 — 应用：判定窗口化（±10 行），并用「远处聚合必须命中 / 近距离夹取不得误报」双向回归锁住
+- [流程] 自测喂的样本覆盖不到真实形态 = 假 GREEN：旧 `STACK_RE` 只喂过 `at D:\app\server.js:12:9` 与 `(<anonymous>)`，漏掉括号帧也照绿 — 应用：每个正则的自测至少一例「框架真实输出原文」+ 一例「易混文本」（`at 10:30` 不得判堆栈）
+- [环境] 再次实证：PowerShell `(Get-Content -Raw) -replace … | Set-Content -Encoding utf8` 改写 UTF-8 源码会把中文注释写坏并把两行合并（`ReferenceError: pages is not defined`）— 应用：源码改动只走 edit/write 工具或 python，禁用 Get-Content/Set-Content 往返
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -288,7 +297,7 @@
 - [技能改进] 待后续轮次（v1.7 已打底）：把「AI 生成用例有效性」的变异杀伤贡献做成跨语言自动跑数脚本 → TDM 的确定性 `--seed` 现为跨语言变异基准的可复现数据底座；本提案仍保留至具体变异工具输出 schema 确定，不硬编码某一家 JSON schema
 - [技能改进] 待评估（v1.8 提出）：把 AUTH/S/F 三张测试卡做成「可执行 adapter」（统一 `token-provider` 接口：登录/刷新/重置取令牌 → 跑卡 → 出 JSON），减少手工 curl；暂不落地，理由：先确认 adapter 接口不绑定某框架，且不能替代人工判据
 - [技能改进] ✅ **已吸收（v1.9）**：时间/时区正确性与备份/恢复可验证性 → 落地为 `references/time-correctness-testing.md` + `references/backup-recovery-testing.md` + 两份矩阵/演练模板 + `scripts/time-audit.py` / `scripts/restore-audit.py`，新增 **R-13/R-14**；理由：dogfood 的 `timedemo` 用 v1.8 实测出 2×S1（令牌跨时区多活 8h、错误备份覆盖新数据）与 UTC 日过滤、`+86400` 调度漂移，旧手册无对应判据
-- [技能改进] 待后续轮次（v1.9 提出）：把「5xx 响应体不得含堆栈 / 绝对路径 / SQL」做成安全手册的固定检查项与报告字段 → 来源：dogfood F7（非法 `at` 入库 201，列表 500 回显 `time.js:7:24` 与绝对路径）；本轮只记提案，不扩 scope
+- [技能改进] ✅ **已吸收（v1.12）**：把「5xx 响应体不得含堆栈 / 绝对路径 / SQL」做成安全手册的固定检查项与报告字段 → 落地为 `references/error-contract-testing.md` §3 硬门禁 + `assets/error-contract-matrix-template.md` 的「5xx 防泄漏（贴原文）」表 + `scripts/error-audit.py` 的 EC-20/EC-01/EC-02/EC-06/EC-08 + 报告证据矩阵 R-20 行；来源仍是 dogfood F7（`time.js:7:24` 与绝对路径入库 500），v1.12 又在 `pagerr-demo` 用真实 500 原文复验（EC-20 判「堆栈、绝对路径」）
 - [技能改进] ✅ **已吸收（v1.10）**：金额与账务正确性、异步消息/Webhook 交付可靠性 → 落地为 `references/money-correctness-testing.md` + `references/webhook-delivery-testing.md` + 两份矩阵模板 + `scripts/money-audit.py` / `scripts/webhook-audit.py`，新增 **R-15/R-16**；理由：dogfood 的 `shopdemo` 用 v1.9 实测出 15×S1（0.1+0.2、JPY×100、幂等失效、退款超退、单边账本、混币种相加、重启丢账、签名不覆盖 ts、事件重复、乱序落退款、handler 残留、无重试/DLQ），旧手册无对应判据
 - [技能改进] 待评估（v1.10 提出）：按税务辖区做「舍入/计税口径矩阵」→ 需要逐国读官方文档（本轮只给 HMRC 示例），不做全球通用断言
 - [技能改进] 已驳回（v1.10，理由保留）：让 `money-audit.py` 自动拉取渠道对账单 → 需真实凭据与网络，违反零依赖/不联网边界；保持离线审计，渠道对账仍由测试者提供数据
@@ -296,3 +305,9 @@
 - [技能改进] 待评估（v1.11 提出）：把「缓存键 × 身份 × tenant × locale」做成自动生成的双会话矩阵 → 先定义 provider 无关的请求夹具格式，否则会绑死某框架
 - [技能改进] 待评估（v1.11 提出）：上传解码重编码的证据自动化（探测 sharp/ImageMagick + 对比输出像素与元数据）→ 依赖本机图形库，本轮只给命令与判据
 - [技能改进] 待核实（v1.10 提出）：各支付渠道对 ISK/UGX/HUF/TWD 的「最小单位」处理随 API 版本变化 — 应用：以接入时渠道文档为准，证据里写清币种、amount 原值、期望 minor 值，不把特例写成通则
+- [技能改进] ✅ **已吸收（v1.12）**：查询语义与分页正确性、错误契约与可诊断性 → 落地为 `references/query-pagination-testing.md` + `references/error-contract-testing.md` + 两份矩阵模板 + `scripts/query-audit.py` / `scripts/error-audit.py`，新增 **R-19/R-20**；理由：dogfood 的 `pagerr-demo` 用 v1.11 实测出「首屏 10 条永不可见 / 插行漏 10 条 / total 取自当前页 / sort 注入回显 SQL / size 无上限 / collation 声明与实测不符 / 越权 18 行 + total 33」与「500 回显 V8 栈与绝对路径 / not-found 回 200 / 429 无 Retry-After / 未认证 403 / HTML 错误页反射 / 生产 include-stacktrace=always」，旧手册无对应判据
+- [技能改进] ✅ **已吸收（v1.12）**：把「`tools.md` 必须登记 `scripts/` 下每个脚本」做成硬门禁 → `scripts/selfcheck.py` 新增 **§7a**；理由：该表此前从未登记 `selfcheck.py` / `test-data-gen.py`，v1.10/v1.11 四个脚本也长期缺席，人眼守不住，改成逐文件 ⊆ 比对，负向测试（抹掉 `error-audit.py`）实证会 FAIL
+- [技能改进] 待评估（v1.12 提出）：分页「collation 声明 vs 实测」自动化 → 需读方言元数据（`information_schema` / `pg_collation`），不能零依赖通用，暂只给对照命令与判据
+- [技能改进] 待评估（v1.12 提出）：批量接口 207 / 部分失败的「逐条 `code` ↔ 顶层 `status`」一致性判据 → 本轮只给单条错误契约判据，批量语义需另立矩阵
+- [技能改进] 待核实（v1.12 提出）：Express 5 / Fastify 4 / Koa 在 `NODE_ENV=production` 下的默认错误体差异 → 逐框架跑一次真实 500 再断言，不把「Express 默认不回栈」推广
+- [技能改进] 待核实（v1.12 提出）：`§7a` 只核脚本名，不核命令与 `--help` 是否一致 → 参数改名而工具表未更新仍会通过；加 `--help` 抓取比对会引入执行依赖，暂不做

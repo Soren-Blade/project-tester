@@ -5,6 +5,87 @@
 
 ---
 
+## [v1.12.0] — 2026-11-16 · 每日升级 #13
+
+**主题**：从「缓存不串号 · 文件不可当代码」扩展到「**翻得准 · 报得清**」——查询语义与分页正确性（R-19）与错误契约与可诊断性（R-20）。一个接口全绿、金额也对、缓存也隔离的系统，仍然会在「第 1 页的 10 条永远看不到」「翻页时后台插了 1 行，后面 10 条被跳过」「`total` 显示 33 但只有 18 条可见」「`sort=created_at LIMIT 1` 让 500 把 SQL 与堆栈一起吐给用户」「429 没 `Retry-After`，客户端把重试打成雪崩」上成片出错；这类缺陷不是「边界没测」，而是「分页契约与错误契约没有可证伪判据」。新增 **R-19 查询语义与分页正确性**、**R-20 错误契约与可诊断性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 Use The Index Luke「No OFFSET Movement」、PostgreSQL/MySQL collation、RFC 8288、GraphQL Relay Cursor、OWASP SQLi Prevention，以及 RFC 9457 / 9110 / 6585 / 4918、OWASP Error Handling Cheat Sheet、OWASP WSTG ERRH、CWE-209、W3C Trace Context。按每日升级序列记为 #13。
+
+**遵循上轮建议**：未重写已覆盖的 18 个主题与五阶段、四层模型、路由闭环，以 **New 为主 + Enhance 为辅**；四层模型与五阶段流程**未改语义**，只升 MINOR。**吸收 v1.9 遗留提案**：「5xx 响应体不得含堆栈 / 绝对路径 / SQL」此前只记提案未扩 scope，本轮做成 R-20 的固定检查项 + 报告字段 + `error-audit.py` 的 EC-20/EC-01/EC-02/EC-06，并用真实 500 证据验收。上轮「税务辖区舍入矩阵」「缓存键 × 身份 × tenant × locale 自动矩阵」「上传解码重编码证据自动化」继续**待评估**；「AI 变异杀伤跨语言自动跑数」仍受变异工具 JSON schema 未定阻塞，顺延；「`money-audit.py` 自动拉渠道对账单」维持**已驳回**（违反零依赖/不联网边界）。每轮至少一条可证伪规则 → 本轮引入 **R-19 / R-20**，并做了**三例负向测试**。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/query-pagination-testing.md`、`assets/query-pagination-matrix-template.md`、`scripts/query-audit.py` | 新增 R-19 能力：分页三模式契约（offset/keyset/cursor）、全量遍历去重后必须等于 `total`、翻页插删的重复与遗漏、`ORDER BY` 唯一 tie-breaker 与 NULL 位置、排序白名单与注入、collation 声明 vs 实测、行级授权与 `total` 泄漏、深页 p95；QP-01~QP-08 静态扫描 + QP-20~QP-30 清单判定 |
+| New | `references/error-contract-testing.md`、`assets/error-contract-matrix-template.md`、`scripts/error-audit.py` | 新增 R-20 能力：三层契约（传输码 / 机器 `code` / 人类 `message`+`trace_id`+`docs_url`）、逐状态码矩阵与 401vs403 / 404vs403 / 409vs422 判据、5xx 防泄漏硬门禁（堆栈/绝对路径/SQL/内网主机/版本/调试页/source map）、六框架默认核对、可诊断性、存在性三态泄漏、错误路径副作用与重试分类；EC-01~EC-08 静态扫描 + EC-20~EC-31 清单判定 |
+| Enhance | `SKILL.md`（description 触发词、v1.12 增量段、阶段 1 查询面/错误面、阶段 3 两条专项、判 bug 第 12 条、**二十条**规则表、阶段 4 自检、索引） | 只增量，不改五阶段与四层模型；顺带把「十六条可证伪规则」标题漂移修正为「二十条」并补齐 v1.11/v1.12 括号说明 |
+| Enhance | `references/dissect.md` §6/§8、`references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵 | 查询/错误两面路由与攻击面、结论作废判据、20 行矩阵 |
+| Enhance | `references/tools.md` | 补登记 v1.10/v1.11 遗漏的 4 个脚本（money/webhook/cache/upload）+ 本轮 2 个脚本 + 长期缺席的 `selfcheck.py` / `test-data-gen.py`，含 `--self-test` 探测与降级路径；纪律补第 18~22 条 |
+| Enhance | `scripts/selfcheck.py` §5/§7f/**新增 §7a**、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 6 个新文件字段、2 个新脚本门禁、**新增「tools.md 必须登记 scripts/ 下每个脚本」硬门禁**、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 36 份手册与 25 份模板 | 不重复造，仅在路由/交叉项里引用 |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- PostgreSQL `LIMIT`/`OFFSET` 与「无 ORDER BY 时顺序未定义」：https://www.postgresql.org/docs/current/queries-limit.html
+- ISO SQL:2023 对 `OFFSET` 的语义 + keyset/seek（`WHERE id < ?last_seen ORDER BY id DESC FETCH FIRST n ROWS ONLY`）：https://use-the-index-luke.com/no-offset
+- 深分页与索引（分页查询执行计划）：https://use-the-index-luke.com/sql/partial-results/fetch-next-page
+- RFC 8288 Web Linking（`Link: rel="next"` 分页头）：https://www.rfc-editor.org/rfc/rfc8288.html
+- GraphQL Relay Cursor Connections（`edges/pageInfo`、cursor 不透明）：https://relay.dev/graphql/connections.htm
+- OWASP SQL Injection Prevention（`ORDER BY` 白名单与参数化边界）：https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
+- MySQL collation（`utf8mb4_0900_ai_ci` 大小写/重音不敏感）：https://dev.mysql.com/doc/refman/8.4/en/charset-collation-names.html
+- PostgreSQL collation 与 ICU：https://www.postgresql.org/docs/current/collation.html
+- Unicode TR10（土耳其 i / 德语 ß 的大小写特例）：https://www.unicode.org/reports/tr10/
+- RFC 9457 Problem Details（`type/title/status/detail/instance`、`application/problem+json`）：https://www.rfc-editor.org/rfc/rfc9457.html
+- RFC 9110 HTTP Semantics（401/403/404/405/409/415/503、`WWW-Authenticate`、`Retry-After`）：https://www.rfc-editor.org/rfc/rfc9110.html
+- RFC 6585（429 + `Retry-After`）：https://www.rfc-editor.org/rfc/rfc6585.html
+- RFC 4918（422、207 Multi-Status）：https://www.rfc-editor.org/rfc/rfc4918.html
+- OWASP Error Handling Cheat Sheet（5xx 只回通用体、细节只进服务端日志、各框架配置范式）：https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html
+- OWASP WSTG — Testing for Improper Error Handling：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Testing_for_Error_Handling/
+- CWE-209（错误消息含敏感信息）：https://cwe.mitre.org/data/definitions/209.html
+- W3C Trace Context（`traceparent`/`tracestate`）：https://www.w3.org/TR/trace-context/
+- ASP.NET Core 错误处理（`UseDeveloperExceptionPage` 仅开发）：https://learn.microsoft.com/aspnet/core/fundamentals/error-handling
+- Spring Boot 错误属性（`server.error.include-stacktrace`）：https://docs.spring.io/spring-boot/reference/web/servlet.html#web.servlet.spring-mvc.error-handling
+
+### 口径诚实
+
+- `query-audit.py` **不联网、不代填**：`scan` 是逐行启发式（排序键拼接、LIMIT/OFFSET 插值、`total=rows.length`、无 tie-breaker、分页参数无夹取、LIKE 未转义），命中只是「可疑写法」，**不证明**运行时翻页正确；`matrix` 的数据由测试者提供，可伪造。`--fail-on-gap` 只把已发现的 S1 变成非零退出码，**不把「没发现」变成「分页正确」**。
+- `query-audit.py` 的 QP-06 夹取判定是「同一行 ±10 行窗口」而非全文件——dogfood 实测证明全文件判定会被同文件里无关的 `MAX(id)` 静音（漏报），窗口化后用 `agg.js`（远处聚合）与 `clamp.js`（近距离夹取）双向回归锁住；窗口仍可能漏掉「夹取写在另一个模块」的合法写法，命中后必须人工确认。
+- `error-audit.py` 同理：`scan` 只看响应路径是否输出 `.stack`、是否 `res.json(err)`、是否 `include-stacktrace=always` / `debug=True` / `display_errors=On`、空 catch、404 回 200、调试路由、message 拼路径；`check` 只核给到的 JSON 样本（状态码、`Content-Type`、`code`/`trace_id`、`Retry-After`、存在性三态、配置）。**静态未命中 ≠ 生产不泄漏**：运行期才出现的堆栈、框架默认页、反代注入的 HTML 错误页都可能绕过。
+- 堆栈识别用文件扩展名锚定（`.js/.py/...` + `:line[:col]`），故意不匹配 `at 10:30` 这类时间文本；代价是 `at node:events:517:28` 这种无扩展名的内部帧不单独判泄漏——所以判据是「应用帧或绝对路径 + 堆栈形态」的合取，单条正则不足时人工看原文。
+- RFC 9457 是**推荐格式**而非强制：手册允许团队自定义错误体，但要求「机器 `code` 稳定 + 人类 `message` 不泄漏 + `trace_id` 可检索」三件事都有证据；**不得**把「用了 problem+json」写成「错误契约合格」。
+- R-19 不认「翻了一遍没重复」「首页 10 条对」「`total` 数字对得上页面」「第 1 页快」；R-20 不认「返回 500」「有 `trace_id`」「4xx 无堆栈」「框架默认不回堆栈」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+在项目外临时目录 `C:\Users\摩羯座\AppData\Local\Temp\pt-v112-dogfood\pagerr-demo` 建了一个零依赖 Node 24 夹具（`node:http` + `node:sqlite`，33 行数据，监听 `127.0.0.1:4321`），故意植入 12 类缺陷（`offset = page * size`、排序键拼接、`total = rows.length`、500 回 `e.stack`、not-found 回 200、429 无 `Retry-After`、未认证 403、HTML 错误页反射 `<script>`、`include-stacktrace=always`、`debug=true` 等），全程只读技能目录：
+
+- 真实 HTTP 采集（`probe.js`）：`baseline dup=[] missing=["3","6","9","12","15","18","21","24","27","30"]`（首屏 10 条永不可见）；插行后 `drift` 同样漏 10 行；`collation count=33 group=["ALPHA","Alpha","alpha"]`（声明 nocase、实测 binary）；`p95_page3=2 size5000=200 sizeNaN=500 pageNeg=200 inj=500 pub=200`；`errors: boom=500 nf=200 throttle=429 admin=403 html=text/html v2=422`。
+- `query-audit.py scan`：6 行（QP-01 CRITICAL、QP-02/03 HIGH、QP-04/06 MEDIUM ×2），exit 1；`matrix`：10 行（QP-21/22/25/29 S1，QP-23/24 HIGH，QP-26/27/28 MEDIUM），exit 1。
+- `error-audit.py scan`：5 行（EC-01 CRITICAL ×2、EC-03 HIGH ×3），exit 1；`check`：9 行（EC-20 S1「堆栈、绝对路径」、EC-29 S1、EC-21/22/23/24/25/27 HIGH），exit 1。
+- 合计 **30 项命中（S1 7 / CRITICAL 3 / HIGH 12 / MEDIUM 8）**，质量状态 **FAIL**、发布建议 **No-Go**；注入响应原文含 `near "LIMIT": syntax error` 与 `C:\Users\...\pagerr-demo\server.js:41:23`。
+- **dogfood 反向改进了技能（本轮真实增量）**：① `QP-06` 原用整文件判定夹取，被夹具里 `COALESCE(MAX(id),0)` 静音 → 改为逐行 ±10 行窗口，并加 `agg.js`/`clamp.js` 双向回归；② `STACK_RE` 原只认 `at file:line`，漏掉 V8 括号帧 `at handler (./src/app.js:41:23)` → 改为括号帧 + 带扩展名裸帧，并加「`at 10:30` 不得误判」回归。两脚本自测复跑：query `SELFTEST GREEN（静态 8 / 清单 11 / 干净夹具零误报）`、error `SELFTEST GREEN（静态 6 / 清单 12 / 干净夹具零误报）`。
+- 证据与报告已归档 `.workbuddy-ai/dogfood/v1.12.0/`（`tree.md`、`report.md`、4 份工具输出、3 份采集 JSON 与 `MANIFEST.sha256.json` 校验和）；该目录本地记忆、不入库。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py`：**GREEN**（PASS 65 / WARN 0 / FAIL 0，exit 0）。
+- 四个负向测试（临时副本，不污染源）：① 删 `assets/report-template.md` 的 `| R-19` 行 → §7d FAIL；② 删 `references/error-contract-testing.md` → 断链 4 处 FAIL；③ 删 `SKILL.md` 的 R-20 规则行 → §7c 双向同步 FAIL；④ 把 `tools.md` 里的 `error-audit.py` 抹成 `X-audit.py` → 新增的 §7a 工具表登记门禁 FAIL。还原后回 GREEN（65/0/0）。
+- 新增 §7a 门禁的直接来由：`references/tools.md` 此前从未登记 `selfcheck.py` 与 `test-data-gen.py`，v1.10/v1.11 的四个脚本也长期缺席——「手册里有脚本、工具表查不到命令」这类漂移靠人眼守不住，改成逐文件比对 `scripts/*.py ⊂ tools.md`，缺一个即 FAIL。
+- 12 个脚本 `--self-test` 全部 exit 0；`query-audit.py scan .` / `error-audit.py scan .` 对技能仓库自身「未命中已知模式」（证明无自伤，也不等于仓库无缺陷）。
+- 同步全局 `C:\Users\摩羯座\.agents\skills\project-tester` 并 `diff -r`（排除 `.git`/`.workbuddy-ai`）0 差异；git commit + push 到 `https://github.com/Soren-Blade/project-tester.git`。
+
+### 提案处置
+
+- **已吸收**（v1.9 提出）：「5xx 响应体不得含堆栈 / 绝对路径 / SQL」做成 R-20 固定检查项 + 报告矩阵行 + `error-audit.py`（EC-20 五正则、EC-01/02/06/08 静态），dogfood 以真实 500 原文验收。
+- 采纳：dogfood 暴露的 `QP-06` 全文件静音与 `STACK_RE` 漏 V8 括号帧，直接改脚本并加双向回归（旧断言只覆盖了 `at file:line` 与绝对路径，覆盖不到括号帧）。
+- 采纳：`tools.md` 长期漏登 v1.10/v1.11 脚本，本轮补齐 6 行工具表 + 8 条 `--self-test` 探测 + 5 条纪律（第 18~22 条），并把它变成 §7a 硬门禁，避免「手册有脚本、工具表查不到」再次发生。
+- 待评估：分页「collation 声明 vs 实测」自动化（需按数据库方言读 `information_schema` / `pg_collation`，不能零依赖通用）。
+- 待评估：错误契约的 207/部分失败矩阵（批量接口逐条 `code` + 顶层 `status` 的一致性判据，本轮只给单条判据）。
+- 待核实：Express 5 / Fastify 4 / Koa 在 `NODE_ENV=production` 下的默认错误体差异，需逐框架跑一次真实 500，不把「Express 默认不回栈」推广到全家。
+- 待核实：`selfcheck.py` 的 §7a 只核「脚本名出现在 tools.md」，不核「命令与真实 `--help` 一致」——脚本参数改名而工具表未更新仍会通过，需评估是否加 `--help` 抓取比对（会引入执行依赖，暂不做）。
+- 顺延：税务辖区舍入矩阵、缓存键双会话自动矩阵、上传解码重编码证据自动化、AI 变异杀伤跨语言跑数。
+
+---
+
 ## [v1.11.0] — 2026-11-14 · 每日升级 #12
 
 **主题**：从「功能、金额、交付都正确」扩展到「**缓存不串号 · 发布即生效 · 文件不可当代码**」——缓存与内容新鲜度（R-17）与文件上传下载内容边界（R-18）。一个接口全绿、金额也对、webhook 也幂等的系统，仍然会在「A 登录后 B 打开同一 URL 看到 A 的账单」「发了新版但 CDN 还吐旧页面」「把 shell 改名成 `.jpg` 就传上去了」「登出后预签名 URL 还能往桶里写」上成片出错；这类缺陷不是「边界没测」，而是「缓存键与文件边界没有可证伪判据」。新增 **R-17 缓存与内容新鲜度**、**R-18 文件上传下载与内容边界** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 RFC 9111 / 5861 / 8246 / 9211 / 9110 / 6266、Cloudflare Cache Deception Armor、OWASP File Upload Cheat Sheet、OWASP WSTG、S3 presigned 官方文档、sharp 构造器文档与 ImageTragick。按每日升级序列记为 #12。
