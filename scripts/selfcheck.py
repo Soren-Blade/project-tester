@@ -152,6 +152,10 @@ checks = {
     "assets/query-pagination-matrix-template.md": ["R-19", "遍历", "total", "不适用", "不得"],
     "references/error-contract-testing.md": ["R-20", "RFC 9457", "trace_id", "CWE-209", "不适用", "不得"],
     "assets/error-contract-matrix-template.md": ["R-20", "trace_id", "不适用", "不得"],
+    "references/search-quality-testing.md": ["R-21", "nDCG", "qrels", "零结果", "不适用", "不得"],
+    "assets/search-quality-matrix-template.md": ["R-21", "nDCG", "qrels", "不适用", "不得"],
+    "references/metrics-correctness-testing.md": ["R-22", "分子", "分母", "对账", "SRM", "不适用", "不得"],
+    "assets/metrics-correctness-matrix-template.md": ["R-22", "分子", "分母", "对账", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -320,6 +324,14 @@ SCRIPT_GATES = {
     "scripts/error-audit.py": [
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "EC-",
         "stack", "Retry-After", "不联网", "不代填", "不证明",
+    ],
+    "scripts/search-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "SR-",
+        "nDCG", "qrels", "不联网", "不代填", "不证明",
+    ],
+    "scripts/metric-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "MA-",
+        "recon", "SRM", "不联网", "不代填", "不证明",
     ],
 }
 for rel, needles in SCRIPT_GATES.items():

@@ -311,3 +311,8 @@
 - [技能改进] 待评估（v1.12 提出）：批量接口 207 / 部分失败的「逐条 `code` ↔ 顶层 `status`」一致性判据 → 本轮只给单条错误契约判据，批量语义需另立矩阵
 - [技能改进] 待核实（v1.12 提出）：Express 5 / Fastify 4 / Koa 在 `NODE_ENV=production` 下的默认错误体差异 → 逐框架跑一次真实 500 再断言，不把「Express 默认不回栈」推广
 - [技能改进] 待核实（v1.12 提出）：`§7a` 只核脚本名，不核命令与 `--help` 是否一致 → 参数改名而工具表未更新仍会通过；加 `--help` 抓取比对会引入执行依赖，暂不做
+- [技能改进] ✅ **已吸收（v1.13）**：搜索相关性与指标口径与报表可信 → 落地为 `references/search-quality-testing.md` + `references/metrics-correctness-testing.md` + 两份矩阵模板 + `scripts/search-audit.py` / `scripts/metric-audit.py`，新增 **R-21/R-22**；理由：dogfood 的 `searchmetric-demo` 用 v1.12 实测出「5 个不同 query 返回同一组 top-6 / `total` 恒 10000 / 每页 6~7 条且分页先切后过滤 / `size=100000` 不夹取 / `tenant` 客户端可控跨租户 14 条 / SQL 回显 / highlight 直出」与「看板 1234 vs 源表 1301（5.15%）/ 定义卡缺 timezone+dedupe_key / 分子 1400>分母 1301 / 新鲜度 180min」，旧手册只有散句没有可证伪判据
+- [技能改进] ✅ **已吸收（v1.13）**：dogfood 暴露的「无判定集 query 被算成 nDCG=0 并触发 SR-21」→ `search-audit.py` 增 `judged` 字段，SR-21/SR-23 只对有判定集 query 生效、均值只统计有判定集 query、输出 nDCG 记「—」；同一轮还修了 `SR-06` 空串 `innerHTML` 误报（`[^"'\s]`）、`metric-audit` 文件级规则恒报 line 1 + 前端 `fetch` 假阳性（`line_of` + `is_client`）、手册 §9 SR 编号与脚本整体错位（按脚本重排 10 行）
+- [技能改进] 待评估（v1.13 提出）：指标接口「硬编码常量」静态规则（dogfood D14：`/api/metrics` 直接返回字面量 1234，现有 MA-01~MA-10 全未命中）→ 需要先定判据（响应构造处数字字面量 vs 从查询取值），避免把「常量配置」误报
+- [技能改进] 待评估（v1.13 提出）：qrels 双标注一致性的自动化（两名标注者文件 + 逐 query κ 矩阵）→ 本轮只给 κ 阈值与口径，未做双文件比对脚本
+

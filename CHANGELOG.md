@@ -5,7 +5,80 @@
 
 ---
 
-## [v1.12.0] — 2026-11-16 · 每日升级 #13
+## [v1.13.0] — 2026-11-17 · 每日升级 #14
+
+**主题**：从「翻得准 · 报得清」扩展到「**搜得准 · 数得对**」——搜索相关性与排序质量（R-21）与指标口径与报表可信（R-22）。一个分页正确、错误契约也规范的系统，仍然会在「搜『蓝牙耳机』第一页出来的是音箱和手机壳」「同一个词上午搜和下午搜 top-10 不一样」「翻到第 2 页又看到第 1 页那三条」「零结果率 18% 没人看」「看板写转化率 3.2%、源表算出来 4.1%」「两个报表 GMV 差 8 万，两边都说自己对」「A/B 说提升 12%，其实是分流比例坏了」上成片出错；这类缺陷不是「没测」，而是「相关性、排序稳定性、指标定义与对账没有可证伪判据」。新增 **R-21 搜索相关性与排序质量**、**R-22 指标口径与报表可信** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 NDCG 原论文 / TREC `trec_eval` / ir_measures / BEIR、Elasticsearch 的 `search_after`、`max_result_window`、`track_total_hits` 与 tie-breaker 语义、二次加权 κ、dbt MetricFlow 与 dbt tests、GA4 的 users vs sessions 口径差、Microsoft ExP 的 SRM 卡方、Simpson 悖论。按每日升级序列记为 #14。
+
+**遵循上轮建议**：未重写已覆盖的 20 个主题与五阶段、四层模型、路由闭环，以 **New 两条规则 + Enhance 全链路接线**；四层模型与五阶段流程**未改语义**，只升 MINOR。吸收 v1.12 遗留提案「分页 collation 声明 vs 实测自动化」的**检索侧**——本轮把它推进为「排序顺序必须可复现」：唯一 tie-breaker + 两次同 query 的 top-20 逐位 diff + 第 2 页拼接去重（R-21 §5、SR-25）；该提案的数据库方言元数据读取部分仍**待评估**（不能零依赖通用）。「批量 207 部分失败逐条 code」仍**待评估**；「AI 变异杀伤跨语言自动跑数」继续受变异工具 JSON schema 未定阻塞，顺延；「`money-audit.py` 自动拉渠道对账单」维持**已驳回**（违反零依赖/不联网边界）。每轮至少一条可证伪规则 → 本轮引入 **R-21/R-22**，并做了**四例负向测试**。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/search-quality-testing.md`、`assets/search-quality-matrix-template.md`、`scripts/search-audit.py` | 新增 R-21 能力：qrels 0~3 分级与九层样本量（合计 ≥200）、二次加权 κ≥0.60、bootstrap CI 半宽 >0.08 只写方向、DCG/IDCG/nDCG/MRR/Recall/Precision/零结果率公式与分母、查询理解九类、排序稳定性与唯一 tie-breaker、`search_after`/`max_result_window`/`track_total_hits`、filter vs post_filter、冷启动兜底标记、highlight XSS 与 DSL 注入、CI 门槛（nDCG@10 相对下降 >2% 阻塞）；SR-01~SR-10 静态 + SR-20~SR-25 评估 |
+| New | `references/metrics-correctness-testing.md`、`assets/metrics-correctness-matrix-template.md`、`scripts/metric-audit.py` | 新增 R-22 能力：指标定义卡十项（分子/分母/时间窗/时区/去重键/过滤/来源/新鲜度/负责人/版本）、dashboard·API·源表三处对账与双阈值（0.5%+2 单 / 0.1%+1 元 / 0.2pp / 1%+50 人）、七类口径陷阱（平均的平均、率的分母、重述、辛普森、分群泄漏、测试流量、时区边界）、新鲜度与重述、可加性、SRM 卡方与固定样本、权限 k<10 抑制；MA-01~MA-10 静态 + MA-20~MA-26 核对 |
+| Enhance | `SKILL.md`（description 触发词、v1.13 增量段、阶段 1 搜索面/指标面、阶段 3 两条专项、判 bug 第 13 条、**二十二条**规则表、阶段 4 自检、索引） | 只增量，不改五阶段与四层模型；「二十条」标题与阶段 4 矩阵行数同步到「二十二条/二十二行」 |
+| Enhance | `references/dissect.md` §6/§8、`references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵 | 搜索/指标两面路由与解剖项、结论作废判据、22 行矩阵与「不得写成」交叉引用 |
+| Enhance | `references/tools.md` | 专项工具表补 2 行（scan/eval/check/`--self-test` 与降级路径）+ 可用性探测 2 行 |
+| Enhance | `scripts/selfcheck.py` §5/§7f、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 4 个新文件字段、2 个新脚本门禁、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 38 份手册与 27 份模板 | 不重复造，仅在路由/交叉项里引用 |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- Järvelin & Kekäläinen, *Cumulated gain-based evaluation of IR techniques*（nDCG 原论文）：https://dl.acm.org/doi/10.1145/582415.582418
+- `trec_eval`（qrels 格式与指标定义）：https://github.com/usnistgov/trec_eval
+- ir_measures（指标口径与实现对照）：https://ir-measur.es/
+- BEIR（跨域 nDCG@10 报告口径）：https://arxiv.org/abs/2104.08663
+- Elasticsearch 分页（`from+size` / `search_after` / `max_result_window`）：https://www.elastic.co/docs/reference/elasticsearch/rest-apis/paginate-search-results
+- Elasticsearch 排序（tie-breaker 与 sort 语义）：https://www.elastic.co/docs/reference/elasticsearch/rest-apis/sort-search-results
+- Elasticsearch BM25 相似度：https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html
+- scikit-learn `ndcg_score`（实现参数与 tie 处理）：https://scikit-learn.org/stable/modules/generated/sklearn.metrics.ndcg_score.html
+- interleaving 评估（在线排序对比）：https://dl.acm.org/doi/10.1145/2094072.2094078
+- OWASP Query Parameterization（注入防护）：https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html
+- Cohen's κ（二次加权一致性口径）：https://en.wikipedia.org/wiki/Cohen%27s_kappa
+- dbt 数据测试（unique / not_null / accepted_values / relationships）：https://docs.getdbt.com/docs/build/tests
+- dbt MetricFlow 语义层指标定义：https://docs.getdbt.com/docs/build/about-metricflow
+- GA4 sessions vs users 口径差：https://support.google.com/analytics/answer/12159447
+- Microsoft ExP：Diagnosing SRM in A/B testing：https://www.exp-platform.com/Documents/2019-02-SRM.pdf
+- Simpson 悖论（Stanford Encyclopedia of Philosophy）：https://plato.stanford.edu/entries/paradox-simpson/
+- PostgreSQL 日期/时间与时区语义：https://www.postgresql.org/docs/current/datatype-datetime.html
+
+### 口径诚实
+
+- `search-audit.py` **不联网、不代填**：`scan` 是逐行启发式（拼接 DSL、时间冒充排序、`from+size` 深翻、`track_total_hits` 缺失、CJK 无 analyzer、highlight 未转义、ACL 后置、前导 wildcard、`LIMIT` 不夹取、日志 PII），命中只是「可疑写法」，**不证明**相关性成立；`eval` 的 nDCG/MRR/Recall 完全取决于测试者给的 qrels 与 runs，**可伪造**，单人标注无 κ 时**不得**外推业务效果；`--fail-on-gap` 只把已发现的缺口变成非零退出码，**不把「没发现」变成「搜索达标」**。
+- 无判定集 query（如 dogfood 的「月球基地」）只计零结果率；nDCG 记「—」、不进均值、**不触发** SR-21——「未评测」不得读成「相关性差」。这条口径由本轮 dogfood 逼出来（见下）。
+- `metric-audit.py` 同理：`scan` 只认静态写法（`COUNT(*)` 无 WHERE、`AVG(AVG())`、`23:59:59`、缺 `DISTINCT`、金额 float、响应无 `as_of`、`SELECT *`、无 SRM）；`check` 只核给到的 `metrics.json`（定义卡字段、两处取值、双阈值、新鲜度、分子>分母、SRM），dashboard/source 数字由测试者提供，**可伪造**；**静态未命中 ≠ 口径正确**——dogfood 里硬编码的 `paid_orders: 1234` 就没有被任何静态规则捕获。
+- SRM 用 df=1 卡方与 `p<0.001` 判分流异常，只说明「分配比例不像随机」，**不证明**实验无偏（埋点、去重、跨设备身份仍可能错）；「对账一致」也不升级为「口径正确」，只证明三处当前取值一致。
+- R-21 不认「手工试了几个词」「CTR 高」「两次看着一样」「有同义词表」「零结果少」；R-22 不认「看板截图」「数字差不多」「p<0.05」「单一汇总值」「日均值求平均」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+在项目外临时目录 `C:\Users\摩羯座\AppData\Local\Temp\pt-v113-dogfood\searchmetric-demo` 建了一个零依赖 Node 24 夹具（`node:http`，40 条商品 + 搜索/翻页/指标/实验端点 + 一个前端渲染文件），故意植入缺陷：`LIKE` 字符串拼接、`ORDER BY created_at` 无 tie-breaker、先切片后租户过滤、`total: 10000` 常量、`LIMIT size` 不夹取、highlight 拼 `<em>`+q、日志打 q 与 `user_email`、`/api/metrics` 硬编码 1234、`metrics.json` 定义卡缺字段与分子>分母；用 `probe.js` 真实请求采集：
+
+- **真实 HTTP 证据**：耳机/跑鞋/咖啡/键盘/显示器 **五个 query 返回同一组 top-6**（`doc-20,39,38,18,17,36`）；`total` 恒 10000；月球基地 0 结果；page0 6 条 / page1 7 条、overlap=[]（tenant-a 共 27 条）；注入 `' OR 1=1 --` 返回 200 并回显 `... WHERE title LIKE '%' OR 1=1 --%' ORDER BY created_at DESC LIMIT 3 OFFSET 0`；`size=100000` 实际返回 26；以 alice 身份 `tenant=tenant-b` 拿到 14 条 tenant-b 文档；dashboard 1234 vs 源表 1301（5.150%）；实验 5000/250 vs 5100/280（SRM p=3.197e-01）。
+- `search-audit.py scan`：9 行（SR-01 CRITICAL、SR-02 HIGH×2、SR-03、SR-06×2、SR-07、SR-09、SR-10），其中 ACL 后置与拼接 DSL 由 `--fail-on-gap` 判 exit 1；`eval`：13 gap（SR-20 S1 ×1、SR-21 HIGH ×7、SR-23 MEDIUM ×5），mean nDCG@10 = 0.235121，零结果率 11.1%（8 条有判定集 query 参与均值）。
+- `metric-audit.py scan`：0 行（静态规则不解析指标定义 JSON，D14 硬编码 1234 靠人工发现）；`check`：6 gap（MA-21×2、MA-20×2、MA-22、MA-23），SRM 表输出 χ²≈0.99、p=3.197e-01。
+- 合计 **19 条脚本 gap + 3 项人工发现**，质量状态 **FAIL**、发布建议 **No-Go**（S1 4 / HIGH 7 / MEDIUM 3）。
+- **dogfood 反向改进了技能（本轮真实增量）**：① `SR-06` 把 `el.innerHTML = ""`（清空占位）误判为 XSS sink → 赋值目标改为 `[^"'\s]`，空串不再命中，`web.js:6` 消失、`:9` 保留；② 无判定集的「月球基地」被算成 nDCG=0 并报 SR-21「相关性差」→ `query_metrics` 增 `judged`，SR-21/SR-23 只对有判定集 query 生效、均值只统计有判定集 query，复跑 mean nDCG 0.209→0.235；③ `metric-audit` 文件级规则一律报 `line 1`，且把含 `fetch`/`res.json` 的前端 `probe.js` 判成指标服务端 → 增 `line_of()` 取真实命中行 + `is_client` 排除，假阳性消失；④ 手册 §9 的 SR 编号与脚本**整体错位**（手册 SR-01=LIKE、脚本 SR-01=拼接，SR-06/07/08 全错位）→ 按脚本重排 §9 十行、补 SR-08「前导 wildcard」，README/SKILL 的脚本索引同步。
+- 证据与报告已归档 `.workbuddy-ai/dogfood/v1.13.0/`（`tree.md`、`report.md`、4 份工具输出、3 份采集 JSON、夹具源码与 `MANIFEST.sha256.json`）；该目录本地记忆、不入库。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py`：**GREEN**（PASS 71 / WARN 0 / FAIL 0，exit 0）。
+- 四个负向测试（临时副本，不污染源）：① 删 `assets/report-template.md` 的 `| R-21` 行 → §7d FAIL；② 删 `references/search-quality-testing.md` → 断链 FAIL；③ 删 `SKILL.md` 的 R-22 规则行 → §7c 双向同步 FAIL；④ 把 `references/tools.md` 里 4 处 `metric-audit.py` 全部抹成 `X-audit.py` → §7a 工具表登记 FAIL。还原后回 GREEN。
+- 14 个带 `--self-test` 的脚本全部 exit 0（`selfcheck.py` 本身由上述 GREEN 覆盖）；`search-audit.py scan .` / `metric-audit.py scan .` 对技能仓库自身「未命中已知模式」（证明无自伤，也不等于仓库无缺陷）。
+- 同步全局 `C:\Users\摩羯座\.agents\skills\project-tester` 并逐文件 sha256 比对（排除 `.git`/`.workbuddy-ai`）0 差异；git commit + push 到 `https://github.com/Soren-Blade/project-tester.git`。
+
+### 提案处置
+
+- **已吸收**（v1.12 提出）：「分页 collation 声明 vs 实测自动化」的检索侧 → R-21 §5 的「唯一 tie-breaker + 两次 top-20 逐位 diff + 第 2 页拼接去重」+ `SR-25`；数据库方言元数据部分仍待评估。
+- **已吸收**（本轮 dogfood）：四条真实缺陷（空串 sink 误报、无判定集 nDCG 误报、文件级行号/前端假阳性、手册 SR 编号错位），均加回归并在本条目记录。
+- 待评估：指标接口「硬编码常量」静态规则（子串/字面量判据未定，易把配置常量误报）。
+- 待评估：qrels 双标注一致性的自动比对（两文件逐 query κ 矩阵）。
+- 待核实：不同检索后端（ES / OpenSearch / pgvector / Meilisearch）对 `track_total_hits`、`max_result_window`、tie-breaker 的默认差异，需各跑一次真实请求，不把 ES 的 10000 默认推广到全家。
+- 顺延：批量 207 逐条 code 一致性、税务辖区舍入矩阵、缓存键双会话矩阵、上传解码重编码自动化、AI 变异杀伤跨语言跑数。
+
+
 
 **主题**：从「缓存不串号 · 文件不可当代码」扩展到「**翻得准 · 报得清**」——查询语义与分页正确性（R-19）与错误契约与可诊断性（R-20）。一个接口全绿、金额也对、缓存也隔离的系统，仍然会在「第 1 页的 10 条永远看不到」「翻页时后台插了 1 行，后面 10 条被跳过」「`total` 显示 33 但只有 18 条可见」「`sort=created_at LIMIT 1` 让 500 把 SQL 与堆栈一起吐给用户」「429 没 `Retry-After`，客户端把重试打成雪崩」上成片出错；这类缺陷不是「边界没测」，而是「分页契约与错误契约没有可证伪判据」。新增 **R-19 查询语义与分页正确性**、**R-20 错误契约与可诊断性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 Use The Index Luke「No OFFSET Movement」、PostgreSQL/MySQL collation、RFC 8288、GraphQL Relay Cursor、OWASP SQLi Prevention，以及 RFC 9457 / 9110 / 6585 / 4918、OWASP Error Handling Cheat Sheet、OWASP WSTG ERRH、CWE-209、W3C Trace Context。按每日升级序列记为 #13。
 

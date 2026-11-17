@@ -95,6 +95,8 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **错误契约与泄漏审计**（v1.12） | `python scripts/error-audit.py scan <path> --format markdown --fail-on-gap`；`error-audit.py check --file errors.json`；`error-audit.py cases`；`--self-test`；配合 `curl -sS -D -` 抓响应头与体 | 无夹具时手工触发一个真实 500 并 grep 堆栈/绝对路径/SQL 正则，注明「仅验证本地错误形态」；**返回 500 ≠ 已处理**，生产配置必须单独核对 | `error-contract-testing.md` §3/§10 |
 | **技能自检与门禁**（v1.12 补登记） | `python scripts/selfcheck.py`（frontmatter / 断链 / 版本一致 / 索引覆盖 / §7a 工具表登记 / §7b 路由闭环 / §7c 规则双向同步 / §7d 报告矩阵 / §7e 例外声明 / §7f 脚本门禁）；版本升级前必须 exit 0 | 环境无 Python 时按 `references/self-evolution.md` §3 手工逐项核清单，报告标「未跑自检」，**不得**写「已自检通过」 | `self-evolution.md` §3 / `quality-gates.md` §8 |
 | **测试数据生成与脱敏**（v1.12 补登记） | `python scripts/test-data-gen.py generate --seed <n> --count <n> --format json`（确定性种子）；`test-data-gen.py mask --file records.json --fields email,phone`（保留格式掩码）；`--self-test` 验确定性与掩码可证伪 | 手工造六类样本：空、单行、脏行（BOM/CRLF/缺列）、超长、重复键、Unicode 边界；注明「未用生成器，种子不可复现」 | `test-data-management.md` §2/§6 |
+| **搜索相关性与排序**（v1.13） | `python scripts/search-audit.py scan <path> --format markdown --fail-on-gap`；`search-audit.py eval --qrels qrels.json --runs runs.json --k 10 --format markdown --fail-on-gap`（可加 `--min-ndcg 0.60 --max-zero-rate 0.20`）；`search-audit.py cases`；`--self-test` 验 nDCG/MRR/Recall 手算一致 | 无判定集时只做「同 query 两次 top-20 diff + 零结果率 + 查询理解五层」并写「无 qrels，相关性未验证」；**扫描未命中 ≠ 相关性达标**，CTR 高不算相关，两次看着一样不算排序稳定 | `search-quality-testing.md` §3/§10 |
+| **指标口径与报表对账**（v1.13） | `python scripts/metric-audit.py scan <path> --format markdown --fail-on-gap`；`metric-audit.py check --file metrics.json --format markdown --fail-on-gap`；`metric-audit.py cases`；`--self-test` 验 SRM 卡方与 p 手算一致 | 无源表访问时只核对 dashboard 与 API 两处并写「未与源表对账」；**两边数字差不多 ≠ 口径一致**，`p<0.05` 不算实验有效（先过 SRM），看板截图不算对账证据 | `metrics-correctness-testing.md` §2/§10 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -120,6 +122,8 @@ python scripts/upload-audit.py --self-test || echo "upload-audit SELFTEST FAIL -
 python scripts/query-audit.py --self-test || echo "query-audit SELFTEST FAIL -> 退回手工全量遍历与翻页插行对账，结论标待确认"
 python scripts/error-audit.py --self-test || echo "error-audit SELFTEST FAIL -> 退回手工触发 500 与泄漏正则核对，结论标待确认"
 python scripts/test-data-gen.py --self-test || echo "test-data-gen SELFTEST FAIL -> 退回手工造六类样本，注明种子不可复现"
+python scripts/search-audit.py --self-test || echo "search-audit SELFTEST FAIL -> 退回手工两次 top-20 diff 与零结果率采样，注明无 qrels"
+python scripts/metric-audit.py --self-test || echo "metric-audit SELFTEST FAIL -> 退回手工三处取值与卡方手算，注明未自动对账"
 python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版本/同步/提交，先修门禁（§7a~§7f）"
 ```
 
