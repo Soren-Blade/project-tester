@@ -279,6 +279,19 @@
 - [流程] 自测喂的样本覆盖不到真实形态 = 假 GREEN：旧 `STACK_RE` 只喂过 `at D:\app\server.js:12:9` 与 `(<anonymous>)`，漏掉括号帧也照绿 — 应用：每个正则的自测至少一例「框架真实输出原文」+ 一例「易混文本」（`at 10:30` 不得判堆栈）
 - [环境] 再次实证：PowerShell `(Get-Content -Raw) -replace … | Set-Content -Encoding utf8` 改写 UTF-8 源码会把中文注释写坏并把两行合并（`ReferenceError: pages is not defined`）— 应用：源码改动只走 edit/write 工具或 python，禁用 Get-Content/Set-Content 往返
 
+## 并发 / 幂等 / 评测可信性类（v1.14 蒸馏）
+
+- [手法] 并发缺陷不是「概率低」而是「窗口存在」：所有 lost update 都长成「先查后写」（read-modify-write）——判据是 `UPDATE` 的 `WHERE` 里有没有 `version`/条件，而不是「有没有用事务」 — 应用：R-23 先列写路径与不变量（余额=Σ流水 / 库存≥0 / 一键一资源），再找窗口，最后用真并发收口
+- [手法] 假并发比不测更危险：串行 `for` + `sleep`、`Promise.all` 但请求打不同键、单实例压测，全都不进同一个竞态窗口 — 应用：结论必须写「并发度 N、屏障方式（`threading.Barrier` / `xargs -P` / k6 constant-arrival）、实例数」，缺一项降为「待确认」
+- [安全] `SETNX` 成功后再单独 `EXPIRE` 是两步：中间崩溃 = 锁永不过期；`DEL` 不校验持有者是释放别人的锁 — 应用：单条 `SET NX PX` + 唯一 token 校验删除 + fencing token；R-23 §6
+- [安全] 幂等键的存在不证明幂等生效：真正的判据是「同键异体是否被拒（409）」与「键作用域（全局/按用户/按租户）写没写进契约」，以及「结果缓存保留期」（Stripe 口径 24h） — 应用：六格矩阵（同键同体/同键异体/不同键同体/键过期重放/跨用户复用/归一化）逐格实测，不看代码里有没有 `idempotency_key` 字段
+- [安全] `FOR UPDATE` 在没走索引的列上会升级成表锁/间隙锁；忽略 `rowcount` 等于没扣减校验 — 应用：扣减必须核对 `rowcount` 与最终不变量，锁等待用 `pg_locks`/`SHOW ENGINE INNODB STATUS` 留原文
+- [流程] 评测结论的最小可证伪集 = 样本量 n + 判定器校准 + 基线 + 分母诚实：n<3 只能写方向性，error/timeout/限流/拒答一律计入分母，出分母即造假 — 应用：R-24 §11 八项逐项填，缺一项降级
+- [安全] LLM judge 与 generator 同模型 = 自偏好偏差，判 S1；judge 未与人工双标校准（κ<0.60）时一律不得作为通过证据 — 应用：先算 po/pe/κ 再谈分数，位置/长度偏见用成对交换样本验
+- [手法] 「单次 87 分」不是「87 分」：非确定系统必须给 n 次采样与 Wilson 95% CI，pass@1 与 pass@k 口径要写明 — 应用：报告写「23/29=79.3%，CI [61.6%, 90.2%], n=29」，不写「准确率 79%」
+- [工具] 静态扫描器扫文档会自我误伤：手册/README 在正文里引用反模式原文（「不要写 `temperature: 1.0`」）会被正则命中 —— 应用：扫描默认只扫代码与配置，文档要显式 `--include-docs` 并逐条按「引用 vs 实践」裁决；`scan` 0 命中只说明没已知形态
+- [流程] CHANGELOG 里的「已同步 / 已推送 / 负向测试通过」是预言不是事实：本轮初稿先写了 GREEN 76 与四条负向测试计划，实跑得 77，四例 FAIL 文案也各不相同 — 应用：先跑、贴真实输出，再写结论；数字只能来自工具回显
+
 ## 技能改进提案区（供用户决策，不自行改动）
 
 > 运行时发现的流程缺口写这里；每日升级任务按 `references/self-evolution.md` §3 处理后，在 CHANGELOG 标注"已吸收 / 已驳回 + 理由"。
@@ -315,4 +328,9 @@
 - [技能改进] ✅ **已吸收（v1.13）**：dogfood 暴露的「无判定集 query 被算成 nDCG=0 并触发 SR-21」→ `search-audit.py` 增 `judged` 字段，SR-21/SR-23 只对有判定集 query 生效、均值只统计有判定集 query、输出 nDCG 记「—」；同一轮还修了 `SR-06` 空串 `innerHTML` 误报（`[^"'\s]`）、`metric-audit` 文件级规则恒报 line 1 + 前端 `fetch` 假阳性（`line_of` + `is_client`）、手册 §9 SR 编号与脚本整体错位（按脚本重排 10 行）
 - [技能改进] 待评估（v1.13 提出）：指标接口「硬编码常量」静态规则（dogfood D14：`/api/metrics` 直接返回字面量 1234，现有 MA-01~MA-10 全未命中）→ 需要先定判据（响应构造处数字字面量 vs 从查询取值），避免把「常量配置」误报
 - [技能改进] 待评估（v1.13 提出）：qrels 双标注一致性的自动化（两名标注者文件 + 逐 query κ 矩阵）→ 本轮只给 κ 阈值与口径，未做双文件比对脚本
+- [技能改进] ✅ **已吸收（v1.14）**：并发与幂等正确性、AI 系统评测可信性 → 落地为 `references/idempotency-concurrency-testing.md` + `references/llm-eval-testing.md` + 两份矩阵模板 + `scripts/concurrency-audit.py` / `scripts/llm-eval-audit.py`，新增 **R-23/R-24**；理由：旧账本里 `data-integrity-testing.md` 只有「并发不变量」一句、`money-correctness-testing.md` 只有「并发重复扣款与超卖」一词，L4 层没有任何可证伪规则；本轮 dogfood 用反模式夹具实跑出「并发 scan 10 命中 / side-effects 揪出 `ord-1002` 一键多资源与 `ord-1003` 同键副作用 2 次」与「评测 stats 23/29=79.3%、CI [61.6%, 90.2%]、κ=0.500、McNemar p=0.03125 → exit 1」
+- [技能改进] ✅ **已吸收（v1.14）**：`llm-eval-audit.py scan` 扫文档自我误伤（自扫技能仓库命中 6 条全是 `.md` 正文引用反模式原文）→ 默认跳过 `.md`、新增 `--include-docs`、`--self-test` 加噪声回归断言、`selfcheck.py` §7f 锁住该参数、手册 §10 写入「扫描范围契约」；理由：同 `search-audit.py` 跳过自身的先例，但那次只排除了自己，没排除其它文档
+- [技能改进] 待评估（v1.14 提出）：并发结论的「最小并发度 N」跨语言经验值 → 现给 N≥10（写路径 20~50），缺真实项目回归样本，不写死成通则
+- [技能改进] 待评估（v1.14 提出）：`concurrency-audit.py side-effects` 事件 schema 是否兼容 OTel span 导出 → 现绑 JSONL 六字段，需先看 span 语义才能不丢字段
+- [技能改进] 待核实（v1.14 提出）：Kafka / SQS / RabbitMQ / NATS 的重复投递窗口与 at-least-once 默认行为差异 → 逐中间件跑一次真实注入再写判据，不把 Kafka 语义推广到全家
 

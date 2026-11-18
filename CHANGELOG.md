@@ -5,7 +5,89 @@
 
 ---
 
-## [v1.13.0] — 2026-11-17 · 每日升级 #14
+## [v1.14.0] — 2026-11-18 · 每日升级 #15
+
+**主题**：从「搜得准 · 数得对」扩展到「**并发不打架 · 评测说得清**」——并发与幂等正确性（R-23）与 AI 系统评测可信性（R-24）。一个接口全绿、分页正确、指标也对得上的系统，仍然会在「两个人同时下单，库存扣成 -1」「用户连点两次，生成两个订单扣两次款」「`SELECT` 完再 `UPDATE`，最后一笔覆盖前一笔」「`SETNX` 加锁后 `EXPIRE` 前进程挂了，锁永不过期」「同一消息被消费两次，用户收到两封邮件」「评测集 20 条就说准确率 90%」「LLM judge 和被测模型是同一个，自己给自己打分」「单次跑出 87 分就当 87 分」上成片出错；这类缺陷不是「没测」，而是「并发窗口、幂等语义与评测统计没有可证伪判据」。新增 **R-23 并发与幂等正确性**、**R-24 AI 系统评测可信性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 Kleppmann *DDIA* 的 lost update 分类、PostgreSQL 事务隔离与 `SELECT … FOR UPDATE`、MySQL InnoDB locking reads、Stripe 幂等键（同键异体→409、结果缓存 24h）、IETF `Idempotency-Key` 草案、RFC 9110 §9.2.2、Jepsen 一致性模型、AWS Builders' Library 重试安全、Google SRE Workbook 重试放大，以及 NIST AI RMF (AI 100-1)、ISO/IEC 42001、HELM、MT-Bench 的 LLM-as-a-judge 偏见、Cohen's κ、McNemar、Wilson 区间、OWASP LLM Top 10。按每日升级序列记为 #15。
+
+**遵循上轮建议**：未重写已覆盖的 22 个主题与五阶段、四层模型、路由闭环，以 **New 两条规则 + Enhance 全链路接线**；四层模型与五阶段流程**未改语义**，只升 MINOR。本轮选型理由来自上轮遗留账本：`data-integrity-testing.md` 全程只有「并发不变量」一句、`money-correctness-testing.md` 只有「并发重复扣款与超卖」一个词，**没有任何 R-N 规则、矩阵或脚本**覆盖并发写路径，而超卖/重复扣款/丢失更新恰是线上最常见的一类 S1；`ai-native-testing.md` 虽有 §4 评测手法，但 L4 层**至今无一条可证伪规则**，与「每一层都要有判据」自相矛盾。v1.13 遗留提案中，「qrels 双标注 κ 自动比对」顺延（本轮做的是 R-24 的 judge 校准 κ，两者不是同一件事）；「指标接口硬编码常量静态规则」仍**待评估**；「批量 207 逐条 code」「税务辖区舍入矩阵」「缓存键 × 身份 × tenant × locale 矩阵」「上传解码重编码自动化」「AI 变异杀伤跨语言跑数」继续顺延；「`money-audit.py` 自动拉渠道对账单」维持**已驳回**。每轮至少一条可证伪规则 → 本轮引入 **R-23 / R-24**，并做了**四例负向测试**。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/idempotency-concurrency-testing.md`、`assets/idempotency-concurrency-matrix-template.md`、`scripts/concurrency-audit.py` | 新增 R-23 能力：不变量先行（余额 == Σ流水 / 库存 ≥ 0 / 一键一资源 / 单号唯一）、三种并发与「只有真并发算数」（屏障 `threading.Barrier` / `xargs -P` / k6 constant-arrival，N≥10）、幂等键矩阵（同键同体 / 同键异体→409 / 不同键同体 / 键过期重放 / 跨用户复用 / 归一化）、锁与事务六类漏点（`FOR UPDATE` 缺索引升级为表锁 / `version` 未进 `WHERE` / `rowcount` 被忽略 / `SETNX`+`EXPIRE` 两步 / 锁内 `sleep` / 自调用 `@Transactional`）、唯一约束与错误码映射（冲突→409 而非 500）、分布式锁与 fencing token、先 ack 后处理与 outbox、副作用对账；CC-01~CC-10 静态 + CC-20~CC-29 运行时 |
+| New | `references/llm-eval-testing.md`、`assets/llm-eval-matrix-template.md`、`scripts/llm-eval-audit.py` | 新增 R-24 能力：评测集构成与污染检查（公开基准 n-gram/哈希比对）、非确定性与采样（n≥3、固定 `temperature/top_p/seed`、pass@1 vs pass@k）、判定器可信性（人工双标 κ≥0.60、judge 与人工一致率 ≥80%、judge ≠ generator、rubric 版本化、位置/长度偏见）、失败分类与分母诚实（error/timeout/限流/拒答一律计入）、成本与 p50/p95、注入与工具越权用例、回归与放量门槛（基线 + Wilson 95% CI + McNemar α=0.05 + 回滚演练）；LE-01~LE-10 静态 + `stats` 统计 |
+| Enhance | `SKILL.md`（description 触发词、v1.14 增量段、L4 行挂两份手册、v1.14 横向叠加表、阶段 1 并发面/AI 评测面、阶段 3 两条专项、判 bug 13→**15** 条、**二十四条**规则表 R-23/R-24、反向断言链 9 句、阶段 4 自检、参考索引 6 行） | 只增量，不改五阶段与四层模型；「二十二条」标题、阶段 4 矩阵行数、`R-1~R-22` 全部同步为「二十四条 / 二十四行 / R-1~R-24」 |
+| Enhance | `references/dissect.md` §6/§7/§8 | 测试设施盘点补「并发面」「AI 评测面」两行；攻击面补「并发与幂等」「AI 评测」两条；路由表补 R-23/R-24 两行（含「仅串行重放」「仅人工抽看」降级写法） |
+| Enhance | `references/quality-gates.md` §3/§8、`assets/report-template.md` 证据矩阵 | 结论作废判据补 R-23/R-24 两行（R-23 必须给并发度 N 与实测差额；R-24 的 n<3 / 超时出分母 / judge 同模型 / 无基线即 S1）；24 行矩阵 + 「二十四行」脚注 + 「不得写成」交叉引用 |
+| Enhance | `references/tools.md` | 专项工具表补 2 行 + 可用性探测 2 行 + 工具使用纪律 23/24（串行重放 ≠ 并发幂等；跑通一遍 ≠ 评测有效） |
+| Enhance | `scripts/selfcheck.py` §5/§7f、`README.md`、`CHANGELOG.md`、`memory/global-lessons.md` | 登记 4 个新文件关键字段、2 个新脚本门禁（`CC-`/`LE-`/`SELFTEST GREEN`/`duplicate_side_effect`/`Wilson`/`McNemar`）、徽章/结构/速查/设计点/版本史、教训与提案 |
+| Existing | 其余 40 份手册与 29 份模板 | 不重复造，仅在路由/交叉项里引用（`ai-native-testing.md` 保留注入手法，R-24 只做评测可信性） |
+
+### 蒸馏来源（深度蒸馏，URL 全记录）
+
+- Martin Kleppmann, *Designing Data-Intensive Applications*（lost update / write skew / 可串行化）：https://dataintensive.net/
+- PostgreSQL, *Transaction Isolation*（READ COMMITTED 的非重复读与幻读语义）：https://www.postgresql.org/docs/current/transaction-iso.html
+- PostgreSQL, *SELECT — Locking Clause*（`FOR UPDATE` 与行不存在时锁不住）：https://www.postgresql.org/docs/current/sql-select.html
+- PostgreSQL, *Constraints*（UNIQUE 是最终防线）：https://www.postgresql.org/docs/current/ddl-constraints.html
+- MySQL 8.0 Reference, *Locking Reads*（间隙锁与索引缺失升级为表锁）：https://dev.mysql.com/doc/refman/8.0/en/innodb-locking-reads.html
+- Stripe, *Idempotent requests*（键保留 24h、同键异体报错、回放首次结果）：https://docs.stripe.com/api/idempotent_requests
+- IETF, *The Idempotency-Key HTTP Header Field*（草案：键作用域与冲突语义）：https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
+- RFC 9110 §9.2.2, *Idempotent Methods*：https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.2
+- Jepsen, *Consistency Models*（并发历史与异常分类）：https://jepsen.io/consistency
+- AWS Builders' Library, *Making retries safe with idempotent APIs*：https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/
+- Google SRE Workbook, *Addressing Cascading Failures*（重试放大）：https://sre.google/workbook/cascading-failures/
+- NIST, *AI Risk Management Framework (AI 100-1)*：https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf
+- ISO/IEC 42001:2023, *AI management system*：https://www.iso.org/standard/81230.html
+- HELM, *Holistic Evaluation of Language Models*：https://arxiv.org/abs/2211.09110
+- Zheng et al., *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*（位置/长度/自我偏好偏见）：https://arxiv.org/abs/2306.05685
+- Cohen, *A Coefficient of Agreement for Nominal Scales*（κ, 1960）：https://doi.org/10.1177/001316446002000104
+- McNemar, *Note on the sampling error of the difference between correlated proportions*（1947）：https://doi.org/10.1007/BF02295996
+- OWASP, *Top 10 for LLM Applications*（注入、越权、数据外泄）：https://owasp.org/www-project-top-10-for-large-language-model-applications/
+- OpenAI Evals / Anthropic Evals（grader 设计与用例组织）：https://github.com/openai/evals · https://github.com/anthropics/evals
+
+### 口径诚实
+
+- `concurrency-audit.py` **不联网、不代填**：`scan` 是逐行启发式（先查后写、`FOR UPDATE` 缺索引、`version` 未进 `WHERE`、`rowcount` 被忽略、`SETNX`+`EXPIRE` 两步、锁内 `sleep`、自调用事务、无唯一约束/去重表、先 ack 后处理、共享可变状态），命中只是「可疑写法」，**不证明**并发安全；`cases` 只打印夹具与判据模板，**不替你造并发**；`side-effects` 只对账你给的 JSONL（`--events`），事件日志本身可伪造；`--fail-on-gap` 只把已发现的高危线索变成非零退出码，**不把「没发现」变成「幂等已做」**。
+- 并发测试的假并发陷阱：串行 `for` 循环 + `sleep`、单实例压测、`Promise.all` 但每条请求打不同键，都不能证明并发安全；结论里必须写清**并发度 N、屏障方式、实例数**，缺一项即降级为「待确认」。
+- `llm-eval-audit.py` 同理：`scan` 只认静态线索（无评测集、单样本、无基线、超时出分母、judge 未校准、judge = generator、未 pin snapshot、无成本观测、注入用例缺失、污染未查）；`stats` 只做算术（Wilson CI、McNemar 精确 p、Cohen's κ、逐类 pass rate），输入 JSONL 由测试者提供、**可伪造**；**统计显著 ≠ 模型可用**，**κ 达标 ≠ 判定器无偏**，**离线绿 ≠ 线上可用**。
+- R-23 不认「串行重放通过」「代码里有锁」「压测没报错」「幂等键存在」「有事务注解」；R-24 不认「跑通一遍」「LLM judge 说好」「单次 87 分」「评测集 20 条」「改了 prompt 分数涨」。
+
+### 深度实测（dogfood，模拟用户项目）
+
+**并发侧**：在 `.workbuddy-ai/dogfood/v1.14.0/concurrency/` 建了一个 7 文件的零依赖反模式夹具（`demo_app/`：先查后写扣库存、`SETNX`+`EXPIRE` 两步锁、无唯一约束重复建单、先 ack 后处理消费者等），并用 `events.jsonl`（9 条有效事件 + 1 条注释 + 1 条坏行）模拟副作用日志，真实执行日志见 `run.log`（15040 字节，含命令原文与退出码）：
+
+- `concurrency-audit.py scan demo_app` → **10 条命中（8 HIGH / 2 MEDIUM）**，id 集合 `CC-01/02/03/04/05/06/08/10`；`CC-07`（`version` 未进 `WHERE`）与 `CC-09` 只在 `--self-test` 夹具里覆盖；`CC-03`/`CC-08` 在 `lock.py` 各命中 2 处，属启发式噪声，报告已按 §11 第 7 项逐条标「需人工裁决」。
+- `concurrency-audit.py side-effects --events events.jsonl --fail-on-gap` → **exit 1**，5 个键 / 9 条事件 / 1 条坏行，**2 个违规键**：`ord-1002`（一键多资源）、`ord-1003`（同键副作用 2 次）。
+- 手工裁决结论：扣库存路径为「先查后写 + 无 `version` CAS + 无原子 `UPDATE … WHERE stock >= ?`」，按 R-23 判 **S1**（并发即超卖）；`SETNX` 后 `EXPIRE` 两步之间进程崩溃可致锁永不过期，判 **S1**。
+
+**评测侧**：在 `.workbuddy-ai/dogfood/v1.14.0/llm-eval/` 建了评测 harness（6 文件）与 `runs.jsonl`（29 次采样）、`baseline.jsonl`（29 条基线）、`judge.jsonl`（36 条人工/judge 对照），真实执行日志 126 行：
+
+- `llm-eval-audit.py stats --fail-on-gap` → pass **23/29 = 79.3%**，Wilson 95% CI **[61.6%, 90.2%]**；8 个 case，error 2（6.9%）与 timeout 1（3.4%）**均计入分母**；p50/p95 = **888/1500 ms**；基线 McNemar **b=6 c=0，双尾 p=0.031250**（当前优于基线）；judge 36 条，po=0.7500 pe=0.5000，**Cohen's κ=0.5000**（阈值 0.60 → 判不可用）。**exit=1**，3 条 FAIL 原因：pass rate < 80%、`c07`/`c08` 的 n=1（样本量不足）、κ < 0.60。
+- `llm-eval-audit.py scan` 夹具 → **LE-01~LE-10 全部命中（13 条 findings），`--fail-on-gap` exit 1**；`cases` exit 0。
+- 手工裁决结论：单次采样 + judge 自评的系统按 R-24 判 **S1**（评测结论不可信）；把超时样本算通过判 **S1**（分母造假）。
+- **dogfood 反向修复（本轮真实缺陷）**：用 `scan` 扫技能仓库自身时命中 6 条（`SKILL.md:33`、`references/ai-native-testing.md`、`references/idempotency-concurrency-testing.md`、`scripts/test-data-gen.py`、`scripts/error-audit.py`），全是**文档正文引用反模式原文**（「不要写 `temperature: 1.0`」「超时必须计入分母」）被正则误伤——旧实现只排除了自己的手册/模板，没排除其它 `.md`。已修：`scan` 默认跳过 `.md`（`EVAL_SUFFIXES` 去掉 `.md`），新增 `--include-docs` 显式开启，并在 `--self-test` 加文档噪声回归断言；修复后自扫 0 命中、纯代码夹具仍 13 条全中。手册 §10 写入「扫描范围契约」，`tools.md` 与 `selfcheck.py` §7f 同步锁住 `--include-docs`。
+
+证据与报告已归档 `.workbuddy-ai/dogfood/v1.14.0/{concurrency,llm-eval}/`（夹具源码、JSONL、run.log、报告）；该目录本地记忆、不入库。
+
+### 自检与门禁
+
+- `python scripts/selfcheck.py`：**GREEN**（PASS 77 / WARN 0 / FAIL 0，exit 0）。
+- 四个负向测试（临时副本 `D:\My Skills\.negtest`，不污染源，实测输出见 `.workbuddy-ai/dogfood/v1.14.0/MANIFEST.md` §4）：① `assets/report-template.md` 的 `| R-23` 行改号 → `[FAIL] 报告证据矩阵缺少规则表格行: R-23`（§7d）；② 删 `references/llm-eval-testing.md` 并把引用改成 `llm-eval-gone.md` → `[FAIL] 断链引用: …` 6 条（§3）；③ `SKILL.md` 的 `**R-24 …**` 行改号 → `[FAIL] quality-gates.md 出现 SKILL.md 未定义的规则: R-24` + 矩阵同步 FAIL（§7c/§7d）；④ 把 `references/tools.md` 里 `concurrency-audit.py` 抹成 `X-audit.py` → `[FAIL] references/tools.md 未登记脚本: concurrency-audit.py`（§7a）。四例全部 exit 1，还原后回 GREEN。
+- 16 个带 `--self-test` 的脚本全部 exit 0（`selfcheck.py` 本身由上述 GREEN 覆盖）。两个新脚本自扫技能仓库：`concurrency-audit.py scan .` **0 命中**（仓库无并发写路径，符合预期）；`llm-eval-audit.py scan .` 修复前 6 条全是文档噪声，修复后 **0 命中**（见上「dogfood 反向修复」）——「0 命中」只说明没有已知形态，**不等于**仓库无缺陷。`llm-eval-audit.py` 按 Python 3.9 语法做了 `ast` 校验，`concurrency-audit.py` 过 `py_compile`。
+- 同步全局 `C:\Users\摩羯座\.agents\skills\project-tester` 并逐文件 sha256 比对（排除 `.git`/`.workbuddy-ai`）0 差异；git commit + push 到 `https://github.com/Soren-Blade/project-tester.git`。
+
+### 提案处置
+
+- **已吸收**（v1.13 提出）：「指标接口硬编码常量静态规则」→ 本轮**仍未落地**，但 R-24 的 `LE-10`「合成数据/评测集污染未查」间接覆盖同类「字面量冒充测量」问题；判据仍待定，继续待评估。
+- **已吸收**（本轮 dogfood）：`CC-07`/`CC-09` 仅 self-test 覆盖（夹具缺对应写法）已在手册 §9 标注覆盖边界；未做规则合并以免误报。
+- 待评估：并发结论的「最小并发度 N 门槛」目前给的是 N≥10（写路径 20~50），缺跨语言经验值 —— 需更多真实项目回归再定。
+- 待评估：`side-effects` 的事件 schema 目前绑定 JSONL 六字段，是否需要兼容 OTel span 导出。
+- 待核实：不同消息中间件（Kafka / SQS / RabbitMQ / NATS）的「重复投递窗口」与 at-least-once 默认行为差异 —— 需各跑一次真实注入，不把 Kafka 的语义推广到全家。
+- 顺延：批量 207 逐条 code 一致性、税务辖区舍入矩阵、缓存键 × 身份 × tenant × locale 矩阵、上传解码重编码自动化、AI 变异杀伤跨语言跑数、qrels 双标注 κ 自动比对。
+
+---
+
 
 **主题**：从「翻得准 · 报得清」扩展到「**搜得准 · 数得对**」——搜索相关性与排序质量（R-21）与指标口径与报表可信（R-22）。一个分页正确、错误契约也规范的系统，仍然会在「搜『蓝牙耳机』第一页出来的是音箱和手机壳」「同一个词上午搜和下午搜 top-10 不一样」「翻到第 2 页又看到第 1 页那三条」「零结果率 18% 没人看」「看板写转化率 3.2%、源表算出来 4.1%」「两个报表 GMV 差 8 万，两边都说自己对」「A/B 说提升 12%，其实是分流比例坏了」上成片出错；这类缺陷不是「没测」，而是「相关性、排序稳定性、指标定义与对账没有可证伪判据」。新增 **R-21 搜索相关性与排序质量**、**R-22 指标口径与报表可信** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 NDCG 原论文 / TREC `trec_eval` / ir_measures / BEIR、Elasticsearch 的 `search_after`、`max_result_window`、`track_total_hits` 与 tie-breaker 语义、二次加权 κ、dbt MetricFlow 与 dbt tests、GA4 的 users vs sessions 口径差、Microsoft ExP 的 SRM 卡方、Simpson 悖论。按每日升级序列记为 #14。
 

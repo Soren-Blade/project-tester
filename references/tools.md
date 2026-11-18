@@ -96,7 +96,8 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **技能自检与门禁**（v1.12 补登记） | `python scripts/selfcheck.py`（frontmatter / 断链 / 版本一致 / 索引覆盖 / §7a 工具表登记 / §7b 路由闭环 / §7c 规则双向同步 / §7d 报告矩阵 / §7e 例外声明 / §7f 脚本门禁）；版本升级前必须 exit 0 | 环境无 Python 时按 `references/self-evolution.md` §3 手工逐项核清单，报告标「未跑自检」，**不得**写「已自检通过」 | `self-evolution.md` §3 / `quality-gates.md` §8 |
 | **测试数据生成与脱敏**（v1.12 补登记） | `python scripts/test-data-gen.py generate --seed <n> --count <n> --format json`（确定性种子）；`test-data-gen.py mask --file records.json --fields email,phone`（保留格式掩码）；`--self-test` 验确定性与掩码可证伪 | 手工造六类样本：空、单行、脏行（BOM/CRLF/缺列）、超长、重复键、Unicode 边界；注明「未用生成器，种子不可复现」 | `test-data-management.md` §2/§6 |
 | **搜索相关性与排序**（v1.13） | `python scripts/search-audit.py scan <path> --format markdown --fail-on-gap`；`search-audit.py eval --qrels qrels.json --runs runs.json --k 10 --format markdown --fail-on-gap`（可加 `--min-ndcg 0.60 --max-zero-rate 0.20`）；`search-audit.py cases`；`--self-test` 验 nDCG/MRR/Recall 手算一致 | 无判定集时只做「同 query 两次 top-20 diff + 零结果率 + 查询理解五层」并写「无 qrels，相关性未验证」；**扫描未命中 ≠ 相关性达标**，CTR 高不算相关，两次看着一样不算排序稳定 | `search-quality-testing.md` §3/§10 |
-| **指标口径与报表对账**（v1.13） | `python scripts/metric-audit.py scan <path> --format markdown --fail-on-gap`；`metric-audit.py check --file metrics.json --format markdown --fail-on-gap`；`metric-audit.py cases`；`--self-test` 验 SRM 卡方与 p 手算一致 | 无源表访问时只核对 dashboard 与 API 两处并写「未与源表对账」；**两边数字差不多 ≠ 口径一致**，`p<0.05` 不算实验有效（先过 SRM），看板截图不算对账证据 | `metrics-correctness-testing.md` §2/§10 |
+| **并发与幂等正确性**（v1.14） | `python scripts/concurrency-audit.py scan <path> --format markdown --fail-on-gap`；`concurrency-audit.py cases`；`concurrency-audit.py side-effects --events events.jsonl --fail-on-gap`；真并发用 `xargs -P` / `threading.Barrier` / k6 constant-arrival 屏障同发；`--self-test` 验 CC 规则与重复副作用检出 | 无多副本/无队列时可只做单实例并发与串行重放，写「未验多实例与消息重复」；**串行重放通过 ≠ 并发幂等**、压测没报错 ≠ 无超卖，幂等键存在 ≠ 幂等生效 | `idempotency-concurrency-testing.md` §9/§10 |
+| **AI 系统评测可信性**（v1.14） | `python scripts/llm-eval-audit.py scan <path> --format markdown --fail-on-gap`（默认跳过 `.md`，查文档示例加 `--include-docs`）；`llm-eval-audit.py stats --runs runs.jsonl [--baseline baseline.jsonl] [--judge judge.jsonl] --format markdown --fail-on-gap`；`llm-eval-audit.py cases`；`--self-test` 验 Wilson CI / McNemar / κ 手算一致 | 无预算做多次采样时只报「单次结果，无统计结论」；无人工标注时只写「未校准 judge，结论仅方向性」；**跑通一遍 ≠ 评测有效**、LLM judge 说好 ≠ 好、单次 87 分 ≠ 87 分 | `llm-eval-testing.md` §9/§10 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -124,6 +125,8 @@ python scripts/error-audit.py --self-test || echo "error-audit SELFTEST FAIL -> 
 python scripts/test-data-gen.py --self-test || echo "test-data-gen SELFTEST FAIL -> 退回手工造六类样本，注明种子不可复现"
 python scripts/search-audit.py --self-test || echo "search-audit SELFTEST FAIL -> 退回手工两次 top-20 diff 与零结果率采样，注明无 qrels"
 python scripts/metric-audit.py --self-test || echo "metric-audit SELFTEST FAIL -> 退回手工三处取值与卡方手算，注明未自动对账"
+python scripts/concurrency-audit.py --self-test || echo "concurrency-audit SELFTEST FAIL -> 退回手工并发屏障与副作用计数，结论标待确认"
+python scripts/llm-eval-audit.py --self-test || echo "llm-eval-audit SELFTEST FAIL -> 退回手工 CI/κ 手算与人工标注，注明无统计结论"
 python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版本/同步/提交，先修门禁（§7a~§7f）"
 ```
 
@@ -151,3 +154,5 @@ python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版�
 20. **查得准要靠遍历，不靠看第一页**：`query-audit.py scan` 是启发式，`matrix` 只裁决给定清单；R-19 的证据必须是「全量遍历去重后条数 == total」或翻页间插行/删行的重复与遗漏记录。（`query-pagination-testing.md` §4/§10）
 21. **错误审计只核「给到的样本」**：`error-audit.py scan` 只看代码形态，`check` 只裁决给定响应样本；真实泄漏需要真实 500 原文，生产配置需要生产证据；`SELFTEST GREEN` 只证明审计器自身可证伪。（`error-contract-testing.md` §3/§10）
 22. **自检 GREEN ≠ 技能正确，但自检 FAIL 一定不放行**：`selfcheck.py` 核的是结构一致性（frontmatter/断链/版本/索引/§7a 工具表登记/§7b 路由闭环/§7c 规则双向/§7d 报告矩阵/§7e 例外声明/§7f 脚本门禁），它不判断规则内容是否可证伪，也**不能替代 dogfood 实测**；新增脚本忘了登记本表会被 §7a 直接 FAIL。`test-data-gen.py` 的确定性只在「同脚本版本 + 同参数」下复现，跨版本不保证（`self-evolution.md` §3、`test-data-management.md` §2）
+23. **串行重放 ≠ 并发幂等，代码里有锁 ≠ 并发安全**：`concurrency-audit.py scan` 只是 grep 级启发式，`cases` 只输出待填矩阵，`side-effects` 只对账你提供的事件日志；真并发必须用屏障同时发射并用数据库终值/不变量复核。压测「没报错」只说明没撞上竞态窗口，超卖数 > 0、同键副作用 > 1、丢失更新即 S1。（`idempotency-concurrency-testing.md` §3/§10）
+24. **跑通一遍 ≠ 评测有效，单次分数 ≠ 分数**：`llm-eval-audit.py scan` 只看代码形态，`stats` 的 Wilson CI / McNemar / κ 都建立在「样本量与分母诚实」上——超时与错误必须计入分母，judge 必须与人工标注校准过（κ≥0.60）且不得与生成同模型。n<3、无基线对照、无污染检查时只能写「方向性观察，无统计结论」。（`llm-eval-testing.md` §3/§4/§10）
