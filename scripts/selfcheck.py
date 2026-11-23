@@ -160,6 +160,8 @@ checks = {
     "assets/idempotency-concurrency-matrix-template.md": ["R-23", "不变量", "幂等键", "不适用", "不得"],
     "references/llm-eval-testing.md": ["R-24", "评测集", "判定器", "不适用", "不得"],
     "assets/llm-eval-matrix-template.md": ["R-24", "评测集", "不适用", "不得"],
+    "references/mobile-app-testing.md": ["R-25", "权限", "深链", "不适用", "不得"],
+    "assets/mobile-app-matrix-template.md": ["R-25", "权限", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -355,6 +357,10 @@ SCRIPT_GATES = {
     "scripts/llm-eval-audit.py": [
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "LE-",
         "Wilson", "McNemar", "--include-docs", "不联网", "不代填", "不证明",
+    ],
+    "scripts/mobile-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "MB-01", "MB-20",
+        "不联网", "不代填", "不证明", "0 命中也不证明无缺陷",
     ],
     "scripts/upgrade.py": [
         "--self-test", "SELFTEST", "--check", "check_structure",

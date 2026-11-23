@@ -5,6 +5,77 @@
 
 ---
 
+## [v1.17.0] — 2026-11-23 · 移动 App 专项：R-25 与 mobile-audit
+
+### 主题
+
+**C1 移动 App 专项**：把「移动 App」从 `cross-platform-testing.md` 的一条附注升为独立能力层——新增 **R-25 移动集成与分发**（管 OS 集成面，与 R-8 的设备矩阵真实性分工）、`references/mobile-app-testing.md` 手册、`assets/mobile-app-matrix-template.md` 矩阵模板、`scripts/mobile-audit.py` 静态扫描器（MB-01~MB-10 反模式 + MB-20~MB-29 运行矩阵）。专项手册 34→35 份、模板 32→33 份、脚本 19→20 个。
+
+### 动机（来自提案区 / 实战反馈）
+
+1. **缺口实证**：v1.16 全库检索 `权限弹窗|深链|推送|安装升级|弱网` 只命中 `cross-platform-testing.md` 的设备形态段与 `global-lessons.md` 的 7 条跨端教训，**没有任何可执行判据**；权限四态、进程回收、覆盖升级、灰度回滚全部空白。
+2. **R-8 管不到 OS 集成面**：R-8 只要求「矩阵与载体真实、不拿仿真冒充真机」，无法推翻「真机装上但深链/推送/升级全没测」这种结论。
+3. **标准 1.2 缺移动向量**：原 15 画像没有「拒绝权限后走设置撤销」「推送冷启动点击」「降级安装」这类端侧刁钻路径。
+
+### 改动清单（文件 : 做了什么）
+
+- `references/mobile-app-testing.md`（**新建**）：§0 触发/不适用、§1 八问、§2 选型矩阵（Appium 2+ / Maestro / XCUITest / Espresso / Detox / 设备云，含证据强度与典型失真）、§3 仿真器·真机·设备云边界、§4 权限四态与 `pm revoke`/`simctl privacy`、§5 生命周期、§6 深链六路径与 `am start`/`openurl`/`simctl push`、§7 安装升级灰度、§8 弱网电量、§9 MB-01~MB-10、§10 MB-20~MB-29、§11 不得冒充、§12 出处。
+- `assets/mobile-app-matrix-template.md`（**新建**）：构建分发 / 载体 / 权限四态 / 中断生命周期 / 深链推送 / 安装升级灰度 / 弱网电量 / 扫描裁决 / 运行矩阵 / 结论（含 R-25 不得声明）。
+- `scripts/mobile-audit.py`（**新建**）：`scan`（table/json/markdown、`--include-docs`、`--fail-on-gap`）、`matrix`、`cases`、`--self-test`；零依赖，文件头写明「不联网 / 不代填 / 0 命中也不证明无缺陷」。
+- `SKILL.md`：frontmatter v1.17.0、description 计数 25 条/R-1~R-25、35 份、20 个并加移动触发词；规则表新增 R-25 行；阶段 4 证据矩阵改二十五行；判 bug 标准第 8 条、参考文件表计数同步。
+- `references/routing.md` / `references/dissect.md` §8：各加 mobile 行（手册 + 模板 + 脚本 + R-25）。
+- `references/quality-gates.md`：§2A 第 8 条加「移动集成面未测」；§3A 加 R-25 证据行与出处；§3B 跨端段加 5 条「≠」；§8 自检计数改二十五条/二十五行。
+- `assets/report-template.md`：证据矩阵加 R-25 行；说明段补 R-23/R-24/R-25 的不得冒充句；模板清单加 mobile 模板。
+- `references/tools.md`：专项工具表登记 `mobile-audit.py`（含降级路径与「静态扫描 0 命中 ≠ 无集成缺陷」）。
+- `scripts/selfcheck.py`：`checks` 增手册/模板关键词；`SCRIPT_GATES` 增 mobile-audit 门禁（自检、命中规则、诚实边界词）。
+- `README.md`：徽章 / 文件结构计数（102 文件 / 44 references / 33 模板 / 20 脚本）/ R 列表 / 设计要点 / 版本历史同步。
+- `memory/global-lessons.md`：本轮经验 1 条已吸收（静态扫描器按标签边界判作用域，别用行窗口）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 条目 | 说明 |
+|---|---|---|
+| **New** | `references/mobile-app-testing.md`、`assets/mobile-app-matrix-template.md`、`scripts/mobile-audit.py`、R-25 | 新能力层与可执行判据 |
+| **Enhance** | `SKILL.md`、`references/routing.md`、`references/dissect.md`、`references/quality-gates.md`、`assets/report-template.md`、`references/tools.md`、`README.md` | R-25 三处同步 + 计数 |
+| **Match** | `scripts/selfcheck.py` | 新手册/模板/脚本接线到门禁 |
+| **Existing** | 其余 34 份手册、R-1~R-24、其余 32 份模板、其余 19 个脚本 | **未改判据** |
+
+### 口径诚实（不新增不可证伪的宣称）
+
+- dogfood 的 **14 条违规 / 1 条无法核对**只证明「扫描器在自造夹具上按预期工作」，**不是任何真实 App 的结论**；夹具在 `.workbuddy-ai/` 下，不上传、不作为案例背书。
+- **MB-09 未在夹具中触发**，由 `--self-test` 的负向控制用例覆盖；这不等于真实项目里 MB-09 少见或常见。
+- `mobile-audit.py` 只做**静态文本/正则扫描**：0 命中不证明无缺陷，斜体/拼接/运行时权限等写法会漏；它不替代真机、不替代 Appium 执行、不判断业务正确性。
+- 手册里的 `adb`/`simctl`/`-netdelay` 命令来自官方文档，**本机未逐条执行**；不同 OS/模拟器版本的权限重置与限速档位会变，手册已标「必须实测」，脚本不代填参数。
+- **未验证**：真实 App 上的命中率/误报率、设备云与真机的行为差异、灰度回滚的实际耗时。
+
+### 自检与门禁（selfcheck 结果）
+
+**深度实测（dogfood v1.17.0）**：`.workbuddy-ai/dogfood/v1.17.0/mini-shop/` 8 个可扫描文件，`python scripts/mobile-audit.py scan .workbuddy-ai/dogfood/v1.17.0/mini-shop` 实跑 **14 违规 / 1 无法核对**——MB-01（Maestro `point` 百分比 + Flutter `tapAt`）、MB-02（`sleep: 4000` + `Future.delayed`）、MB-03（定位未声明 `ACCESS_FINE_LOCATION`，标无法核对）、MB-04（WebView `setJavaScriptEnabled(true)`）、MB-05（`getIntent().getData()` + `getInitialLink()`）、MB-06（`usesCleartextTraffic` + 明文 URL）、MB-07（两处 `exported="true"` 无 permission）、MB-08（硬编码 `sk-live-`）、MB-10（`autoGrantPermissions`/`autoAcceptAlerts`）。诱饵零误报：`localhost`、带 permission 的 exported service、docs 里的 sleep。详见 `.workbuddy-ai/dogfood/v1.17.0/RESULT.md`。
+
+本轮 dogfood 修掉的脚本缺陷（均已加回归断言）：① 相对路径分隔符统一为 `/`；② MB-07 原 ±6 行窗口会把同文件带 permission 的 service 误当保护 → 改为按起始标签边界判定；③ 补 Flutter `tapAt(const Offset(...))` 与 `Future.delayed`；④ 补 `getInitialLink()`/`getAppLinks`；⑤ 补 Dart `permission_handler`。
+
+```powershell
+python scripts/selfcheck.py                    # PASS 90 / WARN 1 / FAIL 0，exit 0
+python scripts/upgrade.py --check              # 结构校验 GREEN，exit 0
+python scripts/mobile-audit.py --self-test     # SELFTEST GREEN，exit 0
+```
+
+唯一 WARN 仍是 `memory/global-lessons.md` 345 行（已知保留项，归档判据见该文件「待核实」）。
+
+负向测试 **4/4 通过**：① 报告矩阵缺 R-25 → `[FAIL] 报告证据矩阵缺少规则表格行: R-25`；② SKILL 规则表写 R-26 → `[FAIL] 可证伪规则未接入 quality-gates.md: R-26`；③ 脚本文件头删「不联网」→ `[FAIL] ... 缺少可证伪性 / 诚实边界关键字段: 不联网`；④ 手册「不得」改「可以」→ `[FAIL] ... 缺少关键字段: 不得`。每次改坏后均恢复并复跑 GREEN。
+
+自动化提示词：revision 5 → 6（更新后 4,183 字符；写入 `C:\Users\摩羯座\.dsh\storages\dsh_automation.json`，回读校验 revision=6、其它记录 prompt 未变）。
+
+### 提案处置（采纳 / 驳回 + 理由）
+
+| 提案 | 处置 | 理由 |
+|---|---|---|
+| 队列 C1「移动 App 专项」 | **采纳** | 本轮主线，按队列交付 |
+| 「能零依赖就加静态扫描」 | **采纳** | 10 类反模式可用正则判，产出 `mobile-audit.py` 并接门禁 |
+| 新增第 16 条判 bug 标准 | **驳回** | 会触发「十五条」全库连锁；改为扩展 §2A 第 8 条并挂新手册 |
+| 在真实 App / 设备云实测 | **暂缓** | 本机无安装包与云设备账号；已标「待确认」，不写成已验证 |
+| MB-09 无夹具命中 | **采纳为自检用例** | 用 `--self-test` 负向控制覆盖，CHANGELOG 明示未在 dogfood 出现 |
+
 ## [v1.16.0] — 2026-11-23 · 记忆升级：需求档案库 plans/ + token 成本账本
 
 ### 主题

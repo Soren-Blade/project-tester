@@ -2,11 +2,11 @@
 
 > 一个会**自我进化**的测试 Skill：解剖任意项目 → 按风险生成测试需求 → 双视角深测 → 记忆树接力 → 每日蒸馏升级。不绑定语言、框架或 agent。
 
-![version](https://img.shields.io/badge/version-v1.16.0-1677ff)
-![references](https://img.shields.io/badge/reference_files-40-2ea44f)
-![assets](https://img.shields.io/badge/templates-29-e60023)
-![scripts](https://img.shields.io/badge/scripts-15-6f42c1)
-![updated](https://img.shields.io/badge/updated-2026-11-17-6e7781)
+![version](https://img.shields.io/badge/version-v1.17.0-1677ff)
+![references](https://img.shields.io/badge/reference_files-44-2ea44f)
+![assets](https://img.shields.io/badge/templates-33-e60023)
+![scripts](https://img.shields.io/badge/scripts-20-6f42c1)
+![updated](https://img.shields.io/badge/updated-2026-11-23-6e7781)
 
 ---
 
@@ -57,17 +57,17 @@
 
 ---
 
-## 文件结构（99 个文件）
+## 文件结构（102 个文件）
 
 ```
 project-tester/
-├── SKILL.md                          # 主流程：五阶段 + 双视角 + 证据纪律 + R-1~R-24 判据骨架 + 需求档案/成本记账（路由见 references/routing.md）
+├── SKILL.md                          # 主流程：五阶段 + 双视角 + 证据纪律 + R-1~R-25 判据骨架 + 需求档案/成本记账（路由见 references/routing.md）
 ├── README.md                         # 本文件
 ├── CHANGELOG.md                      # 每日升级记录（来源 / 改动 / 自检）
 ├── .gitignore
-├── references/                       # 43 份手册（渐进披露，按需读）
+├── references/                       # 44 份手册（渐进披露，按需读）
 │   ├── dissect.md                    # 解剖：栈指纹 / 入口 / 测试设施 / 攻击面 / 观测面 / 交付链 / locale / 租户 / a11y / 设备形态 / 开关 / 路由
-│   ├── routing.md                    # **路由单一事实源**：四层模型 / 22 个解剖面 / 34 份专项手册的「触发信号 → 必做动作 → 所属规则」
+│   ├── routing.md                    # **路由单一事实源**：四层模型 / 22 个解剖面 / 35 份专项手册的「触发信号 → 必做动作 → 所属规则」
 │   ├── tools.md                      # 工具总表 / 专项工具 / 可用性探测 / 降级纪律
 │   ├── personas.md                   # 7 日常 + 8 刁钻画像 / 判 bug 标准 / 手册映射
 │   ├── test-design.md                # 测试设计九式 / 六维矩阵 v2 / 风险分 / 覆盖与退出标准
@@ -76,7 +76,7 @@ project-tester/
 │   ├── performance-testing.md        # 五种负载 / p95 口径 / k6 模板 / 性能预算 / 瓶颈定位
 │   ├── frontend-testing.md           # 五态矩阵 / WCAG 2.2 最小清单 / CWV / 错误映射 / a11y 与跨端联动
 │   ├── fullstack-integration.md      # 测试金字塔 / 隔离与工厂 / 集成边界 / 六门禁 12 分
-│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-24 交付核对
+│   ├── quality-gates.md              # 缺陷八字段 / 严重度 / flaky / 变异测试 / CI 门禁 / R-1~R-25 交付核对
 │   ├── ai-native-testing.md          # 四层能力模型 / AI for QA vs Testing for AI / 评测集
 │   ├── observability-testing.md      # 三大信号 / Trace 驱动 / W3C Trace Context / SLO 与错误预算 / R-1
 │   ├── chaos-resilience.md           # 稳态假设 / 故障注入矩阵 / 三级工具阶梯 / 恢复判据 / R-2
@@ -90,6 +90,7 @@ project-tester/
 │   ├── test-effectiveness-testing.md # DORA 四指标 / 逃逸率 / flaky / 变异得分 / §5A 测试经济性·ROI / §5B AI 生成用例有效性
 │   ├── accessibility-testing.md     # WCAG 2.2 增量 9 条 / 2.4.11·2.5.8·3.3.8 / axe 边界与 incomplete / 键盘路径·读屏组合 / R-7
 │   ├── cross-platform-testing.md    # 设备矩阵与 80% 覆盖 / 载体分野 / Playwright Emulation / 端侧特有面·网络档位 / §6A 视觉基线治理与 install-base 导出 / R-8
+│   ├── mobile-app-testing.md        # 移动 App 集成面：Appium 2·Maestro·XCUITest·Espresso·Detox 选型 / 仿真器·真机·设备云边界 / 权限四态 / 中断与生命周期 / 深链冷温热 / 推送三态 / 安装升级灰度 / 弱网电量 / MB-01~MB-10 静态扫描 + MB-20~MB-29 运行矩阵 / R-25
 │   ├── memory-tree.md                # 记忆树规范 / runs 格式 / 省 token 三律
 │   ├── evolution.md                  # 运行时进化回路 / 四问 / 三层记忆
 │   ├── self-evolution.md             # 每日升级十步协议 / 权限裁决 / 版本与蒸馏门槛
@@ -109,9 +110,9 @@ project-tester/
 │   ├── metrics-correctness-testing.md # 指标口径：定义卡十项 / dashboard·API·源表三处对账与双阈值 / 七类口径陷阱 / 可加性与辛普森 / SRM 卡方 / 新鲜度与重述 / dbt·GE·Soda 门禁 / k<10 抑制 / MA-01~MA-10·MA-20~MA-26 / R-22
 │   ├── idempotency-concurrency-testing.md # 并发与幂等：不变量先行 / 三种并发与屏障真并发 / 幂等键矩阵 / 锁与事务漏点（FOR UPDATE·version CAS·rowcount·SETNX+EXPIRE·自调用）/ 唯一约束与 409 / 副作用对账 / CC-01~CC-10·CC-20~CC-29 / R-23
 │   └── llm-eval-testing.md           # AI 评测可信性：评测集构成与污染 / 判定器校准（κ·judge 一致率·位置与长度偏见）/ n≥3 采样与 Wilson CI / McNemar / 失败分类与分母诚实 / 成本与 p50·p95 / 注入与工具越权 / LE-01~LE-10 / R-24
-├── assets/                           # 32 份模板
+├── assets/                           # 33 份模板
 │   ├── tree-template.md              # 项目记忆树初始化
-│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-24 证据矩阵）
+│   ├── report-template.md            # 测试报告（强制 PASS/FAIL 与 Go/No-Go，含 R-1~R-25 证据矩阵）
 │   ├── bug-report-template.md        # 缺陷报告八字段 + MRE
 │   ├── test-plan-template.md         # 测试计划 / 六维矩阵
 │   ├── plan-template.md              # 测试需求档案：需求原文·拆解·方向矩阵·执行索引·缺口·复用提示（v1.16）
@@ -141,10 +142,11 @@ project-tester/
 │   ├── search-quality-matrix-template.md # 搜索矩阵：评估集与 qrels 分级 / 指标表与分母 / 零结果与查询理解 / 排序稳定性与分页 / 注入与越权负向 / R-21 结论
 │   ├── metrics-correctness-matrix-template.md # 指标矩阵：定义卡 / 三处对账与时间戳 / 口径陷阱 / 新鲜度与重述 / SRM 与权限 / R-22 结论
 │   ├── idempotency-concurrency-matrix-template.md # 并发矩阵：写路径与窗口 / 不变量对账 / 幂等键矩阵 / 真并发 N 与成败数 / 副作用次数 / 锁与约束证据 / R-23 结论
-│   └── llm-eval-matrix-template.md    # 评测矩阵：评测集与污染 / 判定器校准 / 逐类 95% CI / 失败分类与分母 / 成本与延迟 / 安全用例 / R-24 结论
+│   ├── llm-eval-matrix-template.md    # 评测矩阵：评测集与污染 / 判定器校准 / 逐类 95% CI / 失败分类与分母 / 成本与延迟 / 安全用例 / R-24 结论
+│   └── mobile-app-matrix-template.md  # 移动矩阵：构建分发 / 载体矩阵（real·emulator·simulator·cloud-real）/ 权限四态 / 中断生命周期 / 深链推送 / 安装升级灰度 / 弱网电量 / R-25 结论
 ├── memory/
 │   └── global-lessons.md             # 跨项目经验（开局即读，自我进化载体）
-└── scripts/                          # 19 个零依赖 Python 脚本（标准库，无外部包）
+└── scripts/                          # 20 个零依赖 Python 脚本（标准库，无外部包）
     ├── evidence-audit.py             # 证据链自动对账：audit --manifest / --fail-on-gap / --format json|markdown|oscal / --output / --self-test
     ├── device-matrix.py              # install-base 本地导出汇总：build --input/--source/--window/--min-coverage / --self-test
     ├── test-data-gen.py              # 测试数据生成与脱敏：generate --seed / mask --fields / self-test；确定性、保留格式掩码、诚实边界（不联网/不代填/不冒充/不保证无泄漏）
@@ -163,7 +165,8 @@ project-tester/
     ├── concurrency-audit.py          # 并发审计：scan（CC-01~CC-10 先查后写·SELECT FOR UPDATE 缺索引·version 未进 WHERE·rowcount 忽略·SETNX+EXPIRE 两步·锁内 sleep·自调用 @Transactional·无唯一约束/去重表·先 ack 后处理·共享可变状态）/ cases（真并发夹具）/ side-effects --events events.jsonl（同键副作用>1·一键多资源对账）/ --self-test；不联网、不代填、不证明并发安全
     ├── llm-eval-audit.py             # 评测审计：scan（LE-01~LE-10 无评测集·单样本·无基线·超时出分母·judge 未校准·judge=generator·未 pin snapshot·无成本观测·注入用例缺失·污染未查；默认跳过 .md，防文档引用反模式被误报，需 `--include-docs`）/ stats --runs runs.jsonl [--baseline b.jsonl] [--judge j.jsonl] --min-pass 0.80 --min-kappa 0.60（Wilson CI·McNemar 精确 p·Cohen's κ·逐类 pass rate）/ cases / --self-test；不联网、不代填、不证明模型质量
     ├── upgrade.py                    # 版本写回与结构门禁：--new-version（开新段+同步 SKILL frontmatter·H1·README 徽章）/ --check / --dry-run / --self-test；写盘前先校验、落盘后异常全量回滚；不联网、不改写既有版本内容
-    └── context-cost.py               # token 成本账本：estimate（逐文件 chars/行/估算 tok）/ session（阶段 0 开局成本）/ log（追加 metrics.md）/ report（均值与趋势）/ --self-test；chars/3.2 估算非账单、不联网、只量读入不评测试质量
+    ├── context-cost.py               # token 成本账本：estimate（逐文件 chars/行/估算 tok）/ session（阶段 0 开局成本）/ log（追加 metrics.md）/ report（均值与趋势）/ --self-test；chars/3.2 估算非账单、不联网、只量读入不评测试质量
+    └── mobile-audit.py               # 移动集成面审计：scan（MB-01~MB-10 坐标点击·sleep 无 waitFor·权限清单缺失·WebView 白名单·深链校验·明文流量·exported 无 permission·硬编码密钥·热更新无签名·autoGrantPermissions，--fail-on-gap）/ matrix（MB-20~MB-29）/ cases（adb·simctl 命令）/ --self-test；不联网、不代填、0 命中也不证明无缺陷
 ```
 
 ## 知识资产速查
@@ -220,15 +223,16 @@ project-tester/
 - **通用性**：不绑定语言/框架/agent，只用通用能力（文件读写、shell、按需浏览器）；工具缺失自动降级，不中止
 - **省 token**：被测项目根下 `.test-memory/tree.md`（<100 行）是接力地图，细节沉到 `runs/`；读一份树 = 跳过一次完整解剖
 - **证据优先**：每个失败结论必须有 MRE + 实际输出；指标写清分子/分母；报告强制给出 `PASS/FAIL` 与 `Go/No-Go`
-- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，v1.5 叠加证据链对账/视觉基线与 install-base 数据源/AI 用例有效性，v1.6 叠加特性开关/配置/灰度正确性与证据链 OSCAL `assessment-results` 导出，v1.7 叠加测试数据管理（合成数据/PII 脱敏/确定性种子/子集制备/绝不用生产数据），v1.8 叠加身份·会话·令牌安全（JWT 十类攻击/会话生命周期/枚举与限流/密码存储/OAuth·MFA），v1.9 叠加时间·时区正确性与备份·恢复可验证性（DST/TTL/时钟回拨/RPO·RTO/恢复演练/PITR），v1.10 叠加金额·账务正确性与异步消息交付可靠性（多币种 exponent/舍入/分摊/复式对账/重复扣款；webhook 签名·幂等·退避·乱序·DLQ），v1.11 叠加缓存与内容新鲜度（缓存分层/键与 Vary/缓存欺骗/失效）与文件上传下载内容边界（三道闸/绕过后缀/魔数与重编码/presigned/下载鉴权），v1.12 叠加查询语义与分页正确性（三模式契约/翻页漂移/唯一 tie-breaker/排序注入/total 口径/深页）与错误契约与可诊断性（三层结构/5xx 防泄漏/trace_id/存在性三态），v1.13 叠加搜索相关性与排序质量（qrels/nDCG/查询理解/排序稳定/tie-breaker/highlight 与 DSL 注入）与指标口径与报表可信（定义卡/三处对账/口径陷阱/SRM/新鲜度），v1.14 叠加并发与幂等正确性（不变量/幂等键矩阵/真并发屏障/锁与事务漏点/副作用对账）与 AI 系统评测可信性（评测集/判定器校准/n≥3 与 Wilson CI/失败分母/注入与越权），均不新增层级
+- **分层能力**：L1 Core → L2 Engineering → L3 Production → L4 AI Native，按项目形态路由；v1.1 起按项目形态**横向叠加**观测/韧性/数据/协议专项，v1.2 叠加交付链/本地化/租户隔离，v1.3 叠加契约演进/隐私/有效性，v1.4 叠加无障碍/跨端/测试经济性，v1.5 叠加证据链对账/视觉基线与 install-base 数据源/AI 用例有效性，v1.6 叠加特性开关/配置/灰度正确性与证据链 OSCAL `assessment-results` 导出，v1.7 叠加测试数据管理（合成数据/PII 脱敏/确定性种子/子集制备/绝不用生产数据），v1.8 叠加身份·会话·令牌安全（JWT 十类攻击/会话生命周期/枚举与限流/密码存储/OAuth·MFA），v1.9 叠加时间·时区正确性与备份·恢复可验证性（DST/TTL/时钟回拨/RPO·RTO/恢复演练/PITR），v1.10 叠加金额·账务正确性与异步消息交付可靠性（多币种 exponent/舍入/分摊/复式对账/重复扣款；webhook 签名·幂等·退避·乱序·DLQ），v1.11 叠加缓存与内容新鲜度（缓存分层/键与 Vary/缓存欺骗/失效）与文件上传下载内容边界（三道闸/绕过后缀/魔数与重编码/presigned/下载鉴权），v1.12 叠加查询语义与分页正确性（三模式契约/翻页漂移/唯一 tie-breaker/排序注入/total 口径/深页）与错误契约与可诊断性（三层结构/5xx 防泄漏/trace_id/存在性三态），v1.13 叠加搜索相关性与排序质量（qrels/nDCG/查询理解/排序稳定/tie-breaker/highlight 与 DSL 注入）与指标口径与报表可信（定义卡/三处对账/口径陷阱/SRM/新鲜度），v1.14 叠加并发与幂等正确性（不变量/幂等键矩阵/真并发屏障/锁与事务漏点/副作用对账）与 AI 系统评测可信性（评测集/判定器校准/n≥3 与 Wilson CI/失败分母/注入与越权），v1.17 叠加移动 App 操作系统集成面（Appium·Maestro·XCUITest·Espresso·Detox 选型 / 仿真器·真机·设备云边界 / 权限四态 / 中断与生命周期 / 深链·推送 / 安装升级灰度 / 弱网·电量），均不新增层级
 - **路由闭环**：每份专项手册必须同时出现在 `dissect.md` §8 路由表与 `SKILL.md` 叠加项，由 `scripts/selfcheck.py` 逐份核对，缺一即 FAIL（不再只是文字约定）
-- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）、R-9（证据链可追溯与可复核性）、R-10（特性开关 / 配置 / 灰度正确性）、R-11（测试数据可信与合规）、R-12（身份与会话不可冒充）、R-13（时间与时区正确性）、R-14（备份与恢复可验证性）、R-15（金额与账务正确性）、R-16（异步消息 / Webhook 交付可靠性）、R-17（缓存与内容新鲜度）、R-18（文件上传下载与内容边界）、R-19（查询语义与分页正确性）、R-20（错误契约与可诊断性）、R-21（搜索相关性与排序质量）、R-22（指标口径与报表可信）、R-23（并发与幂等正确性）、R-24（AI 系统评测可信性）**二十四条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"、R-9 不认"报告写全了 / 证据文件都在 / 对账 GREEN"、R-10 不认"开态测过 / 配置三处没比对 / 说 5% 没实测"、**R-11 不认"用了生成器 / 掩码了已知字段 / 无种子却说可复现"**、**R-12 不认"登录成功 / 令牌可解码 / Cookie 有 HttpOnly"**、**R-13 不认"能解析时间 / 服务器跑 UTC / 静态扫描未命中"**、**R-14 不认"备份任务成功 / 结构校验通过 / 有备份但没恢复过"**、**R-15 不认"界面显示 2.68 / 账本内部平衡 / 单笔用例通过"**、**R-16 不认"验签函数存在 / 回调返回 200 / 配了重试"**、**R-17 不认"响应头写对 / Age 小 / purge 接口存在"**、**R-18 不认"上传成功 / 扩展名合法 / presign 未过期"**、**R-19 不认"翻了一遍没重复 / 首页 10 条对 / total 数字 / 第 1 页快"**、**R-20 不认"返回 500 / 有 trace_id / 4xx 无堆栈 / 框架默认"**、**R-21 不认"手工试几个词 / CTR 高 / 两次看着一样 / 有同义词表"**、**R-22 不认"看板截图 / 两边数字差不多 / p<0.05 / 单一汇总值 / 日均值求平均"**、**R-23 不认"串行重放通过 / 代码里有锁 / 压测没报错 / 幂等键存在 / 有事务注解"**、**R-24 不认"跑通一遍 / LLM judge 说好 / 单次 87 分 / 评测集 20 条 / 改了 prompt 分数涨"**
+- **可证伪**：R-1（链路）、R-2（韧性）、R-3（制品完整性）、R-4（租户隔离）、R-5（契约演进）、R-6（隐私与数据生命周期）、R-7（无障碍可达性）、R-8（跨端与设备形态真实性）、R-9（证据链可追溯与可复核性）、R-10（特性开关 / 配置 / 灰度正确性）、R-11（测试数据可信与合规）、R-12（身份与会话不可冒充）、R-13（时间与时区正确性）、R-14（备份与恢复可验证性）、R-15（金额与账务正确性）、R-16（异步消息 / Webhook 交付可靠性）、R-17（缓存与内容新鲜度）、R-18（文件上传下载与内容边界）、R-19（查询语义与分页正确性）、R-20（错误契约与可诊断性）、R-21（搜索相关性与排序质量）、R-22（指标口径与报表可信）、R-23（并发与幂等正确性）、R-24（AI 系统评测可信性）、R-25（移动 OS 集成面与分发）**二十五条**规则都写清「什么情况下不适用」，证据不足只能降级为「待确认」，不许用"没报错"冒充"没问题"——R-5 不认"本地能跑"、R-6 不认"接口 200"、R-7 不认"axe 0 violations"、R-8 不认"仿真绿"、R-9 不认"报告写全了 / 证据文件都在 / 对账 GREEN"、R-10 不认"开态测过 / 配置三处没比对 / 说 5% 没实测"、**R-11 不认"用了生成器 / 掩码了已知字段 / 无种子却说可复现"**、**R-12 不认"登录成功 / 令牌可解码 / Cookie 有 HttpOnly"**、**R-13 不认"能解析时间 / 服务器跑 UTC / 静态扫描未命中"**、**R-14 不认"备份任务成功 / 结构校验通过 / 有备份但没恢复过"**、**R-15 不认"界面显示 2.68 / 账本内部平衡 / 单笔用例通过"**、**R-16 不认"验签函数存在 / 回调返回 200 / 配了重试"**、**R-17 不认"响应头写对 / Age 小 / purge 接口存在"**、**R-18 不认"上传成功 / 扩展名合法 / presign 未过期"**、**R-19 不认"翻了一遍没重复 / 首页 10 条对 / total 数字 / 第 1 页快"**、**R-20 不认"返回 500 / 有 trace_id / 4xx 无堆栈 / 框架默认"**、**R-21 不认"手工试几个词 / CTR 高 / 两次看着一样 / 有同义词表"**、**R-22 不认"看板截图 / 两边数字差不多 / p<0.05 / 单一汇总值 / 日均值求平均"**、**R-23 不认"串行重放通过 / 代码里有锁 / 压测没报错 / 幂等键存在 / 有事务注解"**、**R-24 不认"跑通一遍 / LLM judge 说好 / 单次 87 分 / 评测集 20 条 / 改了 prompt 分数涨"**、**R-25 不认"真机装上 / 权限全允许 / 静态扫描 0 命中 / 新装成功"**
 - **证据闭环（v1.4 / v1.5）**：`selfcheck.py` 的代码门禁——`§7d` **逐条核对** `report-template.md` 证据矩阵的 `| R-N |` 表格行（v1.5 负向测试实证加固：旧版只统计整段编号，说明文字里的编号可蒙混），`§7e` 强制每条规则写清禁止冒充声明，**`§7f`（v1.5）强制可执行脚本自带 `--self-test` 与诚实边界声明**；新增规则却忘了留证据槽位、写清降级路径，或新增脚本只会打 PASS，自检直接 FAIL
 - **可执行且诚实（v1.5）**：`scripts/evidence-audit.py`（本地确定性证据链对账）与 `scripts/device-matrix.py`（本地 install-base 导出汇总）只用 Python 标准库、不联网、不修改被测项目；前者固定输出「对账通过只证明证据链可解析，不证明合规或软件安全」，后者不代填 `real` 载体、不写「真机已验证」，缺数据源就显式标注不可作为 R-8 证据
 - **证据可机读（v1.6）**：`scripts/evidence-audit.py` 新增 `--format oscal`，把 manifest 的「结论→证据→锚点」链按 `references/evidence-chain-audit.md` §10 字段映射导出为 OSCAL `assessment-results` JSON，让 R-9 证据链能直接喂给 GRC/审计工具；只做字段搬运，不裁决合规——`待确认`/缺口在 OSCAL 里仍是 `partial`/`gap`，**不得**因「有了 OSCAL 文件」写成「已通过 OSCAL 合规评估」（EA-13 已纳入 `--self-test` 对等性校验）
 - **身份不可冒充（v1.8）**：`scripts/jwt-audit.py` 只用标准库离线解析令牌结构（alg=none、缺 exp/aud/iss、kid/jku/x5u 注入面、弱 HMAC 字典），把 ASVS 5.0 / RFC 8725 / RFC 9700 蒸馏成 AUTH-1~AUTH-12、S1~S9、F1~F12 可执行测试卡；**结构可疑 ≠ 服务端接受，未命中字典 ≠ 密钥强**，cert 结论必须由请求原文 + 响应码 + 登出/改密/重置后重放结果证明（R-12）
 - **时间可证伪 · 恢复可验证（v1.9）**：`time-audit.py` 离线扫 T-01~T-10 时间反模式并用 zoneinfo 实算 gap/fold（缺 tzdata 明确报错，绝不伪造），`restore-audit.py` 对两份清单做 RST-01~RST-11 对账（缺 hash 也判失败）；但**静态扫描未命中 ≠ 时间正确**、**清单一致 ≠ 恢复可用**——DST 任务必须实跑执行次数、恢复必须真做一次 drill 并重算校验和（R-13 / R-14）
 - **并发可证伪 · 评测可复现（v1.14）**：`concurrency-audit.py` 离线扫 CC-01~CC-10 并发反模式（先查后写、`FOR UPDATE` 缺索引、`version` 未进 `WHERE`、`rowcount` 被忽略、`SETNX`+`EXPIRE` 两步、自调用事务、无唯一约束/去重表、先 ack 后处理），并用 `side-effects` 对账「同键只发生一次副作用」；`llm-eval-audit.py` 只做算术不做推理（Wilson 95% CI、McNemar 精确检验、Cohen's κ、逐类 pass rate），把失败/超时计入分母。但**串行重放通过 ≠ 并发幂等**、**跑通一遍 ≠ 评测有效**——并发结论必须给并发度 N 与实测差额，评测结论必须给 n≥3 与置信区间，judge 未校准（κ<0.60）或与生成同模型时不得作为通过证据（R-23 / R-24）
+- **移动面可证伪（v1.17）**：`mobile-audit.py` 离线扫 MB-01~MB-10 集成反模式（坐标硬编码、`sleep` 无 `waitFor`、权限清单缺失、WebView 白名单、深链未校验、明文流量、`exported` 无 permission、硬编码密钥、热更新签名、`autoGrantPermissions` 恒真），`matrix` 给 MB-20~MB-29 运行矩阵；但**真机装上 ≠ 集成面测过**、**静态扫描 0 命中 ≠ 无集成缺陷**——权限必须走允许/拒绝/不再询问/撤销四态，深链必须覆盖冷温热×登录态，升级必须实装旧包再覆盖（R-25）
 - **自我进化**：项目教训 → `.test-memory/lessons.md`；通用教训 → `memory/global-lessons.md`；每日升级 → `CHANGELOG.md` + 版本号
 - **权限裁决**：**测项目时不自治**（运行时只提 `[技能改进]` 提案），**升级技能时授权自治**（用户明确授权的每日任务，走十步门禁）
 
@@ -266,6 +270,7 @@ cd "D:/My Skills/project-tester" && python scripts/selfcheck.py
 
 | 版本 | 日期 | 主题 |
 |---|---|---|
+| v1.17.0 | 2026-11-23 | **移动 App 专项（C1）：把「装在手机上能跑」升级成「OS 集成面可证伪」** — ① 新增 `references/mobile-app-testing.md`（Appium 2+/Maestro/XCUITest/Espresso/Detox/设备云选型矩阵；仿真器·真机·设备云能力边界；权限四态允许/拒绝/不再询问/设置撤销；来电·通知·进程回收·旋转·分屏的生命周期；深链冷/温/热启 × 登录态 × 非法入参；推送前台/后台/杀进程点击路由；`adb install -r`/`-r -d`/`simctl install` 覆盖升级与降级回滚；`-netdelay`/`-netspeed` 弱网档位与低电量/Doze）；② 新增 **R-25 移动 OS 集成面与分发**，与 R-8（设备矩阵真实性）分工：R-8 管矩阵/载体/内核，R-25 管权限/中断/生命周期/深链/推送/安装升级/弱网电量；③ 新增 `assets/mobile-app-matrix-template.md`（九节矩阵 + R-25 结论与「不得」声明）；④ 新增 `scripts/mobile-audit.py`（零依赖 `scan` MB-01~MB-10 / `matrix` MB-20~MB-29 / `cases` adb·simctl 命令 / `--self-test`，默认跳过 `.md` 防文档反模式误报）；⑤ 门禁同步：selfcheck `checks` 与 `SCRIPT_GATES` 登记、routing §3/dissect §8/quality-gates §3A/报告矩阵四处 R-25、计数 25 规则 / 35 手册 / 20 脚本 / 33 模板。**深度实测**：`.workbuddy-ai/dogfood/v1.17.0/mini-shop` 零依赖夹具实跑 `scan` 得 14 条违规 + 1 条无法核对，命中 MB-01/02/03/04/05/06/07/08/10（MB-09 未出现，由 self-test 覆盖）；诱饵（localhost、带 permission 的 exported service、docs 里的 sleep）未误报。**本轮修掉的脚本缺陷**：rel 路径分隔符、MB-07 行窗口误把同文件带 permission 的 service 当保护（改为标签边界）、补 Flutter `tapAt`/`Future.delayed` 与 `permission_handler` 触发。**口径诚实**：夹具是自造零依赖项目，14 条违规不代表任何真实 App 结论；静态扫描 0 命中也不证明无集成缺陷。 |
 | v1.16.0 | 2026-11-23 | **记忆升级（B 阶段）：把「越用越聪明」变成可复用的资产** — ① **需求档案库** `.test-memory/plans/`：一个需求一份档案（需求原文逐字引用 / 拆解与风险分 / **测试方向矩阵**（可直接照做的方向 + 画像手册 + 上轮结论）/ 执行记录索引 / 未覆盖缺口 / 复用提示三行），tree.md 新增「需求索引」区作为唯一入口；阶段 0 命中同类需求只读档案 §3/§6（测试设计环节接近零成本），阶段 2 落盘、阶段 4 追加不改写。此前「测试需求/计划」从不落盘（`plans/` 全库 0 命中），同类需求每次重推方向清单。② **token 成本账本** `scripts/context-cost.py`（`session` 量阶段 0 开局成本 / `log` 记账到 `metrics.md` / `report` 看轮次均值与趋势 / `estimate` 量任意文件 / `--self-test` 14 项），把「省 token」从定性三律变成可测的数。③ 记忆树规范新增「省 token 四律」（第 4 条 = 需求复用 + 记账），`assets/plan-template.md` 与 `tree-template.md` 同步。④ 门禁新增 §7l 需求库/账本接线完整性（规范+模板+脚本+阶段 0/2/4 四处都接了才 PASS）、§7m 树模板需求索引区。**口径诚实**：tokens 是 chars/3.2 的估算、不是账单（中文被低估），只做同口径横比；本轮未在真实第三方项目上验证「复用确实省了 N%」，只验证了机制接线与脚本自测。 |
 | v1.15.0 | 2026-11-23 | **架构收口（维护版本，不新增专项）**：一次全库自审发现「广度极强、收敛不足」——同一套路由信息在 `SKILL.md` 里写了 4 遍（叠加表 / 22 解剖面 / 阶段 3 的 37 条 bullet / 95 行参考索引，合计 30,485 chars = 全文 47%），`SKILL.md` 达 64,893 chars，技能加载时工具输出被截断（`Omitted 20591 bytes`），规则表尾部在真实加载中有丢失风险；`description` 4,433 chars 同样被会话目录截断。本版做四件事：① **路由单一事实源** 新建 `references/routing.md`（四层模型 / 22 解剖面 / 34 份专项手册的「触发信号 → 手册 → 必做动作 → 规则」），`SKILL.md` 精简到 12,241 chars（185 行，−81%），R-1~R-24 只留判据骨架，完整证据要求与「不得冒充」40+ 组对照表移入 `quality-gates.md` §3A/§3B，判 bug 15 条移入 §2A；② **门禁补强**：新增 `scripts/upgrade.py`（结构化版本写回，写盘前校验、失败全量回滚、`--self-test` 8/8 GREEN），`selfcheck.py` 新增 §7g CHANGELOG 层级完整性 / §7h README 版本表覆盖 / §7i SKILL 体积与 description 预算 / §7j routing↔dissect 集合一致 / §7k 模板孤儿 / §8a 全局经验体积；③ **修复两处真实回归**（自审取证明：这两处此前 `selfcheck` 报 PASS 77 全绿却漏检）——`CHANGELOG.md` 丢掉的 `## [v1.13.0]` 与 `## [v1.12.0]` 两个 H2 标题补回（分别由 `52a7dab`、`63aa844` 两次升级插入新段时顶掉，导致两版正文成了挂在 v1.14 下的孤儿段），`README.md` 版本历史表补回漏掉的 v1.9.0 与 v1.7.0 两行；④ `.gitignore` 从「整个 `.test-memory/` 不入库」改为「`tree.md`/`lessons.md`/`plans/` 入库，`runs/`/`tmp/` 不入库」，否则「保存需求与过程」只在本机有效。**门禁口径**：`python scripts/selfcheck.py` exit 0、`python scripts/upgrade.py --check` GREEN；破坏性验证（临时删 H2 / 删 README 行 / 撑大 SKILL）均被对应门禁判 FAIL（[详见 CHANGELOG](CHANGELOG.md)） |
 | v1.14.0 | 2026-11-18 | 每日升级 #15：从「搜得准 · 数得对」扩展到「**并发不打架 · 评测说得清**」——并发与幂等正确性（不变量先行、三种并发只有真并发算数（屏障 N≥10）、幂等键六格矩阵含同键异体→409 与跨用户复用、锁与事务六类漏点（无索引 `FOR UPDATE`、`version` 未进 `WHERE`、忽略 `rowcount`、`SETNX`+`EXPIRE` 两步、锁内 `sleep`、自调用事务）、唯一约束→409 映射、fencing token、先 ack 后处理与 outbox、副作用对账；CC-01~CC-10 静态 + CC-20~CC-29 运行时）与 AI 系统评测可信性（评测集构成与污染、n≥3 与固定采样参数、pass@1 vs pass@k、判定器 κ≥0.60 且 judge ≠ generator、失败/超时/限流/拒答一律进分母、Wilson 95% CI、McNemar 配对检验、p50/p95 与 token 成本、注入与工具越权、放量回滚门槛；LE-01~LE-10 静态 + `stats` 统计）；新增 **R-23/R-24**、`references/idempotency-concurrency-testing.md`、`references/llm-eval-testing.md`、两份矩阵模板、`scripts/concurrency-audit.py`、`scripts/llm-eval-audit.py`（零依赖、带 `--self-test` 与诚实边界）；两个零依赖反模式夹具真实执行（并发 `scan` 10 命中 8 HIGH、`side-effects` 揪出 2 个违规键 exit 1；评测 `stats` 23/29=79.3%、CI [61.6%, 90.2%]、κ=0.500、McNemar p=0.03125，exit 1），结论 FAIL/No-Go；R-23 不认「串行重放 / 代码里有锁 / 压测没报错 / 有幂等键 / 有事务注解」、R-24 不认「跑通一遍 / judge 说好 / 单次 87 分 / 评测集 20 条 / prompt 改了分数涨」（[详见 CHANGELOG](CHANGELOG.md)） |
