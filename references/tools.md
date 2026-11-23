@@ -93,11 +93,13 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **上传绕过与安全清单**（v1.11） | `python scripts/upload-audit.py scan <path> --format markdown --fail-on-gap`；`upload-audit.py matrix --file uploads.json`；`upload-audit.py cases`；`--self-test` | 无脚本时按 `file-upload-download-testing.md` §2 手工实传绕过矩阵；**上传成功 ≠ 文件安全**，魔数与重编码证据不可省 | `file-upload-download-testing.md` §2/§7 |
 | **查询与分页审计**（v1.12） | `python scripts/query-audit.py scan <path> --format markdown --fail-on-gap`；`query-audit.py matrix --file pagination.json`；`query-audit.py cases`；`--self-test` 验门禁可证伪 | 无夹具时手工做「翻页间插行」与「全量遍历去重计数」两个用例并注明「未做自动对账」；**静态扫描未命中 ≠ 分页正确**，必须另有全量遍历记录 | `query-pagination-testing.md` §4/§10 |
 | **错误契约与泄漏审计**（v1.12） | `python scripts/error-audit.py scan <path> --format markdown --fail-on-gap`；`error-audit.py check --file errors.json`；`error-audit.py cases`；`--self-test`；配合 `curl -sS -D -` 抓响应头与体 | 无夹具时手工触发一个真实 500 并 grep 堆栈/绝对路径/SQL 正则，注明「仅验证本地错误形态」；**返回 500 ≠ 已处理**，生产配置必须单独核对 | `error-contract-testing.md` §3/§10 |
-| **技能自检与门禁**（v1.12 补登记） | `python scripts/selfcheck.py`（frontmatter / 断链 / 版本一致 / 索引覆盖 / §7a 工具表登记 / §7b 路由闭环 / §7c 规则双向同步 / §7d 报告矩阵 / §7e 例外声明 / §7f 脚本门禁）；版本升级前必须 exit 0 | 环境无 Python 时按 `references/self-evolution.md` §3 手工逐项核清单，报告标「未跑自检」，**不得**写「已自检通过」 | `self-evolution.md` §3 / `quality-gates.md` §8 |
+| **技能自检与门禁**（v1.12 补登记） | `python scripts/selfcheck.py`（frontmatter / 断链 / 版本一致 / 索引覆盖 / §7a 工具表登记 / §7b 路由闭环 / §7c 规则双向同步 / §7d 报告矩阵 / §7e 例外声明 / §7f 脚本门禁 / §7g CHANGELOG 层级 / §7h README 版本表 / §7i SKILL 体积预算 / §7j routing↔dissect 集合 / §7k 模板孤儿）；版本升级前必须 exit 0 | 环境无 Python 时按 `references/self-evolution.md` §3 手工逐项核清单，报告标「未跑自检」，**不得**写「已自检通过」 | `self-evolution.md` §3 / `quality-gates.md` §8 |
 | **测试数据生成与脱敏**（v1.12 补登记） | `python scripts/test-data-gen.py generate --seed <n> --count <n> --format json`（确定性种子）；`test-data-gen.py mask --file records.json --fields email,phone`（保留格式掩码）；`--self-test` 验确定性与掩码可证伪 | 手工造六类样本：空、单行、脏行（BOM/CRLF/缺列）、超长、重复键、Unicode 边界；注明「未用生成器，种子不可复现」 | `test-data-management.md` §2/§6 |
 | **搜索相关性与排序**（v1.13） | `python scripts/search-audit.py scan <path> --format markdown --fail-on-gap`；`search-audit.py eval --qrels qrels.json --runs runs.json --k 10 --format markdown --fail-on-gap`（可加 `--min-ndcg 0.60 --max-zero-rate 0.20`）；`search-audit.py cases`；`--self-test` 验 nDCG/MRR/Recall 手算一致 | 无判定集时只做「同 query 两次 top-20 diff + 零结果率 + 查询理解五层」并写「无 qrels，相关性未验证」；**扫描未命中 ≠ 相关性达标**，CTR 高不算相关，两次看着一样不算排序稳定 | `search-quality-testing.md` §3/§10 |
 | **并发与幂等正确性**（v1.14） | `python scripts/concurrency-audit.py scan <path> --format markdown --fail-on-gap`；`concurrency-audit.py cases`；`concurrency-audit.py side-effects --events events.jsonl --fail-on-gap`；真并发用 `xargs -P` / `threading.Barrier` / k6 constant-arrival 屏障同发；`--self-test` 验 CC 规则与重复副作用检出 | 无多副本/无队列时可只做单实例并发与串行重放，写「未验多实例与消息重复」；**串行重放通过 ≠ 并发幂等**、压测没报错 ≠ 无超卖，幂等键存在 ≠ 幂等生效 | `idempotency-concurrency-testing.md` §9/§10 |
 | **AI 系统评测可信性**（v1.14） | `python scripts/llm-eval-audit.py scan <path> --format markdown --fail-on-gap`（默认跳过 `.md`，查文档示例加 `--include-docs`）；`llm-eval-audit.py stats --runs runs.jsonl [--baseline baseline.jsonl] [--judge judge.jsonl] --format markdown --fail-on-gap`；`llm-eval-audit.py cases`；`--self-test` 验 Wilson CI / McNemar / κ 手算一致 | 无预算做多次采样时只报「单次结果，无统计结论」；无人工标注时只写「未校准 judge，结论仅方向性」；**跑通一遍 ≠ 评测有效**、LLM judge 说好 ≠ 好、单次 87 分 ≠ 87 分 | `llm-eval-testing.md` §9/§10 |
+| **技能版本写回与结构门禁**（v1.15） | `python scripts/upgrade.py --check`（CHANGELOG H2 严格递减且去重 / 每段至多一个「### 治理分类」/ SKILL·README·CHANGELOG 三方版本一致 / README 版本表覆盖全部版本）；`upgrade.py --new-version <X.Y.Z> --title 「<一句话>」` 开新版本段并同步版本号，**写盘前先校验、失败全量回滚**；`--self-test` 验门禁可证伪 | 无 Python 时按 `references/self-evolution.md` §3 手工核这四项并逐条留证，**不得**手改版本号后声明「已同步」；`--check` BLOCKED 时禁止提交 | `self-evolution.md` §3 / `quality-gates.md` §8 |
+| **token 成本账本**（v1.16） | `python scripts/context-cost.py session --memory <项目>/.test-memory --skill <技能目录>`（阶段 0 开局成本：tree.md + lessons.md + plans/ + global-lessons）；`context-cost.py log --memory <项目>/.test-memory --scene "阶段4 收尾"` 写进 `metrics.md`；`context-cost.py report --memory ...` 看轮次/均值/趋势；`estimate <paths...>` 量任意文件；`--self-test` 14 项 | 无 Python 时手工记 `wc -c` 与行数进 `metrics.md`，注明「未用脚本，口径为字节数」；**估算 tokens 不是账单**（chars/3.2，中文被低估），只做同口径横比，不得据此向用户承诺省钱；「更省」≠「测得更好」 | `memory-tree.md`「省 token 四律」 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -127,7 +129,10 @@ python scripts/search-audit.py --self-test || echo "search-audit SELFTEST FAIL -
 python scripts/metric-audit.py --self-test || echo "metric-audit SELFTEST FAIL -> 退回手工三处取值与卡方手算，注明未自动对账"
 python scripts/concurrency-audit.py --self-test || echo "concurrency-audit SELFTEST FAIL -> 退回手工并发屏障与副作用计数，结论标待确认"
 python scripts/llm-eval-audit.py --self-test || echo "llm-eval-audit SELFTEST FAIL -> 退回手工 CI/κ 手算与人工标注，注明无统计结论"
-python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版本/同步/提交，先修门禁（§7a~§7f）"
+python scripts/selfcheck.py >/dev/null || echo "selfcheck FAIL -> 停止升版本/同步/提交，先修门禁（§7a~§7k）"
+python scripts/upgrade.py --self-test || echo "upgrade SELFTEST FAIL -> 退回手工核 CHANGELOG 层级，禁止手改版本号"
+python scripts/upgrade.py --check || echo "upgrade check BLOCKED -> 按输出逐条修结构，禁止带病升版本"
+python scripts/context-cost.py --self-test || echo "context-cost SELFTEST FAIL -> 退回 wc -c 手工记 metrics.md，注明未用脚本"
 ```
 
 ## 工具使用纪律

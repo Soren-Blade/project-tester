@@ -180,11 +180,14 @@ if tree_tpl.is_file() and len(read(tree_tpl).splitlines()) >= 100:
 else:
     ok("tree 模板 <100 行")
 
-# 7) 索引覆盖：references/ 下每份手册都被 SKILL.md 或 README 提及
+# 7) 索引覆盖：references/ 下每份手册都被 SKILL.md / routing.md / README 提及
+#    v1.15.0 起路由单一事实源是 references/routing.md，SKILL.md 只留指针（体积预算）。
+routing = read(ROOT / "references/routing.md")
 refs = sorted((ROOT / "references").glob("*.md"))
-unindexed = [p.name for p in refs if p.name not in skill and p.name not in readme]
+index_pool = skill + readme + routing
+unindexed = [p.name for p in refs if p.name not in index_pool]
 if unindexed:
-    warn("未被 SKILL.md/README 索引的手册: " + ", ".join(unindexed))
+    warn("未被 SKILL.md/routing.md/README 索引的手册: " + ", ".join(unindexed))
 else:
     ok(f"references/ 全部 {len(refs)} 份手册已索引")
 
@@ -198,10 +201,11 @@ if missing_tools:
 else:
     ok(f"references/tools.md 已登记全部 {len(script_files)} 个脚本")
 
-# 7b) 路由闭环（孤儿文档门禁）：专项手册必须同时出现在 dissect.md §8 路由表与 SKILL.md
-#     L1 元手册对所有项目都读，不要求出现在 §8 路由表里。
+# 7b) 路由闭环（孤儿文档门禁）：专项手册必须同时出现在 references/routing.md §3 与
+#     dissect.md §8 路由表。routing.md 是 v1.15.0 起的单一事实源；dissect §8 保留为
+#     阶段 1 的项目形态视图，两者集合必须相等（7j 强制），否则会各自漂移。
 CORE_REFS = {
-    "dissect.md", "tools.md", "personas.md", "test-design.md",
+    "dissect.md", "tools.md", "personas.md", "test-design.md", "routing.md",
     "memory-tree.md", "evolution.md", "self-evolution.md", "quality-gates.md",
 }
 dissect = read(ROOT / "references/dissect.md")
@@ -211,18 +215,25 @@ if route_marker in dissect:
 else:
     route_section = ""
     fail("references/dissect.md 缺少 §8 路由表，无法校验孤儿文档")
+if "## 3." in routing:
+    routing_section = routing
+else:
+    routing_section = ""
+    fail("references/routing.md 缺少 §3 专项路由表，无法校验孤儿文档")
 orphans: list[str] = []
 special_refs = [p for p in refs if p.name not in CORE_REFS]
 for p in special_refs:
     if p.name not in route_section:
         orphans.append(f"{p.name}: 缺 dissect.md §8 路由")
-    elif p.name not in skill:
-        orphans.append(f"{p.name}: 缺 SKILL.md 叠加项/索引")
+    elif p.name not in routing_section:
+        orphans.append(f"{p.name}: 缺 routing.md 专项路由")
+    elif p.name not in index_pool:
+        orphans.append(f"{p.name}: 缺 SKILL.md/routing.md 索引")
 if orphans:
     for item in sorted(orphans):
         fail(f"孤儿文档: {item}")
 else:
-    ok(f"路由闭环：{len(special_refs)} 份专项手册均有 §8 路由 + SKILL.md 触发条件")
+    ok(f"路由闭环：{len(special_refs)} 份专项手册均有 routing.md 路由 + dissect §8 视图 + 索引")
 
 # 7c) 可证伪规则同步（双向）：SKILL.md 定义集与 quality-gates.md 引用集必须相等
 #     单向检查挡不住「悄悄删掉一条规则」，所以两边都查。
@@ -345,6 +356,15 @@ SCRIPT_GATES = {
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "LE-",
         "Wilson", "McNemar", "--include-docs", "不联网", "不代填", "不证明",
     ],
+    "scripts/upgrade.py": [
+        "--self-test", "SELFTEST", "--check", "check_structure",
+        "治理分类", "不联网", "回滚",
+    ],
+    "scripts/context-cost.py": [
+        "--self-test", "SELFTEST GREEN", "CHARS_PER_TOKEN", "metrics.md",
+        "不是任何 tokenizer 的精确值", "不联网", "不评价「测得对不对」",
+        "只适合**同一口径下的横向比较**",
+    ],
 }
 for rel, needles in SCRIPT_GATES.items():
     sp = ROOT / rel
@@ -358,6 +378,151 @@ for rel, needles in SCRIPT_GATES.items():
     else:
         ok(f"{rel} 自带 --self-test 与诚实边界声明（§7f）")
 
+# 7g) CHANGELOG 版本层级完整性（v1.15.0 新增）
+#     回归来源：v1.13.0 / v1.14.0 两次升级用临时 str.replace 脚本打补丁，把上一版的
+#     `## [v1.13.0]` / `## [v1.12.0]` H2 标题顶掉，两个版本的正文成了挂在 v1.14 下的孤儿段。
+#     旧门禁只查「当前版本条目存在」，对历史序列断裂完全无感。
+h2_re = re.compile(r"^##\s*\[?v?(\d+\.\d+\.\d+)\]?", re.M)
+cl_versions = h2_re.findall(changelog)
+if not cl_versions:
+    fail("CHANGELOG.md 未识别到任何 `## [vX.Y.Z]` 版本标题（层级无法校验）")
+else:
+    rev_bad = [f"{a} → {b}" for a, b in zip(cl_versions, cl_versions[1:])
+               if tuple(int(x) for x in b.split(".")) >= tuple(int(x) for x in a.split("."))]
+    dup_ver = sorted({v for v in cl_versions if cl_versions.count(v) > 1})
+    h3_seen: dict[str, int] = {}
+    cur_ver = None
+    for ln in changelog.splitlines():
+        m2 = h2_re.match(ln)
+        if m2:
+            cur_ver = m2.group(1)
+        elif ln.startswith("### 治理分类") and cur_ver:
+            h3_seen[cur_ver] = h3_seen.get(cur_ver, 0) + 1
+    orphan_blocks = [f"v{v}（{n} 次）" for v, n in h3_seen.items() if n > 1]
+    if rev_bad:
+        fail("CHANGELOG 版本标题顺序异常（应严格递减）: " + ", ".join(rev_bad))
+    elif dup_ver:
+        fail("CHANGELOG 版本标题重复: " + ", ".join(dup_ver))
+    elif orphan_blocks:
+        fail("CHANGELOG 版本段内出现重复『### 治理分类』—— 上一版 H2 标题可能被顶掉: "
+             + ", ".join(orphan_blocks))
+    else:
+        ok(f"CHANGELOG 版本层级完整：{len(cl_versions)} 个 H2 严格递减，无孤儿段")
+
+# 7h) README 版本历史表覆盖 CHANGELOG 的每个版本（v1.15.0 新增）
+#     回归来源：v1.9.0 与 v1.7.0 两次升级没往 README 表里补行，表内直接跳版。
+vh_marker = "## 版本历史"
+if vh_marker not in readme:
+    fail("README.md 缺少「## 版本历史」段（无法校验版本表）")
+elif not cl_versions:
+    warn("CHANGELOG 版本标题未识别，跳过 README 版本表校验")
+else:
+    vh_table = readme.split(vh_marker, 1)[1]
+    # 只认表格行的第一个单元格：散文里提到「v1.9.0」不算补过行
+    # （v1.15.0 实测踩过：版本历史表头下方的说明文字写了「补回 v1.9.0 与 v1.7.0 两行」，
+    #   旧的全文 regex 因此误判为表内已有这些版本）
+    vh_versions = set()
+    for ln in vh_table.splitlines():
+        row = ln.strip()
+        if not row.startswith("|"):
+            continue
+        cell = row.strip("|").split("|")[0].strip().lstrip("vV")
+        if re.fullmatch(r"\d+\.\d+\.\d+", cell):
+            vh_versions.add(cell)
+    missing_rows = [v for v in cl_versions if v not in vh_versions]
+    if missing_rows:
+        fail("README 版本历史表缺行: " + ", ".join(f"v{v}" for v in missing_rows))
+    else:
+        ok(f"README 版本历史表覆盖全部 {len(cl_versions)} 个已发布版本")
+
+# 7i) SKILL.md 体积与 description 预算（v1.15.0 新增）
+#     回归来源：v1.14.0 的 SKILL.md 达 64,898 chars，技能加载时工具输出被截断
+#     （`Omitted 20591 bytes`），规则表尾部在真实加载中有丢失风险；description 4,433 chars
+#     在会话技能目录里同样被截断。体积超标 = 规则不可靠送达，属 FAIL 级问题。
+skill_chars = len(skill)
+if skill_chars > 26000:
+    fail(f"SKILL.md 体积 {skill_chars} chars 超硬上限 26,000（加载会被截断，规则不可靠送达）")
+elif skill_chars > 22000:
+    warn(f"SKILL.md 体积 {skill_chars} chars 超建议上限 22,000（接近截断风险）")
+else:
+    ok(f"SKILL.md 体积 {skill_chars} chars（< 22,000 预算，加载不截断）")
+desc_m = re.search(r"^description:\s*(.+)$", (skill.split("---", 2)[1] if skill.count("---") >= 2 else ""), re.M)
+if desc_m and len(desc_m.group(1)) > 1024:
+    fail(f"SKILL.md description 长 {len(desc_m.group(1))} chars，超 skill 规范上限 1024（会被截断）")
+elif desc_m:
+    ok(f"SKILL.md description {len(desc_m.group(1))} chars（< 1024，不被截断）")
+
+# 7j) routing.md ↔ dissect §8 集合一致（v1.15.0 新增）
+#     routing.md 是路由单一事实源；dissect §8 是阶段 1 的项目形态视图。两份清单各写一遍，
+#     只靠「都在」挡不住新增手册只补了一处 —— 必须集合相等。
+special_names = {p.name for p in special_refs} if "special_refs" in dir() else set()
+if special_names and route_section and routing_section:
+    in_dissect = {n for n in special_names if n in route_section}
+    in_routing = {n for n in special_names if n in routing_section}
+    only_d = sorted(in_dissect - in_routing)
+    only_r = sorted(in_routing - in_dissect)
+    if only_d:
+        fail("手册只在 dissect §8、未进 routing.md: " + ", ".join(only_d))
+    elif only_r:
+        fail("手册只在 routing.md、未进 dissect §8: " + ", ".join(only_r))
+    else:
+        ok(f"routing.md 与 dissect §8 路由集合一致（{len(in_routing)} 份专项手册）")
+
+# 7k) 模板孤儿检查（软约束，v1.15.0 新增）：assets/ 下每个模板应被至少一处引用
+asset_files = sorted((ROOT / "assets").glob("*.md"))
+all_md_text = "\n".join(read(p) for p in md_files())
+orphan_assets = [p.name for p in asset_files if p.name not in all_md_text]
+if orphan_assets:
+    warn("未被任何文档引用的模板: " + ", ".join(orphan_assets))
+else:
+    ok(f"assets/ 全部 {len(asset_files)} 份模板均被引用")
+
+# 7l) 需求库与成本账本的接线完整性（v1.16.0 新增）
+#     回归来源：v1.14 之前「测试需求/计划」从不落盘，plans/ 全库 0 命中 —— 同一类需求
+#     下次要重推一遍测试设计；而「省 token」也只有定性三律、没有可测的数。
+#     本门禁锁住四处接线，任何一处被删/漂移就 FAIL，防止功能「写在规范里但流程没接上」。
+try:
+    mt = read(ROOT / "references/memory-tree.md")
+    tl = read(ROOT / "references/tools.md")
+    wiring = {
+        "memory-tree.md 未定义 plans/ 需求档案格式": "plans/PLAN-<N>-<slug>.md",
+        "memory-tree.md 未定义 tree.md 需求索引": "需求索引",
+        "memory-tree.md 未引用档案模板": "assets/plan-template.md",
+        "memory-tree.md 未定义成本账本 metrics.md": "metrics.md",
+        "SKILL.md 阶段 0 未接入需求档案索引": "plans/",
+        "SKILL.md 阶段 2 未要求落盘需求档案": "plan-template.md",
+        "SKILL.md 未接入成本账本脚本": "context-cost.py",
+        "tools.md 未登记 context-cost.py": "context-cost.py",
+    }
+    missing_wiring = []
+    for label, needle in wiring.items():
+        pool = mt if "memory-tree" in label else (tl if "tools.md" in label else skill)
+        if needle not in pool:
+            missing_wiring.append(label)
+    script_ok = (ROOT / "scripts/context-cost.py").is_file()
+    if not script_ok:
+        missing_wiring.append("scripts/context-cost.py 缺失")
+    tmpl_ok = (ROOT / "assets/plan-template.md").is_file()
+    if not tmpl_ok:
+        missing_wiring.append("assets/plan-template.md 缺失")
+    if missing_wiring:
+        fail("需求库/成本账本接线不完整: " + "；".join(missing_wiring))
+    else:
+        ok("需求库（plans/）与成本账本（metrics.md）已接线：规范 + 模板 + 脚本 + 阶段 0/2/4 全链")
+except OSError as e:  # 文件缺失由上方的断链检查负责报错
+    warn(f"需求库接线检查跳过：{e}")
+
+# 7m) 记忆树模板必须含需求索引区（v1.16.0 新增）
+tree_tmpl = ROOT / "assets/tree-template.md"
+if tree_tmpl.is_file():
+    tt = read(tree_tmpl)
+    if "需求索引" not in tt or "PLAN-" not in tt:
+        fail("assets/tree-template.md 缺「需求索引」区：新建的树将无法定位需求档案")
+    else:
+        ok("tree 模板含需求索引区（PLAN- 指针）")
+else:
+    fail("assets/tree-template.md 缺失")
+
 # 8) global-lessons 格式（软约束）
 gl = read(ROOT / "memory/global-lessons.md")
 bad = [ln for ln in gl.splitlines()
@@ -366,6 +531,15 @@ if bad:
     warn(f"global-lessons.md 有 {len(bad)} 行不符合 '[标签] 教训 — 应用：' 约定")
 else:
     ok("global-lessons.md 格式基本合规")
+# 8a) 体积纪律（v1.15.0 新增）：文件头自定「>40 行修剪旧条目」，实际已 337 行且阶段 0 整份读入。
+#     不直接 FAIL（会造成「要么删知识、要么门禁永远红」的两难），但必须持续可见、逼出索引化。
+gl_lines = len(gl.splitlines())
+if gl_lines > 500:
+    fail(f"memory/global-lessons.md 已 {gl_lines} 行（>500），阶段 0 整份读入成本过高，必须索引化/归档")
+elif gl_lines > 200:
+    warn(f"memory/global-lessons.md 已 {gl_lines} 行，超自定 40 行上限，建议加 TOC 并把冷门条目归档")
+else:
+    ok(f"memory/global-lessons.md {gl_lines} 行（体积可控）")
 
 # 汇总
 print(f"=== project-tester 自检 {version or '(版本未知)'} ===")

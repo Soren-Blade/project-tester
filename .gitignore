@@ -1,9 +1,9 @@
-# WorkBuddy 会话/自动化数据（项目相关数据，不入库，勿删除）
+# WorkBuddy 会话/自动化数据（项目相关数据，不入库，可删除）
 .workbuddy-ai/
 
-# 被测项目产生的记忆树与临时探针
-.test-memory/
-**/.test-memory/
+# 被测试项目生成的记忆树：树/经验/需求归档入库（跨会话可复用），运行记录与探针不入库
+**/.test-memory/runs/
+**/.test-memory/tmp/
 
 # 运行时产物
 __pycache__/

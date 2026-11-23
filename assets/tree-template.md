@@ -40,3 +40,9 @@
 - [ ] 待测：<模块 / 优先级>
 - [ ] 阻塞：<🔥 环境问题 + 下一步尝试>
 - [ ] 技能改进提案：<来自 global-lessons.md 的 [技能改进] 条目，可选>
+
+## 需求索引（plans/ 的唯一入口，不写等于没建档）
+
+- [PLAN-<n>] <一句话需求> | <进行中 / 已完成 / 搁置> | 最近 <YYYY-MM-DD> <PASS / FAIL / 阻塞> | plans/PLAN-<n>-<slug>.md
+
+> 成本账本：`.test-memory/metrics.md`（由 `python scripts/context-cost.py log` 自动追加，不要手改表结构）。

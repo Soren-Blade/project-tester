@@ -5,6 +5,126 @@
 
 ---
 
+## [v1.16.0] — 2026-11-23 · 记忆升级：需求档案库 plans/ + token 成本账本
+
+### 主题
+
+**记忆升级，不新增测试维度**：把「越用越聪明」从口号变成两份可复用资产——`.test-memory/plans/` 需求档案库（同类需求第二次不再重推测试设计）与 `metrics.md` token 成本账本（把「省 token」变成可测的数）。这是 B 阶段（记忆升级），承接 v1.15 的 A 阶段收口。
+
+### 动机（来自提案区 / 实战反馈）
+
+1. **标准 1.1 的核心缺口**（v1.15 审计 §2 缺口 A）：全库 grep `plans/|requirements\.md|测试需求归档|需求库` **零命中**——「测试需求」只活在当轮对话与 `runs/` 的结论表里，而 `runs/` 超 10 份会删最旧，同类需求下次连历史方向清单都找不回，只能重推一遍测试设计。
+2. **「省 token」全是设计意图**（同审计缺口 D）：三律（tree < 100 行 / 先信记忆树 / 稳定模块折叠）没有一条能被验证，全库没有任何计量。
+3. **阶段 2 的模板只产出当轮计划**：`assets/test-plan-template.md` 没有「归档供下次复用」这一步，需求天然不可积累。
+
+### 改动清单（文件 : 做了什么）
+
+- `references/memory-tree.md`：目录结构加 `plans/` 与 `metrics.md`；新增「plans/ 需求档案格式」节（何时建档 / 命名 / 六节结构 / 复用规则 / 更新规则）；tree.md 新增第 6 区「需求索引」；更新规则补「plans 不随 runs 删除而失效」与每轮记账；「省 token 三律」扩为**四律**（第 4 条 = 需求复用 + 记账，并写明前三条无法被验证）。
+- `assets/plan-template.md`（**新建**）：需求原文（逐字、追加不覆盖）/ 拆解与风险分 / **方向矩阵**（功能点 × 维度 × 可直接执行的方向 × 画像手册 × 上轮结论）/ 执行索引 / 未覆盖缺口 / 复用提示三行。
+- `assets/tree-template.md`：新增「需求索引」区与 `metrics.md` 指针。
+- `scripts/context-cost.py`（**新建**）：`estimate` / `session` / `log` / `report` 四子命令，零依赖，`--self-test` 14 项；诚实边界写进文件头与自测断言（估算非 tokenizer 精确值、不联网、只量读入不评测试质量、漏记就是漏记）。
+- `SKILL.md`：阶段 0 由「读两份」改为「读三处」，并明确「命中同类需求只读档案 §3/§6，测试设计环节应接近零成本」；阶段 2 增加「需求档案落盘」；阶段 4 五步扩为七步（更新档案 / 记成本）；五阶段总览、记忆树速览、示例、参考文件表同步；脚本 18→19、模板 31→32。
+- `references/tools.md`：登记 `context-cost.py`（用法 / 降级路径 / 「估算不是账单」的不得声明）；可用性探测块加自测行。
+- `references/routing.md`：脚本数 18→19（两处）。
+- `scripts/selfcheck.py`：新增 §7l 需求库/账本**接线完整性**（8 条接线 + 脚本与模板存在性）、§7m 树模板必须含需求索引区；§7f 脚本门禁加入 `context-cost.py`。
+- `README.md`：版本历史补 v1.16.0 行；文件结构计数同步（99 文件 / 32 模板 / 19 脚本）。
+- `memory/global-lessons.md`：新增 2 条已吸收 + 1 条待核实。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 条目 | 说明 |
+|---|---|---|
+| **New** | `assets/plan-template.md`、`scripts/context-cost.py` | 新资产 |
+| **Enhance** | `references/memory-tree.md`、`assets/tree-template.md` | 记忆树规范扩到「需求复用 + 记账」 |
+| **Enhance** | `SKILL.md` 阶段 0/2/4、`references/tools.md`、`references/routing.md`、`README.md` | 流程接线与计数同步 |
+| **Match** | `scripts/selfcheck.py` §7l / §7m / §7f | 门禁与规范对齐 |
+| **Existing** | 34 份专项手册、R-1~R-24、其余 31 份模板、其余 18 个脚本 | **未改动** |
+
+### 口径诚实（不新增不可证伪的宣称）
+
+- 本轮**不新增测试维度、R 规则或检测项**；档案库与账本都是「让已有能力可复用 / 可测量」的机制。
+- `tokens` 是 `chars / 3.2` 的**估算**，不是账单；中文真实约 1.5~2 chars/token，会被低估。它只用于**同一口径下的横向比较**。
+- **未验证**：在真实第三方项目上跑两轮同类需求、对比「有档案 vs 无档案」的实测 token 差。本版只验证了机制接线与脚本自测，**不复述任何「省了 N%」的数字**。
+- 文中的估算示例（`SKILL.md` 12,241 chars ≈ 3,825 tok；`routing.md` 13,508 ≈ 4,221；`global-lessons.md` 29,606 ≈ 9,252）来自对技能自身文件的 `estimate`，只证明口径能跑，不代表典型项目。
+
+### 自检与门禁（selfcheck 结果）
+
+```powershell
+python scripts/selfcheck.py              # PASS 87 / WARN 1 / FAIL 0，exit 0
+python scripts/context-cost.py --self-test  # SELFTEST GREEN（14 项），exit 0
+python scripts/upgrade.py --check        # 结构校验 GREEN，exit 0
+```
+
+唯一 WARN 仍是 `memory/global-lessons.md` 341 行（已知保留项，归档判据见该文件「待核实」）。
+
+### 提案处置（采纳 / 驳回 + 理由）
+
+| 提案 | 处置 | 理由 |
+|---|---|---|
+| `.test-memory/plans/` 测试需求库 | **采纳** | v1.15 审计缺口 A；落地为档案库 + tree 需求索引 + §7l 接线门禁 |
+| token 成本账本 | **采纳** | v1.15 审计缺口 D；落地为 `context-cost.py` + `metrics.md` |
+| `global-lessons.md` TOC 与归档 | 顺延 | 需先定「连续两轮未被引用」的归档判据，避免删掉仍有召回价值的长尾经验 |
+| 移动 App / 桌面端 / 小程序手册 | 顺延 | 属 C 阶段（形态补齐），不塞进「维护 + 记忆」版本 |
+| 刁钻方向生成器 | 顺延 | 属 C 阶段；且需先靠档案库沉淀真实方向样本，作为生成器的评测素材 |
+
+## [v1.15.0] — 2026-11-23 · 架构收口：SKILL 65KB → 15KB + 结构门禁补强
+
+### 主题 
+
+**架构收口，不新增任何测试维度**：把 `SKILL.md` 从 64,893 chars（430 行）压到 12,241 chars（185 行，−81%），把写散在 4 处的路由信息归一到 `references/routing.md` 一处，并把门禁从「只验当前版本条目存在」扩到「验历史版本序列完整 + 体积预算 + 跨文件集合一致」。这是一次**维护版本**，不属于每日升级序列（#15 之后不连续编号）。
+
+### 动机（来自提案区 / 实战反馈） 
+
+来自一次全库自审（报告留档 `.workbuddy-ai/review/2026-11-23-audit.md`，411 行）：
+
+1. **同一套 34 份手册路由在 `SKILL.md` 里写了 4 遍** —— L53-134 四层叠加表 7,834 chars、L157-172 阶段 1 解剖面 3,787、L195-229 阶段 3 的 37 条专项 bullet 6,697、L324-418 参考索引 12,167，合计 **30,485 chars = 全文 47%**；R-1~R-24 的证据要求在 `quality-gates.md` §3 又有第 2 份全文渲染。
+2. **`SKILL.md` 已超单次展示预算**：加载本技能时工具输出出现 `Omitted 20591 bytes`，规则表尾部（R-9~R-24 区域）在真实加载中有丢失风险；`description` 单行 4,433 chars（值长度，不含 `description:` 前缀），在会话技能目录里被截断为 `...`，尾部关键词既占 token 又不产生发现价值。
+3. **`selfcheck.py` 报 PASS 77 / WARN 0 / FAIL 0 全绿，却漏掉两处真实回归**：`CHANGELOG.md` 的 `## [v1.13.0]` 与 `## [v1.12.0]` 两个 H2 标题被后续两次升级顶掉，两段正文成了挂在 v1.14 下的孤儿；`README.md` 版本历史表缺 v1.9.0 与 v1.7.0 两行。逐提交取证确认这是 `52a7dab`、`63aa844` 引入的回归，不是历史惯例。根因是升级靠 `.workbuddy-ai/tmp/patch_readme.py` 一类 `str.replace` 一次性脚本打补丁，无结构校验拦截。
+4. 次要证据：`memory/global-lessons.md` 337 行，违反文件自定的「超 40 行修剪」8 倍，且阶段 0 每次整份读入（≈8.8k tok）。
+
+### 改动清单（文件 : 做了什么） 
+
+- `SKILL.md`：64,893 → 12,241 chars（430 → 185 行）。删除 v1.1~v1.14 逐版增量段（8,838 chars）、四份重复路由清单（30,485）、95 行参考索引；R-1~R-24 改为 24 行判据骨架表（列 = 规则｜结论必须附的证据｜不适用时），完整证据要求指向 `quality-gates.md` §3A；description 从 4,433 压到 752 chars（值长度），触发词前移。五阶段流程、双视角、证据纪律、安全边界、记忆树规范**语义未改**。
+- `references/routing.md`（**新建**，13,508 chars / 115 行）：路由单一事实源 —— §1 四层模型、§2 22 个解剖面（含「必须回答 / 见哪份手册」）、§3 34 份专项手册的「触发信号 → 手册 → 必做动作 → 规则」、§4 元手册、§5 叠加纪律。
+- `references/quality-gates.md`：10,150 → 20,119 chars。新增 §2A 判 bug 十五条表、§3A 24 条 R 规则的完整证据要求与「不适用时的写法」（逐字承接旧 SKILL 正文）、§3B「近似证据 ≠ 结论」40+ 组对照表；§3 收敛为作废判据决策表。
+- `scripts/upgrade.py`（**新建**，294 行，零依赖）：结构化版本写回 —— `--new-version` 开新段并同步三处版本号、`--check` 校验结构、`--self-test` 自证可证伪；写盘前先校验、落盘后异常全量回滚。
+- `scripts/selfcheck.py`：383 → 496 行。新增 §7g `CHANGELOG` H2 严格递减且每段至多一个「### 治理分类」、§7h `README` 版本表覆盖（只认表格行首列，散文提及不算）、§7i `SKILL.md` 体积（>26K FAIL / >22K WARN）与 description ≤1024、§7j `routing.md` ↔ `dissect.md` §8 集合相等、§7k 模板孤儿、§8a `global-lessons.md` 体积；索引池加入 `routing.md`。
+- `references/tools.md`：专项工具表补 `upgrade.py` 一行、可用性探测补 2 行、自检项说明扩到 §7a~§7k。
+- `CHANGELOG.md`：补回 `## [v1.13.0]`（L91）与 `## [v1.12.0]`（L166）两个 H2。
+- `README.md`：版本历史表补 v1.9.0、v1.7.0 两行与 v1.15.0 行；徽章同步 v1.15.0。
+- `.gitignore`：从「整个 `.test-memory/` 不入库」改为「`tree.md`/`lessons.md`/`plans/` 入库，`runs/`/`tmp/` 不入库」。
+
+### 治理分类（Existing / Enhance / Merge / Match / New） 
+
+| 分类 | 对象 | 处置 |
+|---|---|---|
+| New | `references/routing.md` | 路由唯一事实源；原 4 处清单合并为此一处，34 份手册逐行给「触发信号 / 必做动作 / 所属规则」 |
+| New | `scripts/upgrade.py` | 结构化版本写回器，替代 ad-hoc `str.replace` 补丁；本版开新段即由它完成 |
+| Merge | `SKILL.md` → `references/quality-gates.md` | 旧 SKILL 的 R 表证据要求与「不得冒充」串迁入 §3A/§3B，判 bug 15 条迁入 §2A；SKILL 只留判据骨架 |
+| Enhance | `scripts/selfcheck.py` | 新增 §7g~§7k、§8a 六类检查，直接覆盖本版修掉的两处回归 |
+| Enhance | `references/tools.md`、`README.md`、`.gitignore` | 登记新脚本、补版本史与徽章、记忆树入库策略 |
+| Existing | 其余 34 份专项手册、31 份模板、16 个 audit 脚本 | **未改动**，只在 `routing.md` 中重新索引 |
+
+### 口径诚实（不新增不可证伪的宣称） 
+
+- 本版**不新增任何测试维度、R 规则或脚本检测项**；34 份专项手册内容未重写，只是索引收敛。
+- 「−81%」指字符数（python UTF-8 实测 64,893 → 12,241），不代表能力项减少：34 份手册在 `routing.md` §3、`dissect.md` §8、索引池三方齐备，由 §7b/§7j 强制。
+- 破坏性验证在临时副本上做（删 H2 / 删 README 行 / 撑大 SKILL 后跑门禁），属**门禁负向测试**，不是真实故障演练。
+- **未验证**：在真实第三方项目上跑一次完整「阶段 0→4」以对比新旧版实际 token 消耗；本版的省 token 结论只来自文件体积与加载截断的事实。
+- `CHANGELOG` 两处 H2 属**修复既有内容**，不是本轮新增能力。
+
+### 自检与门禁（selfcheck 结果） 
+
+- `python scripts/selfcheck.py` → 见下方「落盘后实测」；`python scripts/upgrade.py --check` → GREEN；`python scripts/upgrade.py --self-test` → 8 项全 PASS / SELFTEST GREEN。
+- 破坏性验证：临时副本删 `## [v1.13.0]` → §7g FAIL；删 README v1.9.0 行 → §7h FAIL；把 SKILL 撑到 >26K → §7i FAIL。三条门禁均可证伪。
+
+### 提案处置（采纳 / 驳回 + 理由） 
+
+- **采纳**：路由单一事实源（消除 47% 冗余）、结构化版本写回器（消除补丁脚本漂移）、体积与序列门禁（本版两处回归的直接解）。
+- **顺延到下一版**：`.test-memory/plans/` 需求库 + tree.md 需求索引（记忆层缺口，改动面大）、token 成本账本 `context-cost.py`、移动 App / 桌面 CLI / 小程序三份专项手册（1.3 覆盖缺口）、刁钻方向生成器（1.2 从静态清单升级为可执行生成）。
+- **驳回**：无。
+
+
 ## [v1.14.0] — 2026-11-18 · 每日升级 #15
 
 **主题**：从「搜得准 · 数得对」扩展到「**并发不打架 · 评测说得清**」——并发与幂等正确性（R-23）与 AI 系统评测可信性（R-24）。一个接口全绿、分页正确、指标也对得上的系统，仍然会在「两个人同时下单，库存扣成 -1」「用户连点两次，生成两个订单扣两次款」「`SELECT` 完再 `UPDATE`，最后一笔覆盖前一笔」「`SETNX` 加锁后 `EXPIRE` 前进程挂了，锁永不过期」「同一消息被消费两次，用户收到两封邮件」「评测集 20 条就说准确率 90%」「LLM judge 和被测模型是同一个，自己给自己打分」「单次跑出 87 分就当 87 分」上成片出错；这类缺陷不是「没测」，而是「并发窗口、幂等语义与评测统计没有可证伪判据」。新增 **R-23 并发与幂等正确性**、**R-24 AI 系统评测可信性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 Kleppmann *DDIA* 的 lost update 分类、PostgreSQL 事务隔离与 `SELECT … FOR UPDATE`、MySQL InnoDB locking reads、Stripe 幂等键（同键异体→409、结果缓存 24h）、IETF `Idempotency-Key` 草案、RFC 9110 §9.2.2、Jepsen 一致性模型、AWS Builders' Library 重试安全、Google SRE Workbook 重试放大，以及 NIST AI RMF (AI 100-1)、ISO/IEC 42001、HELM、MT-Bench 的 LLM-as-a-judge 偏见、Cohen's κ、McNemar、Wilson 区间、OWASP LLM Top 10。按每日升级序列记为 #15。
@@ -88,6 +208,7 @@
 
 ---
 
+## [v1.13.0] — 2026-11-17 · 每日升级 #14
 
 **主题**：从「翻得准 · 报得清」扩展到「**搜得准 · 数得对**」——搜索相关性与排序质量（R-21）与指标口径与报表可信（R-22）。一个分页正确、错误契约也规范的系统，仍然会在「搜『蓝牙耳机』第一页出来的是音箱和手机壳」「同一个词上午搜和下午搜 top-10 不一样」「翻到第 2 页又看到第 1 页那三条」「零结果率 18% 没人看」「看板写转化率 3.2%、源表算出来 4.1%」「两个报表 GMV 差 8 万，两边都说自己对」「A/B 说提升 12%，其实是分流比例坏了」上成片出错；这类缺陷不是「没测」，而是「相关性、排序稳定性、指标定义与对账没有可证伪判据」。新增 **R-21 搜索相关性与排序质量**、**R-22 指标口径与报表可信** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 NDCG 原论文 / TREC `trec_eval` / ir_measures / BEIR、Elasticsearch 的 `search_after`、`max_result_window`、`track_total_hits` 与 tie-breaker 语义、二次加权 κ、dbt MetricFlow 与 dbt tests、GA4 的 users vs sessions 口径差、Microsoft ExP 的 SRM 卡方、Simpson 悖论。按每日升级序列记为 #14。
 
@@ -160,7 +281,9 @@
 - 待核实：不同检索后端（ES / OpenSearch / pgvector / Meilisearch）对 `track_total_hits`、`max_result_window`、tie-breaker 的默认差异，需各跑一次真实请求，不把 ES 的 10000 默认推广到全家。
 - 顺延：批量 207 逐条 code 一致性、税务辖区舍入矩阵、缓存键双会话矩阵、上传解码重编码自动化、AI 变异杀伤跨语言跑数。
 
+---
 
+## [v1.12.0] — 2026-11-16 · 每日升级 #13
 
 **主题**：从「缓存不串号 · 文件不可当代码」扩展到「**翻得准 · 报得清**」——查询语义与分页正确性（R-19）与错误契约与可诊断性（R-20）。一个接口全绿、金额也对、缓存也隔离的系统，仍然会在「第 1 页的 10 条永远看不到」「翻页时后台插了 1 行，后面 10 条被跳过」「`total` 显示 33 但只有 18 条可见」「`sort=created_at LIMIT 1` 让 500 把 SQL 与堆栈一起吐给用户」「429 没 `Retry-After`，客户端把重试打成雪崩」上成片出错；这类缺陷不是「边界没测」，而是「分页契约与错误契约没有可证伪判据」。新增 **R-19 查询语义与分页正确性**、**R-20 错误契约与可诊断性** 与六份文件（2 手册 + 2 矩阵模板 + 2 零依赖脚本），蒸馏底座为 Use The Index Luke「No OFFSET Movement」、PostgreSQL/MySQL collation、RFC 8288、GraphQL Relay Cursor、OWASP SQLi Prevention，以及 RFC 9457 / 9110 / 6585 / 4918、OWASP Error Handling Cheat Sheet、OWASP WSTG ERRH、CWE-209、W3C Trace Context。按每日升级序列记为 #13。
 
