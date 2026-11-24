@@ -52,7 +52,7 @@
 
 **解剖够用即止**——能支撑测试计划就停，不做无死角代码审读；大型项目只解剖本次范围内的模块。
 
-## 3. 专项路由表（35 份，阶段 3 逐条核「必做动作」）
+## 3. 专项路由表（36 份，阶段 3 逐条核「必做动作」）
 
 | 触发信号 | 手册 | 必做动作（阶段 3 逐条核） | 规则 |
 |---|---|---|---|
@@ -76,6 +76,7 @@
 | 有 UI / 交互，或声称「WCAG 2.2 AA / 支持读屏 / 可键盘操作」 | `references/accessibility-testing.md` + `assets/accessibility-matrix-template.md` | WCAG 2.2 增量 9 条、axe violations **+ incomplete** 人工复核、完整键盘路径、至少一组读屏+浏览器+OS 组合逐项标注、2.4.11/2.5.8/3.3.8 实测；无 UI 写「不适用：无图形交互界面」 | **R-7** |
 | 移动端 / 桌面端 / 多浏览器，或声称「真机验过 / 适配折叠屏 / 跨浏览器兼容」 | `references/cross-platform-testing.md` + `assets/device-matrix-template.md` | 设备矩阵来源与覆盖占比、`real`/`emulator`/`simulator`/`browser-emulation` 逐项标注、多内核与长尾条目、端侧特有面与网络档位、§6A 视觉基线留痕；纯后端/CLI 写「不适用：无终端形态差异」 | **R-8** |
 | 有移动安装包（`.apk`/`.aab`/`.ipa`/`.app`）、Appium/Maestro/XCUITest/Espresso/Detox，或声称「真机验过 / 权限正常 / 推送正常 / 升级无影响」 | `references/mobile-app-testing.md` + `assets/mobile-app-matrix-template.md` + `scripts/mobile-audit.py` | 构建与分发（bundle id/versionCode/签名/渠道/灰度轨道）、载体矩阵（real/emulator/simulator/cloud-real）、权限四态（允许/拒绝/不再询问/设置撤销）、中断与生命周期、深链冷/温/热启与非法入参、推送前台/后台/杀进程点击路由、覆盖升级保数据与降级/回滚、弱网档位与低电量/Doze；纯 Web 写「不适用：无移动安装包与 OS 集成面」 | **R-25** |
+| 有桌面包（Electron/Tauri：`.exe`/`.msi`/`.dmg`/`.app`/`.AppImage`），或声称「进程隔离 / IPC 安全 / 签名公证 / 自动更新正常 / 单实例」 | `references/desktop-app-testing.md` + `assets/desktop-app-matrix-template.md` + `scripts/desktop-audit.py` | 运行时权限声称值 vs 实测（nodeIntegration/contextIsolation/sandbox/fuses 逐项）、IPC 入参矩阵与 sender·路径校验、导航·新窗口·CSP·自定义协议、更新签名与公证命令原文/退出码、降级更新与中断更新、单实例·深链·文件关联、崩溃恢复与版本回滚；纯 Web/CLI 写「不适用：无桌面安装包与本地进程边界」 | **R-26** |
 | 有测试报告 / 发布验收 / CI 门禁，需结论可复核；或声称「符合 SOC2/等保/SSDF」「证据链完整」 | `references/evidence-chain-audit.md` + `assets/evidence-chain-template.md` + `scripts/evidence-audit.py` | 结论→证据文件→原始输出的三级引用链逐条可解析（`L<n>` / `text:` 锚点）、证据 `sha256` + commit/环境/时间窗绑定、自动对账与缺口清单、控制项映射与未映射声明、§10 OSCAL 导出；一次性探索写「不适用：无留档要求」 | **R-9** |
 | 特性开关 / kill-switch / 远程配置 / 实验开关 / A-B | `references/feature-flag-testing.md` + `assets/flag-rollout-matrix-template.md` | 开关 off 态与**缺失态**回退安全路径、目标群体否定用例、env/文件/远程三处配置漂移比对、kill-switch 真关实测、灰度比例实测；无开关与配置化写「不适用：无开关与配置维度」 | **R-10** |
 | 有测试库 / fixtures / 工厂 / 种子脚本，或声称「数据已脱敏 / 合成无 PII / 可复现 / 没用生产数据」 | `references/test-data-management.md` + `assets/test-data-matrix-template.md` + `scripts/test-data-gen.py` | 数据来源声明（合成种子/脱敏命令原文+退出码/明确未用生产数据）、脱敏字段清单 + 残留核查 + 人工复核、同 `--seed` 两次逐字节一致、子集外键悬空数 = 0；无数据依赖写「不适用：无测试数据维度」 | **R-11** |
@@ -97,17 +98,17 @@
 | 文件 | 用途 | 何时读 |
 |---|---|---|
 | `references/dissect.md` | 解剖手法（栈指纹、入口、可运行性、测试设施、攻击面、观测面、依赖拓扑） | 阶段 1 |
-| `references/tools.md` | **工具总表（20 个脚本的唯一登记处）**、可用性探测、降级策略、shell 断言模板 | 阶段 1 / 阶段 3 选手段 |
+| `references/tools.md` | **工具总表（21 个脚本的唯一登记处）**、可用性探测、降级策略、shell 断言模板 | 阶段 1 / 阶段 3 选手段 |
 | `references/personas.md` | 7 日常 + 8 刁钻画像、判 bug 5 标准、手册映射 | 阶段 3 两遍执行 |
 | `references/test-design.md` | 测试设计九式、六维矩阵 v2、风险分、覆盖准则与退出标准 | 阶段 1~2 |
-| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、判 bug 15 条、**R-1~R-25 证据要求全文**、flaky、覆盖率/变异、CI 门禁、阶段 4 自检 | 阶段 3 判缺陷 / 阶段 4 自检 |
+| `references/quality-gates.md` | 缺陷八字段、严重度矩阵、判 bug 15 条、**R-1~R-26 证据要求全文**、flaky、覆盖率/变异、CI 门禁、阶段 4 自检 | 阶段 3 判缺陷 / 阶段 4 自检 |
 | `references/memory-tree.md` | 记忆树规范、runs/ 格式、省 token 三律 | 阶段 0 / 阶段 4 |
 | `references/evolution.md` | 运行时进化回路、四问、三层记忆 | 阶段 4 |
 | `references/self-evolution.md` | 每日升级十步协议、权限裁决、版本与变更证据、蒸馏质量门槛 | 升级技能时（非测项目时） |
 | `memory/global-lessons.md` | 跨项目通用经验（开局即读，自我进化载体） | 阶段 0 |
 
-**模板**在 `assets/`（33 份，专项模板按 `<主题>-matrix-template.md` 命名，由本表 §3 对应行指向）。
-**脚本**在 `scripts/`（20 个零依赖脚本，全部带 `--self-test`；命令与降级路径见 `references/tools.md`）。
+**模板**在 `assets/`（34 份，专项模板按 `<主题>-matrix-template.md` 命名，由本表 §3 对应行指向）。
+**脚本**在 `scripts/`（21 个零依赖脚本，全部带 `--self-test`；命令与降级路径见 `references/tools.md`）。
 
 ## 5. 叠加纪律（三条硬约束）
 

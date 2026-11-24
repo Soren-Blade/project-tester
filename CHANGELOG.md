@@ -5,6 +5,84 @@
 
 ---
 
+## [v1.18.0] — 2026-11-24 · 桌面端专项 + R-26 桌面进程边界与分发
+
+### 主题
+
+**C2 桌面端专项**：把「桌面应用」从 `cross-platform-testing.md` 的一条附注升为独立能力层——新增 **R-26 桌面进程边界与分发**（管主进程/渲染进程边界、IPC、导航与 CSP、签名公证、自动更新、单实例/深链、崩溃回滚，与 R-8 的设备形态真实性分工）、`references/desktop-app-testing.md`、`assets/desktop-app-matrix-template.md`、`scripts/desktop-audit.py`（DT-01~DT-10 静态扫描 + DT-20~DT-29 运行矩阵）。专项手册 35→36 份、模板 33→34 份、脚本 20→21 个、规则 25→26 条。
+
+### 动机（来自提案区 / 实战反馈）
+
+1. **缺口实证**：v1.17 全库检索 `nodeIntegration|contextIsolation|sandbox|fuses|Tauri|senderFrame|codesign|stapler` 只命中 `supply-chain-testing.md` 的签名附注与 `cross-platform-testing.md` 的「桌面端也适用」一句，**没有任何可执行判据**；preload 暴露面、IPC sender 校验、capabilities 收窄、降级更新、单实例参数校验全部空白。
+2. **R-8 管不到进程边界**：R-8 只要求「矩阵与载体真实、不拿仿真冒充真机」，无法推翻「桌面端能启动 / 装了签名就安全」这种结论。
+3. **标准 1.2 缺桌面向量**：原 15 画像没有「在渲染进程里 `typeof require` 验证隔离」「用 `../` 打 IPC 路径」「安装中杀进程再启动」这类端侧刁钻路径。
+
+### 改动清单（文件 : 做了什么）
+
+- `references/desktop-app-testing.md`（**新建**）：§0 触发/不适用、§1 八问、§2 选型矩阵（Playwright+Electron / WebdriverIO / Spectron 已停维护 / tauri-driver / 原生 UI 自动化 / 签名命令行 / 人工清单，含证据强度与典型失真）、§3 环境能证明/不能证明、§4 进程权限（`nodeIntegration`/`contextIsolation`/`sandbox`/`webSecurity` + preload 最小暴露 + Tauri capabilities 与 `AppManifest::commands` 收窄）、§5 IPC 入参矩阵与 sender·路径校验、§6 导航/CSP/自定义协议、§7 更新签名（`codesign`/`spctl`/`stapler`/`signtool`/fuses/`pubkey`/降级与中断）、§8 单实例/深链/文件关联/托盘、§9 崩溃休眠回滚、§10 DT-01~DT-10、§11 DT-20~DT-29、§12 不得冒充与降级、§13 出处。
+- `assets/desktop-app-matrix-template.md`（**新建**）：制品与分发 / 运行时权限声称值 vs 实测 / IPC 入参裁决 / 导航与 CSP / 更新签名公证 / 单实例·深链 / 崩溃休眠 / DT-01~DT-10 裁决表 / DT-20~DT-29 / 结论（含 R-26 不得声明）。
+- `scripts/desktop-audit.py`（**新建**）：`scan`（table/json/markdown、`--include-docs`、`--fail-on-gap`）、`matrix`、`cases`（codesign/spctl/stapler/signtool/fuses/tasklist/pgrep）、`--self-test`；零依赖，文件头写明「不联网 / 不代填 / 0 命中也不证明没有缺陷」。
+- `SKILL.md`：frontmatter v1.18.0、description 计数 26 条/R-1~R-26、36 份、21 个并加桌面触发词；规则表新增 R-26 行；阶段 4 证据矩阵改二十六行；判 bug 标准第 8 条、覆盖范围、参考文件表计数同步。
+- `references/routing.md` / `references/dissect.md` §8：各加 desktop 行（手册 + 模板 + 脚本 + R-26）。
+- `references/quality-gates.md`：§2A 第 8 条加「桌面进程边界未测」；§3A 加 R-26 证据行与出处；§3B 新增「桌面进程边界与分发」段 9 条「≠」；§8 自检计数改二十六条/二十五行。
+- `assets/report-template.md`：证据矩阵加 R-26 行；模板清单加 desktop 模板，说明段改二十六行。
+- `references/tools.md`：专项工具表登记 `desktop-audit.py`（含降级路径与「静态扫描 0 命中 ≠ 边界安全」）。
+- `scripts/selfcheck.py`：`checks` 增手册/模板关键词；`SCRIPT_GATES` 增 desktop-audit 门禁（自检、命中规则、诚实边界词）；**§7c 规则同步门禁强化**（见「自检与门禁」）。
+- `README.md`：徽章 / 文件结构计数（105 文件 / 45 references / 34 模板 / 21 脚本）/ R 列表 / 设计要点 / 版本历史同步。
+- `memory/global-lessons.md`：本轮经验 2 条（桌面专项已吸收 + 静态扫描豁免按结构块判定）。
+
+### 治理分类（Existing / Enhance / Merge / Match / New）
+
+| 分类 | 条目 | 说明 |
+|---|---|---|
+| **New** | `references/desktop-app-testing.md`、`assets/desktop-app-matrix-template.md`、`scripts/desktop-audit.py`、R-26 | 新能力层与可执行判据 |
+| **Enhance** | `SKILL.md`、`references/routing.md`、`references/dissect.md`、`references/quality-gates.md`、`assets/report-template.md`、`references/tools.md`、`README.md`、`memory/global-lessons.md` | R-26 三处同步 + 计数 + 经验沉淀 |
+| **Match** | `scripts/selfcheck.py` | 新手册/模板/脚本接线到门禁；§7c 补「§3A 逐条证据行 + 规则编号上限」负向漏洞 |
+| **Existing** | 其余 35 份手册、R-1~R-25、其余 33 份模板、其余 20 个脚本 | **未改判据** |
+
+### 口径诚实（不新增不可证伪的宣称）
+
+- dogfood 的 **12 条违规 / 2 条无法核对**只证明「扫描器在自造夹具上按预期工作」，**不是任何真实桌面应用的结论**；夹具在 `.workbuddy-ai/` 下，不入库、不作案例背书。
+- **DT-04（preload 过度暴露）未在夹具中出现**，由 `--self-test` 的 preload 夹具覆盖；这不等于真实项目里 DT-04 少见或常见。
+- `desktop-audit.py` 只做**静态文本/正则扫描**：0 命中不证明边界安全；动态拼接、打包后才写入的配置、模板字符串拼接的 IPC 通道名会漏；它不替代运行态验证、不替代 `codesign`/`signtool` 实跑、不判断业务正确性。
+- 手册里的 `codesign` / `spctl` / `stapler` / `signtool` / `@electron/fuses` / Tauri capability 命令来自官方文档，**本机（Windows）未逐条执行**（无 macOS 签名环境、未安装真实 Electron/Tauri 应用）；不同 Electron / Tauri / OS 版本默认值与参数会变，手册已标「版本敏感、执行前本机复核并留 `--help` 输出」。
+- **未验证**：真实 Electron/Tauri 应用的命中率/误报率、跨平台签名差异、降级安装与中断更新的实际拦截行为、公证审核时延。
+
+### 自检与门禁（selfcheck 结果）
+
+**深度实测（dogfood v1.18.0）**：`.workbuddy-ai/dogfood/v1.18.0/desktop-sample/` 3 个可扫描文件，`python scripts/desktop-audit.py scan .workbuddy-ai/dogfood/v1.18.0/desktop-sample` 实跑 **12 违规 / 2 无法核对**——DT-01（`nodeIntegration: true`）、DT-02（`contextIsolation: false` + `sandbox: false`）、DT-03（`webSecurity: false`）、DT-05（IPC handler 读文件且无 sender/路径校验，标无法核对）、DT-06（`shell.openExternal(target)`）、DT-07（`setWindowOpenHandler` 恒 allow）、DT-08（`csp: null` + 项目级 CSP 缺口，各 1）、DT-09（`pubkey` 空 + http 更新源 + `dangerousInsecureTransportProtocol`）、DT-10（capability 全窗口 + fs/shell default；assetProtocol 裸 `**` + `requireLiteralLeadingDot:false`）。诱饵零误报：同文件已校验 handler（`senderFrame`+`realpath`）、注释里的 `senderFrame` 字样、https 无签名场景不编造「证书过期」。详见 `.workbuddy-ai/dogfood/v1.18.0/RESULT.md`。
+
+本轮 dogfood 修掉的脚本缺陷（均已加回归断言）：① DT-05 整文件判定被同文件安全 handler 的 `senderFrame` 压掉 → 改逐 handler 块判定；② 注释里的 `senderFrame`/`realpath` 压制命中 → 新增 `_blank_comments()` 等长空格置空；③ Tauri `"csp": null` 未覆盖 → 新增行级规则 + 项目级「无法核对」兜底；④ 同行多规则重复条目 → 去重键改 `(rule, rel, line)`。
+
+本轮负向测试发现并修掉的**门禁缺陷**：`selfcheck.py` §7c 原先把 `quality-gates.md` 全文件所有 `R-N` 当「引用集」，导致 ① 删掉 §3A 的 R-26 证据行仍 PASS（R-26 在 §3B 还有）；② SKILL 把「R-1~R-26」改成「R-1~R-27」也 PASS。已改为：§3A 区域内逐条 `| **R-N` 表格行必须覆盖 SKILL 规则集，且 SKILL 不得出现编号 > 最大规则的引用。
+
+```powershell
+python scripts/selfcheck.py                    # PASS 93 / WARN 1 / FAIL 0，exit 0
+python scripts/upgrade.py --check              # 结构校验 GREEN，exit 0
+python scripts/desktop-audit.py --self-test    # SELFTEST GREEN，exit 0
+```
+
+WARN 仍为 `memory/global-lessons.md` 347 行（D1 待做，非本轮引入）。
+
+**负向测试 6/6**（在仓库临时副本上改坏一处，确认对应门禁 FAIL，原仓库不受影响）：
+
+| # | 改坏什么 | 期望/实测 |
+|---|---|---|
+| N1 | 删 `report-template.md` 的 `\| R-26 ` 矩阵行 | FAIL「报告证据矩阵缺少规则表格行: R-26」 |
+| N2 | SKILL 的 `R-1~R-26` 改成 `R-1~R-27` | FAIL「SKILL.md 出现超出最大规则编号 R-26 的引用: R-27」 |
+| N3 | `desktop-audit.py` 的「0 命中也不证明没有缺陷」改成「0 命中即安全」 | FAIL「缺少可证伪性 / 诚实边界关键字段」 |
+| N4 | 删 `quality-gates.md` §3A 的 R-26 证据行 | FAIL「§3A 缺少规则证据行: R-26」 |
+| N5 | 删 `routing.md` 的 desktop 行 | FAIL「孤儿文档: desktop-app-testing.md」+「只在 dissect §8、未进 routing.md」 |
+| N6 | 删 §3A 的 R-13 证据行 | FAIL「§3A 缺少规则证据行: R-13」 |
+
+自动化提示词：revision 5 → 6。
+
+### 提案处置（采纳 / 驳回 + 理由）
+
+- **采纳（v1.18）**：C2 桌面端专项 —— v1.15 提案③「移动 / 桌面 / 小程序三份专项」的第二份；桌面端可零依赖落静态扫描（配置字面量、capability JSON、CSP），且官方文档足以支撑可证伪判据。
+- **顺延（队列）**：C3 小程序专项（微信/支付宝：授权 scope、setData 性能、分包与首包、审核环境差异、storage 上限、真机调试）；C4 刁钻方向生成器（把 1.2 从静态 15 画像变成「给定功能 → 20+ 方向」）；D1 `global-lessons.md` TOC + 归档判据（347 行，阶段 0 每次整份读入）；D2 plans 复用实测；D3 CHANGELOG 归档。
+- **低优先/暂不做**：D4 脚本公共 harness（同口径 Jaccard ≈0.24，收益低）；桌面端「运行态自动化」不写成必选——`tauri-driver`/原生 UI 自动化的跨平台成本高，手册只给选型与最低证据。
+
 ## [v1.17.0] — 2026-11-23 · 移动 App 专项：R-25 与 mobile-audit
 
 ### 主题

@@ -342,4 +342,6 @@
 - [流程类] **要求写的「下次更省」，必须先有地方存 + 有办法量** — v1.15 之前技能同时缺「需求档案」与「成本账本」：宣传越用越聪明，实际第二轮仍从零推方向、也无人知道是否真省。应用：任何「随使用自我进化」的机制，先问三件事——产物存哪、谁读它、怎么验证它有用；三者缺一，宣称降级为「设计意图」
 - [技能改进] 待核实（v1.16 提出）：plans 档案复用到底省多少 → 需在真实第三方项目上跑两轮同类需求，对比「有档案 vs 无档案」的实测读入量（`context-cost.py estimate` 同口径），再决定是否回填任何百分比；本版只验证了机制接线与脚本自测
 - [技能改进] 待核实（v1.15 提出）：本文件已 336 行，超自定「超 40 行修剪」8 倍，且阶段 0 每次整份读入（≈8.8k tok）→ 需要「TOC + 冷门条目归档到 `memory/archive/`」，但归档会损失跨项目经验召回，先定归档判据（连续两轮升级未被引用的条目）再动手，不做无判据的批量删除
+- [技能改进] ✅ **已吸收（v1.18）**：桌面端（Electron / Tauri）从「R-8 的一条附注」升为独立能力层 → 落地为 `references/desktop-app-testing.md` + `assets/desktop-app-matrix-template.md` + `scripts/desktop-audit.py`，新增 **R-26 桌面进程边界与分发**；理由：Electron 安全清单把 `contextIsolation`/`sandbox`/fuses/`senderFrame` 写成可核对项，Tauri capabilities/assetProtocol scope 有明确的过宽形态（`windows:["*"]`、裸 `**`、`requireLiteralLeadingDot:false`），旧手册只有「桌面应用也适用」一句，无法推翻「能启动就算过」
+- [流程类] **静态扫描的豁免判定要绑定到最小结构单元，不能整文件一刀切，也不能用行窗口** — v1.18 dogfood 里同一 `main.js` 有一个已校验 IPC handler，整文件判定会把另一个未校验 handler 一起洗白；换成 ±N 行窗口又会把相邻 handler 的保护误算过来。应用：任何「出现 A 即视为安全」的规则，先确定 A 该保护的最小单元（handler / 路由 / 组件 / 函数体），在该单元内判；判之前把注释替换为等长空格，避免「注释里写了 senderFrame」变成假的豁免证据
 

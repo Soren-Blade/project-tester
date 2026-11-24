@@ -101,6 +101,7 @@ out=$(cmd args); [[ "$out" == *"期望片段"* ]] && echo PASS || echo "FAIL 实
 | **技能版本写回与结构门禁**（v1.15） | `python scripts/upgrade.py --check`（CHANGELOG H2 严格递减且去重 / 每段至多一个「### 治理分类」/ SKILL·README·CHANGELOG 三方版本一致 / README 版本表覆盖全部版本）；`upgrade.py --new-version <X.Y.Z> --title 「<一句话>」` 开新版本段并同步版本号，**写盘前先校验、失败全量回滚**；`--self-test` 验门禁可证伪 | 无 Python 时按 `references/self-evolution.md` §3 手工核这四项并逐条留证，**不得**手改版本号后声明「已同步」；`--check` BLOCKED 时禁止提交 | `self-evolution.md` §3 / `quality-gates.md` §8 |
 | **token 成本账本**（v1.16） | `python scripts/context-cost.py session --memory <项目>/.test-memory --skill <技能目录>`（阶段 0 开局成本：tree.md + lessons.md + plans/ + global-lessons）；`context-cost.py log --memory <项目>/.test-memory --scene "阶段4 收尾"` 写进 `metrics.md`；`context-cost.py report --memory ...` 看轮次/均值/趋势；`estimate <paths...>` 量任意文件；`--self-test` 14 项 | 无 Python 时手工记 `wc -c` 与行数进 `metrics.md`，注明「未用脚本，口径为字节数」；**估算 tokens 不是账单**（chars/3.2，中文被低估），只做同口径横比，不得据此向用户承诺省钱；「更省」≠「测得更好」 | `memory-tree.md`「省 token 四律」 |
 | **移动 App 集成面静态扫描与运行矩阵**（v1.17） | `python scripts/mobile-audit.py scan <path> --format markdown --fail-on-gap`（默认跳过 `.md`，查文档示例加 `--include-docs`）；`mobile-audit.py matrix`（MB-20~MB-29 权限/中断/生命周期/深链/推送/升级/灰度/弱网/电量/无障碍）；`mobile-audit.py cases`（android/ios 命令清单）；`--self-test` 验 MB-01~MB-10 命中与误报控制 | 无 Python 时按 `mobile-app-testing.md` §9 手工 grep 坐标点击 / sleep 无 waitFor / 权限清单缺失并逐条裁决；**静态扫描 0 命中 ≠ 无集成缺陷**，真机装上 ≠ 集成面测过，权限全允许 ≠ 拒绝路径安全 | `mobile-app-testing.md` §4/§9/§10 |
+| **桌面应用进程边界静态扫描与运行矩阵**（v1.18） | `python scripts/desktop-audit.py scan <path> --format markdown --fail-on-gap`（默认跳过 `.md`；只面向 Electron/Tauri 源码与配置）；`desktop-audit.py matrix`（DT-20~DT-29 进程边界/IPC/导航/CSP/更新签名/回滚/单实例/崩溃/协议穿越/跨平台）；`desktop-audit.py cases`（codesign/spctl/stapler/signtool/fuses/进程与代理命令）；`--self-test` 验 DT-01~DT-10 命中与误报控制 | 无 Python 时按 `desktop-app-testing.md` §10 手工 grep `nodeIntegration`/`sandbox: false`/`csp` 并逐条裁决；**静态扫描 0 命中 ≠ 进程边界安全**，`contextIsolation: true` 写了 ≠ 打包值未被改，签名有效 ≠ 更新不可替换 | `desktop-app-testing.md` §4/§10/§11 |
 
 ### 可用性探测（一次跑完，结果记进命令速查）
 
@@ -135,6 +136,7 @@ python scripts/upgrade.py --self-test || echo "upgrade SELFTEST FAIL -> 退回�
 python scripts/upgrade.py --check || echo "upgrade check BLOCKED -> 按输出逐条修结构，禁止带病升版本"
 python scripts/context-cost.py --self-test || echo "context-cost SELFTEST FAIL -> 退回 wc -c 手工记 metrics.md，注明未用脚本"
 python scripts/mobile-audit.py --self-test || echo "mobile-audit SELFTEST FAIL -> 退回 mobile-app-testing.md §9 手工 grep 与逐条裁决，结论标待确认"
+python scripts/desktop-audit.py --self-test || echo "desktop-audit SELFTEST FAIL -> 退回 desktop-app-testing.md §10 手工 grep 与逐条裁决，结论标待确认"
 ```
 
 ## 工具使用纪律

@@ -43,7 +43,7 @@
 | 5 | **不符宣称** | 文档/README/宣传承诺的行为与实测不符 | `dissect.md` §2 |
 | 6 | **前端五态缺失 / 焦点不可见** | 空态·加载·错误·无权限·超时缺一，或键盘焦点看不见 | `frontend-testing.md` §4 |
 | 7 | **跨租户泄漏 / 制品对不上 / locale 与 RTL 漂移** | 隔离失效、SBOM 与实物不符、翻译溢出或镜像布局错位 | `multi-tenancy-testing.md` · `supply-chain-testing.md` · `i18n-localization-testing.md` |
-| 8 | **焦点被遮挡 / 目标过小 / 仿真被写成真机 / 移动集成面未测** | 2.4.11 遮挡、2.5.8 尺寸不足、仅仿真即宣称真机通过；权限/中断/深链/推送/升级未测却称「移动端可用」 | `accessibility-testing.md` · `cross-platform-testing.md` · `mobile-app-testing.md` |
+| 8 | **焦点被遮挡 / 目标过小 / 仿真被写成真机 / 移动集成面未测 / 桌面进程边界未测** | 2.4.11 遮挡、2.5.8 尺寸不足、仅仿真即宣称真机通过；权限/中断/深链/推送/升级未测却称「移动端可用」；nodeIntegration/sandbox/fuses 未核对、IPC 无入参校验却称「桌面端安全」 | `accessibility-testing.md` · `cross-platform-testing.md` · `mobile-app-testing.md` · `desktop-app-testing.md` |
 | 9 | **令牌可伪造 / 会话不可终止** | `alg=none` 被接受、登出后旧令牌仍可用 | `auth-session-testing.md` |
 | 10 | **DST 双跑漏跑 / 备份不可恢复** | 转换日任务重复或跳过；备份任务成功但恢复失败 | `time-correctness-testing.md` · `backup-recovery-testing.md` |
 | 11 | **金额精度与分摊 / webhook 重放与重复副作用** | 展示价≠实扣价、分摊丢分；同事件触发多次扣款/发货 | `money-correctness-testing.md` · `webhook-delivery-testing.md` |
@@ -67,9 +67,9 @@
 
 报告末尾必须给一句明确结论：`质量状态：PASS / FAIL` + `发布建议：Go / No-Go` + 一句话理由。禁止"基本可以""问题不大"。
 
-## 3A. R-1~R-25 证据要求（全文）
+## 3A. R-1~R-26 证据要求（全文）
 
-**二十五条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11，v1.8 引入 R-12，v1.9 引入 R-13/R-14，v1.10 引入 R-15/R-16，v1.11 引入 R-17/R-18，v1.12 引入 R-19/R-20，v1.13 引入 R-21/R-22，v1.14 引入 R-23/R-24，v1.17 引入 R-25）。`SKILL.md` 只留判据骨架，**逐条证据要求以本节为准**。
+**二十六条可证伪规则**（v1.1 引入 R-1/R-2，v1.2 引入 R-3/R-4，v1.3 引入 R-5/R-6，v1.4 引入 R-7/R-8，v1.5 引入 R-9，v1.6 引入 R-10，v1.7 引入 R-11，v1.8 引入 R-12，v1.9 引入 R-13/R-14，v1.10 引入 R-15/R-16，v1.11 引入 R-17/R-18，v1.12 引入 R-19/R-20，v1.13 引入 R-21/R-22，v1.14 引入 R-23/R-24，v1.17 引入 R-25，v1.18 引入 R-26）。`SKILL.md` 只留判据骨架，**逐条证据要求以本节为准**。
 
 | 规则 | 结论必须附的证据 | 不适用时的写法 |
 |---|---|---|
@@ -98,8 +98,9 @@
 | **R-23 并发与幂等正确性** | 声称「幂等已做 / 防重复提交 / 不会超卖 / 并发安全 / 加了锁 / 消息只消费一次」，须附 ① 契约清单（手册 §1 八问原文：键位置 / 保留期 / 同键异体语义 / 隔离级别 / 扣减语义 / 重试策略 / 实例数，缺哪条写「未确认」）；② 并发夹具（并发度 N、执行体数量、屏障实现、是否同进程、请求原文含 `Idempotency-Key` 与 trace，以及为什么它是真并发而非串行重放）；③ 不变量对账（余额 == Σ流水 / 库存 ≥ 0 / 一键一资源 / 单号唯一：期望值、实测值、差额 + 对账 SQL 原文与执行时间）；④ 幂等键矩阵实测（同键同体 / 同键异体 / 不同键同体 / 键过期重放 / 跨用户复用 / 归一化）的响应码、`resource_id`、副作用次数，至少含一行「同键异体」与一行「跨用户复用」负向；⑤ `side-effects` 输出原文（命令 + 退出码 + 逐键表，`duplicate_side_effect=true` / `multi_resource=true` 原样贴）；⑥ 锁与事务证据（`rowcount` 断言、`version` 递增、`pg_locks` / `INNODB STATUS` 锁等待片段、临界区时间戳交叠或 fencing token 拒绝旧写日志）；⑦ `scan` 命中逐条裁决（真缺陷 / 误报原因 / 不适用原因，不得只贴数量）；⑧ 回归对照（串行基线 vs 真并发的成功数、错误率、p95、冲突计数；未做写「未做并发基线对照」并降级） | 纯只读服务、无写路径 → 只写「不适用：无并发写路径」，**不得**写「并发安全 / 无竞态 / 幂等已做」；只做了串行重放或单实例压测 → 写「仅测串行重放与单实例，未验真并发与多副本」，结论降为「待确认」，**不得**把「代码里有锁」冒充「并发安全」，**不得**把「压测没报错」冒充「无超卖」，**不得**把「幂等键存在」冒充「幂等生效」，**不得**把「有事务注解」冒充「事务生效」 |
 | **R-24 AI 系统评测可信性** | 声称「AI 答得准 / 效果好 / 评测通过 / 幻觉已解决 / 换了 prompt 提升 X%」，须附 ① 评测任务与输入输出契约（一句话 + 允许的多种答案）；② 评测集来源、分层、条数、版本 hash、采集时间与污染检查结论；③ 采样次数 n、`temperature`/`top_p`/`seed`、pass@1 或 pass@k 口径；④ 判定器类型、人工校准样本、κ 或一致率、judge 与 generator 的模型差异（同模型判分即 S1）；⑤ 总体与逐类 pass rate + Wilson 95% CI，以及失败 / 超时 / 限流 / 拒答分母（出分母即造假）；⑥ 基线版本、McNemar p 与「显著 / 不显著」、安全用例逐条判定（注入 / 工具越权 / RAG 租户隔离 / 输出渲染 XSS）；⑦ p50/p95、token、`$` 成本与预算结论；⑧ 放量 / 回滚条件与「离线结论不能覆盖什么」；并附 `scripts/llm-eval-audit.py scan` / `stats` 输出原文与退出码 | 无 AI 生成输出 → 只写「不适用：无 AI 生成输出面」，**不得**写「AI 效果达标 / 评测通过」；只有 demo 人工抽看 → 写「仅人工抽看 N 条，无统计结论」，**不得**把「跑通一遍」冒充「评测有效」，**不得**把「LLM judge 说好」冒充「好」（judge 未校准时不得作为通过证据），**不得**把「单次 87 分」冒充「87 分」，**不得**把「改了 prompt 分数涨」冒充「模型更好」，**不得**用「评测集 20 条」冒充「有统计结论」 |
 | **R-25 移动 OS 集成面与分发** | 声称「移动端能用 / 真机验过 / 权限正常 / 推送正常 / 升级无影响 / 灰度可控」，须附 ① 构建与分发信息（bundle id / applicationId、versionCode / CFBundleVersion、签名类型与证书指纹、渠道、灰度轨道与放量比例）；② 载体矩阵逐行标注 `real` / `emulator` / `simulator` / `cloud-real`（型号、OS 版本、来源），并写明哪些结论只来自仿真；③ 权限四态实测（允许 / 拒绝 / 不再询问 / 设置中撤销）各自的界面行为与后续功能可用性，含 `adb shell pm revoke` / `xcrun simctl privacy ... reset all` 命令与回读；④ 中断与生命周期（来电、通知、低内存回收、旋转、分屏、后台返回）的恢复证据（截图或状态 diff + `dumpsys` / 日志）；⑤ 深链冷 / 温 / 热启 × 已登录 / 未登录 / 非法入参，`adb shell am start -W -a android.intent.action.VIEW -d …` 或 `xcrun simctl openurl` 回显 + 落地页渲染证明；⑥ 推送前台 / 后台 / 杀进程三态点击路由，`simctl push` payload 原文与点击后页面；⑦ 覆盖升级保数据 + 降级 / 回滚操作记录（`adb install -r`、`adb install -r -d`、`simctl install` 输出）；⑧ 弱网档位（上下行 / 时延 / 丢包，`-netdelay` / `-netspeed` 命令原文）与低电量 / Doze 下关键路径时延与失败率；⑨ `scripts/mobile-audit.py scan` 命中逐条裁决（真缺陷 / 误报 / 不适用）+ `matrix` 输出原文 | 无移动安装包 → 只写「不适用：无移动 App 安装包与 OS 集成面」，**不得**写「移动端已测 / 真机验过」；只有模拟器结果 → 写「仅仿真器验证，未覆盖真机与设备云，R-25 降级为待确认」，**不得**写「真机通过」；权限只测允许 → 写「仅测允许路径，未测拒绝 / 不再询问 / 撤销」，**不得**写「权限正常」；深链只跑一条 → 写「仅测热启已登录深链」，**不得**写「深链可用」；只新装未升旧包 → 写「仅验证新装，未验证覆盖升级与回滚」，**不得**写「升级无影响」；静态扫描 0 命中 → 写「静态扫描 0 命中，未做运行态验证」，**不得**写「无集成缺陷」 |
+| **R-26 桌面进程边界与分发** | 声称「进程隔离 / IPC 安全 / 签名公证 / 自动更新正常 / 单实例 / 桌面端已测」，须附 ① 运行时权限声称值 vs 实测（`nodeIntegration` / `contextIsolation` / `sandbox` / `webSecurity` 的实际取值来源 + `npx @electron/fuses read --app …` 或 Tauri `capabilities` 清单与 `AppManifest::commands` 收窄证据）；② IPC 入参矩阵（路径穿越 `../../`、命令拼接、类型混淆、超长/空值）的请求原文与响应或日志 + `event.senderFrame` / `path.resolve` / `realpath` 校验代码或拒绝证据；③ 导航与新窗口（`will-navigate` / `setWindowOpenHandler` 配置原文 + 越权导航实测）、CSP 响应头或 meta 原文、自定义协议与 `file://` 使用情况；④ 更新链路：`codesign -dv` / `spctl -a -vv` / `xcrun stapler validate` / `signtool verify` 命令原文与退出码 + 更新包公钥指纹（Tauri `pubkey`）+ 下载→验签→安装日志；⑤ 降级更新（version 回退）与中断更新（安装中杀进程）实测结论 + 失败可回滚证据；⑥ 单实例与深链/文件关联：第二个实例唤起、参数校验、非法入参拒绝；⑦ 崩溃恢复：主进程崩溃、渲染进程崩溃、休眠唤醒后的状态与日志；⑧ `scripts/desktop-audit.py scan` 命中逐条裁决（真缺陷 / 误报 / 不适用）+ `matrix` 输出原文 | 纯 Web/CLI、无桌面安装包与本地进程 → 只写「不适用：无桌面安装包与本地进程边界」，**不得**写「桌面端已测 / 进程隔离良好」；只有静态扫描 → 写「仅静态扫描，未做运行态验证，R-26 降级为待确认」，**不得**写「边界安全 / IPC 已校验」；只测一个平台 → 写「仅测 <平台>，未验证其余平台的签名与更新」，**不得**写「跨平台已验」；只测正常升级 → 写「仅测正常升级，未测降级与中断更新」，**不得**写「更新安全」；签名命令通过 → 写「签名有效，未验证更新包不可替换」，**不得**把「签名有效」冒充「更新不可篡改」 |
 
-逐条手册出处：`observability-testing.md` §8、`chaos-resilience.md` §8、`supply-chain-testing.md` §7、`multi-tenancy-testing.md` §9、`contract-evolution-testing.md` §6、`privacy-compliance-testing.md` §7、`accessibility-testing.md` §5、`cross-platform-testing.md` §7、`evidence-chain-audit.md` §7、`feature-flag-testing.md` §4、`test-data-management.md` §6、`auth-session-testing.md` §8、`time-correctness-testing.md` §9、`backup-recovery-testing.md` §8、`money-correctness-testing.md` §9、`webhook-delivery-testing.md` §7、`cache-freshness-testing.md` §8、`file-upload-download-testing.md` §7、`query-pagination-testing.md` §10、`error-contract-testing.md` §10、`search-quality-testing.md` §10、`metrics-correctness-testing.md` §10、`idempotency-concurrency-testing.md` §11、`llm-eval-testing.md` §11、`mobile-app-testing.md` §11。
+逐条手册出处：`observability-testing.md` §8、`chaos-resilience.md` §8、`supply-chain-testing.md` §7、`multi-tenancy-testing.md` §9、`contract-evolution-testing.md` §6、`privacy-compliance-testing.md` §7、`accessibility-testing.md` §5、`cross-platform-testing.md` §7、`evidence-chain-audit.md` §7、`feature-flag-testing.md` §4、`test-data-management.md` §6、`auth-session-testing.md` §8、`time-correctness-testing.md` §9、`backup-recovery-testing.md` §8、`money-correctness-testing.md` §9、`webhook-delivery-testing.md` §7、`cache-freshness-testing.md` §8、`file-upload-download-testing.md` §7、`query-pagination-testing.md` §10、`error-contract-testing.md` §10、`search-quality-testing.md` §10、`metrics-correctness-testing.md` §10、`idempotency-concurrency-testing.md` §11、`llm-eval-testing.md` §11、`mobile-app-testing.md` §11、`desktop-app-testing.md` §12。
 
 ## 3B. 「近似证据 ≠ 结论」对照表
 
@@ -112,6 +113,10 @@
 **无障碍与跨端**
 - axe 0 violations ≠ WCAG 合规 ｜ 仿真绿（Playwright Mobile Safari）≠ iOS 真机通过 ｜ 仿真绿 ≠ 全平台兼容
 - 真机装上 ≠ 集成面测过 ｜ 权限全允许 ≠ 拒绝路径安全 ｜ 静态扫描 0 命中 ≠ 无移动集成缺陷 ｜ 新装成功 ≠ 覆盖升级无影响 ｜ 灰度放量 ≠ 可回滚
+
+**桌面进程边界与分发**
+- 桌面端能启动 ≠ 进程边界安全 ｜ `contextIsolation: true` 写了 ≠ 实际打包值没被改 ｜ IPC handler 存在 ≠ 入参已校验 ｜ `ipcRenderer.invoke` 通 ≠ sender 可信
+- 签名有效 ≠ 更新不可替换 ｜ 公证通过 ≠ 无权限风险 ｜ 正常升级成功 ≠ 降级/中断更新安全 ｜ 单实例插件装了 ≠ 第二实例参数已校验 ｜ 只测 macOS ≠ 跨平台已验
 
 **配置、数据、身份**
 - 开态测过 ≠ 关态也安全 ｜ 配了三处没比对 ≠ 开关可控 ｜ 用了生成器 / 掩码了已知字段 ≠ 数据已脱敏 / 无 PII 泄漏
@@ -201,7 +206,7 @@ cargo mutants                     # Rust
 - [ ] 报告按 `assets/report-template.md` 输出，含 PASS/FAIL 与 Go/No-Go
 - [ ] 临时探针清理完毕
 - [ ] 若本轮触发了技能本体改进提案 → 写进 `global-lessons.md` 的 `[技能改进]`，由用户决定（见 `self-evolution.md`）
-- [ ] R-1 ~ R-25 **二十五条**可证伪规则未被误判为通过：不适用项已写明原因，证据不足的结论已降级为「待确认」，而非填 0 分假装测过；逐条比对 §3B 的「近似证据 ≠ 结论」，确认没有拿左边的现象写成右边的结论
-- [ ] 报告证据矩阵**二十五行**逐行填了结论或「不适用 / 待确认」声明，未留空行、未出现未定义的 R 编号（由 `scripts/selfcheck.py` 的 §7d 强制）
+- [ ] R-1 ~ R-26 **二十六条**可证伪规则未被误判为通过：不适用项已写明原因，证据不足的结论已降级为「待确认」，而非填 0 分假装测过；逐条比对 §3B 的「近似证据 ≠ 结论」，确认没有拿左边的现象写成右边的结论
+- [ ] 报告证据矩阵**二十六行**逐行填了结论或「不适用 / 待确认」声明，未留空行、未出现未定义的 R 编号（由 `scripts/selfcheck.py` 的 §7d 强制）
 - [ ] 每条 R 规则的「不适用时的写法」都保留了明确的禁止冒充声明（由 `scripts/selfcheck.py` 的 §7e 强制）；新增规则时同步写清降级路径，而非只加一句「要有证据」
 - [ ] 若本轮用了 `scripts/evidence-audit.py` / `scripts/device-matrix.py` / `scripts/search-audit.py` / `scripts/metric-audit.py` / `scripts/concurrency-audit.py` / `scripts/llm-eval-audit.py`，六者 `--self-test` 退出码均为 0 且对账/草稿/评测/口径/副作用/显著性缺口的声明已抄进报告（由 `scripts/selfcheck.py` 的 §7f 静态门禁 + 人工回归共同确认）；**对账 GREEN 不得升级成「合规通过 / 发布批准」，nDCG 达标不得升级成「搜索业务成功」，对账一致不得升级成「指标口径正确」，无静态反模式不得升级成「并发安全」，CI 与 κ 达标不得升级成「模型可用」**

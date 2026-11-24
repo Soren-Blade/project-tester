@@ -162,6 +162,8 @@ checks = {
     "assets/llm-eval-matrix-template.md": ["R-24", "评测集", "不适用", "不得"],
     "references/mobile-app-testing.md": ["R-25", "权限", "深链", "不适用", "不得"],
     "assets/mobile-app-matrix-template.md": ["R-25", "权限", "不适用", "不得"],
+    "references/desktop-app-testing.md": ["R-26", "IPC", "contextIsolation", "fuses", "不适用", "不得"],
+    "assets/desktop-app-matrix-template.md": ["R-26", "IPC", "签名", "不适用", "不得"],
     "references/self-evolution.md": ["测项目时不自治", "每日升级"],
     "references/quality-gates.md": ["缺陷报告八字段", "Flaky"],
 }
@@ -237,21 +239,41 @@ if orphans:
 else:
     ok(f"路由闭环：{len(special_refs)} 份专项手册均有 routing.md 路由 + dissect §8 视图 + 索引")
 
-# 7c) 可证伪规则同步（双向）：SKILL.md 定义集与 quality-gates.md 引用集必须相等
+# 7c) 可证伪规则同步（双向）：SKILL.md 定义集与 quality-gates.md 引用集必须相等。
 #     单向检查挡不住「悄悄删掉一条规则」，所以两边都查。
+#     v1.18 负向测试发现：qg 引用集全文件匹配时，删掉 §3A 的 R-26 证据行仍会 PASS
+#     （因为 R-26 在 §3B/标题里还出现过），且 SKILL 里把「R-1~R-26」改成「R-1~R-27」
+#     也不会 FAIL。因此 §3A 必须逐条有表格行，且 SKILL 不得出现超出最大编号的规则号。
 rules = sorted(set(re.findall(r"\*\*(R-\d+)\s", skill)))
 qg = read(ROOT / "references/quality-gates.md")
 qg_rules = sorted(set(re.findall(r"R-\d+", qg)))
 unsynced = [r for r in rules if r not in qg_rules]
 orphan_qg = [r for r in qg_rules if r not in rules]
+qa_marker = "## 3A."
+qa_section = qg.split(qa_marker, 1)[1].split("\n## ", 1)[0] if qa_marker in qg else ""
+qa_row_re = re.compile(r"^\|\s*\*\*(R-\d+)")
+qa_rules = sorted({m.group(1) for ln in qa_section.splitlines()
+                   for m in [qa_row_re.match(ln)] if m})
+missing_qa = [r for r in rules if r not in qa_rules]
+extra_qa = [r for r in qa_rules if r not in rules]
+max_rule = max((int(r.split("-")[1]) for r in rules), default=0)
+stray_skill = sorted({r for r in re.findall(r"R-(\d+)", skill) if int(r) > max_rule})
 if len(rules) < 2:
     fail(f"SKILL.md 可证伪规则不足（仅识别到 {len(rules)} 条）")
 elif unsynced:
     fail("可证伪规则未接入 quality-gates.md: " + ", ".join(unsynced))
 elif orphan_qg:
     fail("quality-gates.md 出现 SKILL.md 未定义的规则（可能被悄悄删除或编号写错）: " + ", ".join(orphan_qg))
+elif missing_qa:
+    fail("quality-gates.md §3A 缺少规则证据行: " + ", ".join(missing_qa))
+elif extra_qa:
+    fail("quality-gates.md §3A 出现 SKILL.md 未定义的规则证据行: " + ", ".join(extra_qa))
+elif stray_skill:
+    fail("SKILL.md 出现超出最大规则编号 R-"
+         + str(max_rule) + " 的引用: " + ", ".join("R-" + r for r in stray_skill))
 else:
-    ok(f"可证伪规则双向同步：{', '.join(rules)} 共 {len(rules)} 条，SKILL.md 与 quality-gates.md 集合一致")
+    ok(f"可证伪规则双向同步：{', '.join(rules)} 共 {len(rules)} 条；"
+       f"§3A 证据行 {len(qa_rules)} 条且无超出 R-{max_rule} 的编号")
 
 # 7d) 报告证据矩阵同步：证据矩阵**表格行**必须逐条覆盖 SKILL.md 定义的全部规则。
 #     v1.5 负向测试发现：只统计整段里的 R-N 会被说明文字中的编号蒙混（删掉 R-9 表格行
@@ -361,6 +383,10 @@ SCRIPT_GATES = {
     "scripts/mobile-audit.py": [
         "--self-test", "SELFTEST GREEN", "--fail-on-gap", "MB-01", "MB-20",
         "不联网", "不代填", "不证明", "0 命中也不证明无缺陷",
+    ],
+    "scripts/desktop-audit.py": [
+        "--self-test", "SELFTEST GREEN", "--fail-on-gap", "DT-01", "DT-20",
+        "不联网", "不代填", "不证明", "0 命中也不证明没有缺陷",
     ],
     "scripts/upgrade.py": [
         "--self-test", "SELFTEST", "--check", "check_structure",
